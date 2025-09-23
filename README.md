@@ -8,7 +8,7 @@ Setup Instructions
 1. Clone the repository
     naviagte to folder you want the repository (projetct) to be in
     git clone https://github.com/LLJM10/Webapp.git
-
+source venv/Scripts/activate
 2. Create virtual environment
     Open Git Bash Terminal
     navigate to Webapp Folder
