@@ -8,6 +8,7 @@ Setup Instructions
 1. Clone the repository
     naviagte to folder you want the repository (projetct) to be in
     git clone https://github.com/LLJM10/Webapp.git
+    git clone https://github.com/LLJM10/Webapp.git -b branch-name
 
 2. Create virtual environment
     Open Git Bash Terminal
