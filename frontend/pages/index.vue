@@ -6,17 +6,18 @@
       <h1 class="title">Login</h1>
       <p class="subtitle">Bitte melde dich an, um fortzufahren.</p>
 
+      <!-- Fehlermeldung, die nur angezeigt wird, wenn 'errorMessage' einen Wert hat -->
+      <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+
       <!-- Eingabefeld für den Benutzernamen -->
       <div class="input-group">
         <label for="username">Benutzername</label>
-        <!-- v-model verknüpft dieses Feld mit der 'username'-Variable im Script -->
         <input id="username" v-model="username" type="text" placeholder="Dein Benutzername" />
       </div>
 
       <!-- Eingabefeld für das Passwort -->
       <div class="input-group">
         <label for="password">Passwort</label>
-        <!-- v-model verknüpft dieses Feld mit der 'password'-Variable im Script -->
         <input id="password" v-model="password" type="password" placeholder="Dein Passwort" />
       </div>
 
@@ -27,26 +28,63 @@
 </template>
 
 <script setup lang="ts">
-// Importiert 'ref', um reaktive Variablen zu erstellen
 import { ref } from 'vue';
 
-// Definiert die Variablen, die an die Eingabefelder gebunden sind.
-// 'ref' sorgt dafür, dass die Seite auf Änderungen reagiert.
 const username = ref('');
 const password = ref('');
+const errorMessage = ref('');
 
-// Diese Funktion wird ausgeführt, wenn der Button geklickt wird.
-const handleLogin = () => {
-  // Für den Test geben wir die Daten in der Browser-Konsole aus.
-  console.log('Login versucht mit:', {
-    username: username.value,
-    password: password.value,
-  });
+// Die 'handleLogin' Funktion ist der Kern der Logik.
+// Sie wird 'async', damit wir auf die Antwort des Servers warten können.
+const handleLogin = async () => {
+  errorMessage.value = ''; // Fehlermeldung bei jedem Versuch zurücksetzen
 
-  // NÄCHSTER SCHRITT:
-  // Hier würdest du den Code einfügen, um diese Daten an dein Django-Backend
-  // zu senden, z.B. mit der 'fetch'-API.
-  alert(`Login-Versuch mit Benutzer: ${username.value}`);
+  try {
+    // SCHRITT 1: DATEN SENDEN
+    // Wir senden die eingegebenen Daten per 'fetch' an den API-Endpunkt, den 'simple-jwt' bereitstellt.
+    // Dieser Endpunkt ist speziell dafür gemacht, Benutzerdaten zu überprüfen.
+    const response = await fetch('http://127.0.0.1:8000/api/token/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value,
+      }),
+    });
+
+    // SCHRITT 2: ANTWORT AUSWERTEN
+    // Das Django-Backend hat die Daten erhalten und mit der Datenbank abgeglichen.
+    // Jetzt schickt es eine Antwort. Wir prüfen, ob diese Antwort erfolgreich war.
+    if (!response.ok) {
+      // Wenn die Antwort nicht 'ok' ist (z.B. Status 401 Unauthorized), bedeutet das,
+      // der Benutzer wurde nicht in der Datenbank gefunden oder das Passwort war falsch.
+      // Wir werfen einen Fehler, der im 'catch'-Block unten behandelt wird.
+      throw new Error('Benutzername oder Passwort ist falsch.');
+    }
+
+    // SCHRITT 3: ERFOLG VERARBEITEN
+    // Wenn der Code hier ankommt, war der Login erfolgreich!
+    // Das Backend hat Tokens zurückgeschickt, die den Benutzer identifizieren.
+    const data = await response.json();
+    console.log('Login erfolgreich, Token erhalten:', data);
+
+    // Hier würdest du den Benutzer z.B. auf eine andere Seite weiterleiten
+    // und die erhaltenen Tokens speichern, um eingeloggt zu bleiben.
+    alert('Login erfolgreich!');
+    // Beispiel für eine Weiterleitung:
+    // const router = useRouter();
+    // router.push('/todos');
+
+
+  } catch (error: any) {
+    // SCHRITT 4: FEHLER BEHANDELN
+    // Falls irgendwo im Prozess ein Fehler auftritt (falsche Daten, Server nicht erreichbar),
+    // wird er hier gefangen und dem Benutzer eine klare Fehlermeldung angezeigt.
+    console.error('Login-Fehler:', error);
+    errorMessage.value = error.message || 'Ein unbekannter Fehler ist aufgetreten.';
+  }
 };
 </script>
 
@@ -82,6 +120,15 @@ const handleLogin = () => {
   margin-bottom: 2rem;
 }
 
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 0.75rem;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
 .input-group {
   text-align: left;
   margin-bottom: 1.5rem;
@@ -98,7 +145,7 @@ const handleLogin = () => {
   padding: 0.75rem;
   border: 1px solid #ccc;
   border-radius: 4px;
-  box-sizing: border-box; /* Stellt sicher, dass Padding die Breite nicht beeinflusst */
+  box-sizing: border-box;
 }
 
 .login-button {
@@ -118,3 +165,4 @@ const handleLogin = () => {
   background-color: #0056b3;
 }
 </style>
+
