@@ -1,60 +1,31 @@
-# Webapp
-Entire Code for the webapp
+Setup Instructions
 
-🚀 Setup Instructions
+1. Installations
+    Install git
+    Install Node.js
+
+
 1. Clone the repository
-git clone https://github.com/yourusername/yourrepo.git
-cd yourrepo
+    naviagte to folder you want the repository (projetct) to be in
+    git clone https://github.com/LLJM10/Webapp.git
 
-2. Backend Setup (Django)
+2. Create virtual environment
+    Open Git Bash Terminal
+    navigate to Webapp Folder
+    source venv/bin/activate
 
-Create & activate virtual environment
+3. Start Backend Server
+    cd backend
+    (pip install python)
+    python manage.py runserver
+    
+    ✅ Now backend runs at: http://127.0.0.1:8000
 
-Windows (PowerShell):
+4. Start frontend
+    Open new terminal
+    cd frontend
+    (pip install npm)
+    npm run dev
 
-py -m venv venv
-.\venv\Scripts\activate
-
-
-Git Bash / WSL:
-
-python3 -m venv venv
-source venv/bin/activate
-
-
-Install dependencies
-
-pip install -r requirements.txt
-
-
-Run database migrations
-
-cd backend
-py manage.py migrate
-
-
-Start backend server
-
-py manage.py runserver
-
-
-✅ Now backend runs at: http://127.0.0.1:8000
-
-3. Frontend Setup (Nuxt)
-
-Navigate to frontend folder
-
-cd frontend
-
-
-Install dependencies
-
-npm install
-
-
-Start development server
-
-npm run dev
-
-
-✅ Now frontend runs at: http://localhost:3000
+    
+    ✅ Now frontend runs at: http://localhost:3000
