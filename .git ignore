@@ -1,6 +1,0 @@
-# Python Bytecode und Caches
-__pycache__/
-*.pyc
- 
-# Virtuelle Umgebungen
-venv/
