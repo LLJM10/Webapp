@@ -13,11 +13,11 @@ Setup Instructions
 2. Create virtual environment
     Open Git Bash Terminal
     navigate to Webapp Folder
-    source venv/bin/activate
+    source venv/bin/activate #WINDOWS: source .venv/Scripts/activate
 
 3. Start Backend Server
     cd backend
-    (pip install python)
+    (pip install python) #pip install django djangorestframework django-cors-headers djangorestframework-simplejwt
     python manage.py runserver
     
     ✅ Now backend runs at: http://127.0.0.1:8000

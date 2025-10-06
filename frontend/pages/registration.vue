@@ -3,31 +3,39 @@
     <div class="card">
       <div class="brand">
         <div class="logo">iv</div>
-        <h1 class="title">Login bei investify</h1>
+        <h1 class="title">Konto erstellen</h1>
       </div>
-      <p class="subtitle">Bitte melde dich an, um fortzufahren.</p>
+      <p class="subtitle">Werde Teil von investify.</p>
 
+      <div v-if="successMessage" class="success-message">
+        {{ successMessage }}
+      </div>
       <div v-if="errorMessage" class="error-message">
         {{ errorMessage }}
       </div>
 
-      <form @submit.prevent="handleLogin">
+      <form @submit.prevent="handleRegister">
         <div class="input-group">
-          <label for="username">Benutzername</label>
-          <input id="username" v-model="username" type="text" placeholder="Dein Benutzername" />
+          <label for="reg-username">Benutzername</label>
+          <input id="reg-username" v-model="username" type="text" placeholder="Wähle einen Benutzernamen" />
         </div>
 
         <div class="input-group">
-          <label for="password">Passwort</label>
-          <input id="password" v-model="password" type="password" placeholder="Dein Passwort" />
+          <label for="reg-password">Passwort</label>
+          <input id="reg-password" v-model="password" type="password" placeholder="Dein sicheres Passwort" />
         </div>
 
-        <button type="submit" class="btn primary">Anmelden</button>
+        <div class="input-group">
+          <label for="reg-password2">Passwort bestätigen</label>
+          <input id="reg-password2" v-model="password2" type="password" placeholder="Passwort wiederholen" />
+        </div>
+
+        <button type="submit" class="btn primary">Konto erstellen</button>
       </form>
       
       <p class="link-text">
-        Noch kein Konto? 
-        <NuxtLink to="/registration">Jetzt registrieren</NuxtLink>
+        Schon ein Konto? 
+        <NuxtLink to="/">Hier anmelden</NuxtLink>
       </p>
     </div>
   </div>
@@ -38,26 +46,30 @@ import { ref } from 'vue';
 
 const username = ref('');
 const password = ref('');
+const password2 = ref('');
 const errorMessage = ref('');
+const successMessage = ref('');
 
-const handleLogin = async () => {
+const handleRegister = async () => {
   errorMessage.value = '';
+  successMessage.value = '';
+  if (password.value !== password2.value) {
+    errorMessage.value = 'Die Passwörter stimmen nicht überein.';
+    return;
+  }
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/token/', {
+    const response = await fetch('http://127.0.0.1:8000/api/register/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: username.value,
-        password: password.value,
-      }),
+      body: JSON.stringify({ username: username.value, password: password.value }),
     });
-    if (!response.ok) throw new Error('Benutzername oder Passwort ist falsch.');
     const data = await response.json();
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('access_token', data.access);
-      localStorage.setItem('refresh_token', data.refresh);
+    if (!response.ok) {
+      const errorText = Object.values(data).join(' ');
+      throw new Error(errorText || 'Registrierung fehlgeschlagen.');
     }
-    await navigateTo('/dashboard'); // Redirect to a protected page
+    successMessage.value = 'Erfolgreich! Du wirst zum Login weitergeleitet...';
+    setTimeout(() => navigateTo('/'), 2500); // Angepasst auf die Startseite
   } catch (error: any) {
     errorMessage.value = error.message || 'Ein unbekannter Fehler ist aufgetreten.';
   }
@@ -197,6 +209,16 @@ body {
   color: #f87171;
   padding: 0.75rem;
   border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.success-message {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
+  padding: 0.75rem;
+  border: 1px solid rgba(34, 197, 94, 0.2);
   border-radius: 10px;
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
