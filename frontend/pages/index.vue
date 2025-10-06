@@ -1,205 +1,61 @@
 <template>
-  <div class="auth-container">
-    <div class="card">
-      <div class="brand">
-        <div class="logo">iv</div>
-        <h1 class="title">Login bei investify</h1>
-      </div>
-      <p class="subtitle">Bitte melde dich an, um fortzufahren.</p>
-
-      <div v-if="errorMessage" class="error-message">
-        {{ errorMessage }}
-      </div>
-
-      <form @submit.prevent="handleLogin">
-        <div class="input-group">
-          <label for="username">Benutzername</label>
-          <input id="username" v-model="username" type="text" placeholder="Dein Benutzername" />
-        </div>
-
-        <div class="input-group">
-          <label for="password">Passwort</label>
-          <input id="password" v-model="password" type="password" placeholder="Dein Passwort" />
-        </div>
-
-        <button type="submit" class="btn primary">Anmelden</button>
-      </form>
-      
-      <p class="link-text">
-        Noch kein Konto? 
-        <NuxtLink to="/registration">Jetzt registrieren</NuxtLink>
-      </p>
-    </div>
-  </div>
+<section id="page-landing">
+<div class="hero">
+<div>
+<h1 class="large">Investiere in die Innovation von morgen — mit <span style="color:var(--accent)">investify</span>.</h1>
+<p class="lead">Eine sichere B2B-Plattform, die Gründer & verifizierte Investoren zusammenbringt. Pitch hochladen, Investoren finden, Co-Investments organisieren und Wachstum skalieren — alles an einem Ort.</p>
+<div class="cta-row">
+<NuxtLink to="/profile" class="btn primary">Jetzt Demo-Profil ansehen</NuxtLink>
+<NuxtLink to="/market" class="btn ghost">Marktplatz vorschau</NuxtLink>
+</div>
+<div class="grid-3">
+<FeatureCard title="Pitching & Dokumente" desc="Strukturierte Pitch-Profile mit Video, Cap Table und KPIs für bessere Entscheidungen." />
+<FeatureCard title="Verifiziertes Netzwerk" desc="KYC & OpenVerify Workflows, Co-Investor Matching und Due Diligence Tools." />
+<FeatureCard title="Intelligente Matches" desc="AI-gestützte Empfehlungen für Deals, basierend auf Präferenzen & Track Record." />
+</div>
+<div style="margin-top:20px;display:flex;gap:12px;align-items:center">
+<div class="badge">Demo & Mock Data</div>
+<div class="muted">Seiten vollständig im Look gefüllt — klick dich durch.</div>
+</div>
+</div>
+<aside>
+<div class="hero-card">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div>
+<div class="muted">Top-Pitch</div>
+<strong>SmartHome Energy</strong>
+</div>
+<div class="tag">AI · Energy</div>
+</div>
+<img src="https://picsum.photos/seed/hero/900/520" alt="mockup" style="margin-top:12px;border-radius:8px" />
+<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+<div class="muted">Funding Ziel: 400k €</div>
+<div class="muted">Anteile: 8%</div>
+</div>
+</div>
+<div style="margin-top:12px" class="card">
+<strong>Unsere Versprechen</strong>
+<div class="muted" style="margin-top:8px">Kuratiert, transparent und datengetrieben — vorbereitet für echte Investitionsprozesse.</div>
+</div>
+</aside>
+</div>
+<div style="margin-top:28px">
+<h2>Marktplatz — Vorschau</h2>
+<p class="muted">Eine Auswahl interessanter Pitches. Voller Zugriff im Marktplatz.</p>
+<div class="list">
+<PitchCard v-for="s in previewStartups" :key="s.id" :pitch="s" />
+</div>
+</div>
+</section>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue';
-
-const username = ref('');
-const password = ref('');
-const errorMessage = ref('');
-
-const handleLogin = async () => {
-  errorMessage.value = '';
-  try {
-    const response = await fetch('http://127.0.0.1:8000/api/token/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: username.value,
-        password: password.value,
-      }),
-    });
-    if (!response.ok) throw new Error('Benutzername oder Passwort ist falsch.');
-    const data = await response.json();
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('access_token', data.access);
-      localStorage.setItem('refresh_token', data.refresh);
-    }
-    await navigateTo('/dashboard'); // Redirect to a protected page
-  } catch (error: any) {
-    errorMessage.value = error.message || 'Ein unbekannter Fehler ist aufgetreten.';
-  }
-};
+<script setup>
+// Demo-Daten (Im echten Nuxt würden diese aus einem Store/API geladen)
+const startups = [
+ { id:'s1', title:'SmartHome Energy', sector:'Energy', stage:'Seed', desc:'Dezentrale Energieoptimierung für Privathaushalte mittels Edge-AI und Lastverschiebung.', img:'https://picsum.photos/seed/s1/900/480', kpis:{revenue:'420k€ TTM', growth:'+72% YoY', customers:'1.2k'}, traction:'Pilot in 3 Städten', market:'DACH', goal:'400k€', equity:'8%'},
+ { id:'s2', title:'GreenCharge', sector:'AI', stage:'Series A', desc:'Batterie-Management für EV-Flotten mit optimierter Ladeplanung und Flotten-Analytics.', img:'https://picsum.photos/seed/s2/900/480', kpis:{revenue:'1.1M€ TTM', growth:'+120% YoY', customers:'35 fleets'}, traction:'Verträge mit 2 großen Flottenbetreibern', market:'EU', goal:'2.5M€', equity:'12%'},
+ { id:'s3', title:'Medico', sector:'Health', stage:'Seed', desc:'Telehealth für chronisch Kranke mit KI-Triage & Adhärenz-Programmen.', img:'https://picsum.photos/seed/s3/900/480', kpis:{revenue:'320k€ TTM', growth:'+48% YoY', customers:'4k'}, traction:'Pilot mit Klinikgruppe; 85% Retention', market:'EU', goal:'500k€', equity:'6%'},
+ { id:'s4', title:'OrbitSense', sector:'SpaceTech', stage:'Pre-Seed', desc:'Low-cost Sensor-Satellites zur Erfassung von Luftqualität & Emissionen.', img:'https://picsum.photos/seed/s4/900/480', kpis:{revenue:'—', growth:'—', customers:'2 research projects'}, traction:'1 Test-Sat in LEO erfolgreich', market:'Global', goal:'800k€', equity:'15%'}
+];
+// Zeige die ersten 3 Startups für die Vorschau
+const previewStartups = startups.slice(0, 3);
 </script>
-
-<style>
-:root {
-  --bg: #061022;
-  --card: #0b1320;
-  --muted: #9fb0c8;
-  --accent: #5eead4;
-  --accent-2: #60a5fa;
-  --radius: 12px;
-}
-
-body {
-  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  background: linear-gradient(180deg, #020a14, #071126 65%);
-  color: #eaf6fb;
-  margin: 0;
-}
-
-.auth-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 1rem;
-}
-
-.card {
-  background: var(--card);
-  padding: 2.5rem;
-  border-radius: var(--radius);
-  border: 1px solid rgba(255, 255, 255, 0.02);
-  width: 100%;
-  max-width: 420px;
-  text-align: center;
-}
-
-.brand {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
-}
-
-.logo {
-  width: 46px;
-  height: 46px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 1.2rem;
-  color: #021;
-}
-
-.title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin: 0;
-}
-
-.subtitle {
-  color: var(--muted);
-  margin-bottom: 1.5rem;
-}
-
-.input-group {
-  text-align: left;
-  margin-bottom: 1.25rem;
-}
-
-.input-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-
-.input-group input {
-  width: 100%;
-  padding: 0.8rem 1rem;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  color: #fff;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
-
-.input-group input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.btn {
-  width: 100%;
-  padding: 0.8rem 1rem;
-  border-radius: var(--radius);
-  border: 0;
-  font-weight: 800;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: transform 0.14s ease;
-}
-
-.btn:hover {
-  transform: translateY(-3px);
-}
-
-.btn.primary {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  color: #042;
-}
-
-.link-text {
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-
-.link-text a {
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 700;
-}
-
-.error-message {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #f87171;
-  padding: 0.75rem;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 10px;
-  margin-bottom: 1.5rem;
-  font-size: 0.9rem;
-}
-</style>
-
