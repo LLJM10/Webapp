@@ -21,7 +21,6 @@
 </header>
 </template>
 <script setup>
-
-// Kein spezielles Script hier, da die Logik in RoleToggle ist
+import RoleToggle from './RoleToggle.vue'; 
 </script>
  

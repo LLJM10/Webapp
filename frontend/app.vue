@@ -1,6 +1,11 @@
 <template>
   <div>
-    <NuxtRouteAnnouncer />
-    <NuxtPage />   <!-- hier werden deine pages/ gerendert -->
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </div>
 </template>
+
+<script setup>
+
+</script>
