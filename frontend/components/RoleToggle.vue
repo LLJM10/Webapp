@@ -16,11 +16,16 @@
 </div>
 </template>
 <script setup>
-// Globaler State für die Rolle (wird bei Nuxt 3 in einem composable oder Store ausgelagert)
-// Für dieses Mockup simulieren wir den State wie folgt:
-const currentRole = useState('currentRole', () => 'startup') // 'startup' oder 'investor'
+// Sicherstellen, dass useRole aus dem Composables-File geladen wird
+import { useRole } from '~/composables/useDemoData'; 
+
+const currentRole = useRole(); // Holen des globalen States über das Composable
+
+/**
+ * Aktualisiert den globalen Zustand der Rolle.
+ */
 function setRole(role) {
- currentRole.value = role
- // Hinweis: In einem echten Nuxt-Projekt würden wir hier einen Store-Action auslösen
+  currentRole.value = role
+  console.log('Rolle gewechselt zu:', role);
 }
 </script>
