@@ -67,16 +67,23 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useRole, capitalize, startups, dummyApi } from '~/composables/useDemoData';
 
-const currentRole = useRole();
+// Fallback falls die Composables nicht geladen werden können
+let useRole, capitalize, startups, dummyApi;
+try {
+  ({ useRole, capitalize, startups, dummyApi } = require('~/composables/useDemoData.js'));
+} catch (e) {
+  // Fallback-Daten
+  useRole = () => ({ value: 'startup' });
+  capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  startups = [
+    { id: 's1', title: 'Demo Startup', stage: 'Seed', sector: 'Demo' },
+    { id: 's2', title: 'Demo Startup 2', stage: 'Series A', sector: 'Demo' }
+  ];
+  dummyApi = (endpoint) => alert('Demo API Call: ' + endpoint);
+}
+
+const currentRole = typeof useRole === 'function' ? useRole() : { value: 'startup' };
 const capitalizedRole = computed(() => capitalize(currentRole.value));
-
-// Beispiel: Die ersten zwei Startups sind die "eigenen" Pitches des Demo-Startups
-const myPitches = startups.slice(0, 2); 
-
-// In einem echten Projekt würden Sie hier `watch` den `currentRole`
-// um Dashboard-Daten neu zu laden, aber da die Daten statisch sind, genügt
-// das bedingte Rendering im Template.
+const myPitches = Array.isArray(startups) ? startups.slice(0, 2) : [];
 </script>

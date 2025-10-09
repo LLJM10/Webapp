@@ -19,6 +19,11 @@
           <label for="reg-username">Benutzername</label>
           <input id="reg-username" v-model="username" type="text" placeholder="Wähle einen Benutzernamen" />
         </div>
+        
+        <div class="input-group">
+          <label for="reg-email">Mail</label>
+          <input id="reg-email" v-model="email" type="email" placeholder="Deine E-Mail-Adresse" />
+        </div>
 
         <div class="input-group">
           <label for="reg-password">Passwort</label>
@@ -45,6 +50,7 @@
 import { ref } from 'vue';
 
 const username = ref('');
+const email = ref('');
 const password = ref('');
 const password2 = ref('');
 const errorMessage = ref('');
@@ -58,10 +64,10 @@ const handleRegister = async () => {
     return;
   }
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/register/', {
+    const response = await fetch('http://127.0.0.1:8000/users/users/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: username.value, password: password.value }),
+      body: JSON.stringify({ username: username.value, email: email.value, password: password.value }),
     });
     const data = await response.json();
     if (!response.ok) {
