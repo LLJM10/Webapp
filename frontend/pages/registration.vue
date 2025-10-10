@@ -15,14 +15,37 @@
       </div>
 
       <form @submit.prevent="handleRegister">
+
         <div class="input-group">
           <label for="reg-username">Benutzername</label>
           <input id="reg-username" v-model="username" type="text" placeholder="Wähle einen Benutzernamen" />
         </div>
-        
+
         <div class="input-group">
           <label for="reg-email">Mail</label>
           <input id="reg-email" v-model="email" type="email" placeholder="Deine E-Mail-Adresse" />
+        </div>
+
+        <div class="input-group">
+          <label for="reg-role">Rolle</label>
+          <div style="display:flex;gap:12px;">
+            <button
+              type="button"
+              :class="['btn', role === 'startup' ? 'primary' : 'ghost']"
+              @click="role = 'startup'"
+              style="flex:1"
+            >
+              StartUp
+            </button>
+            <button
+              type="button"
+              :class="['btn', role === 'investor' ? 'primary' : 'ghost']"
+              @click="role = 'investor'"
+              style="flex:1"
+            >
+              Investor
+            </button>
+          </div>
         </div>
 
         <div class="input-group">
@@ -51,6 +74,7 @@ import { ref } from 'vue';
 
 const username = ref('');
 const email = ref('');
+const role = ref('startup');
 const password = ref('');
 const password2 = ref('');
 const errorMessage = ref('');
@@ -67,7 +91,7 @@ const handleRegister = async () => {
     const response = await fetch('http://127.0.0.1:8000/users/users/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: username.value, email: email.value, password: password.value }),
+      body: JSON.stringify({ username: username.value, email: email.value, password: password.value, role: role.value }),
     });
     const data = await response.json();
     if (!response.ok) {

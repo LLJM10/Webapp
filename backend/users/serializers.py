@@ -20,7 +20,15 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    role = serializers.CharField(required=True)
 
     class Meta:
         model = UserProfile
-        fields = ["id", "user", "bio", "created_at"]
+        fields = ["id", "user", "role", "bio", "created_at"]
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        role = validated_data.pop('role', 'startup')
+        user = User.objects.create_user(**user_data)
+        profile = UserProfile.objects.create(user=user, role=role, **validated_data)
+        return profile
