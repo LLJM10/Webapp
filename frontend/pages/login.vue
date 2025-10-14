@@ -56,6 +56,18 @@ const handleLogin = async () => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('access_token', data.access);
       localStorage.setItem('refresh_token', data.refresh);
+      // Nutzerinformationen nach Login abfragen und speichern
+      try {
+        const profileRes = await fetch('http://127.0.0.1:8000/users/profiles/', {
+          headers: { 'Authorization': `Bearer ${data.access}` }
+        });
+        const profileData = await profileRes.json();
+        if (Array.isArray(profileData) && profileData.length > 0) {
+          localStorage.setItem('user_username', profileData[0].user.username);
+          localStorage.setItem('user_email', profileData[0].user.email);
+          localStorage.setItem('user_role', profileData[0].role);
+        }
+      } catch (e) {}
     }
     await navigateTo('/dashboard'); // Redirect to a protected page
   } catch (error: any) {

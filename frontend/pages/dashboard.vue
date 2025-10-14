@@ -4,6 +4,12 @@
       <h2>Dashboard</h2>
       <div class="muted">Rolle: <strong>{{ capitalizedRole }}</strong></div>
     </div>
+    <div class="card" style="max-width:420px;margin:24px auto 0 auto;">
+      <h3>Nutzerinfo</h3>
+      <div class="input-group"><label>Benutzername</label><div class="muted">{{ user.username }}</div></div>
+      <div class="input-group"><label>E-Mail</label><div class="muted">{{ user.email }}</div></div>
+      <div class="input-group"><label>Rolle</label><div class="muted">{{ user.role }}</div></div>
+    </div>
 
     <div style="margin-top:12px;display:grid;grid-template-columns:1fr 360px;gap:12px">
       <div>
@@ -67,21 +73,15 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
+const user = ref({ username: '', email: '', role: '' });
+onMounted(() => {
+  user.value.username = localStorage.getItem('user_username') || '';
+  user.value.email = localStorage.getItem('user_email') || '';
+  user.value.role = localStorage.getItem('user_role') || '';
+});
 
-// Fallback falls die Composables nicht geladen werden können
-let useRole, capitalize, startups, dummyApi;
-try {
-  ({ useRole, capitalize, startups, dummyApi } = require('~/composables/useDemoData.js'));
-} catch (e) {
-  // Fallback-Daten
-  useRole = () => ({ value: 'startup' });
-  capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-  startups = [
-    { id: 's1', title: 'Demo Startup', stage: 'Seed', sector: 'Demo' },
-    { id: 's2', title: 'Demo Startup 2', stage: 'Series A', sector: 'Demo' }
-  ];
-  dummyApi = (endpoint) => alert('Demo API Call: ' + endpoint);
-}
+
 
 const currentRole = typeof useRole === 'function' ? useRole() : { value: 'startup' };
 const capitalizedRole = computed(() => capitalize(currentRole.value));

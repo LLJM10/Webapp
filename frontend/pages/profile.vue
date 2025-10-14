@@ -1,6 +1,12 @@
 <template>
   <section id="page-profile">
     <h2>Profil</h2>
+    <div class="card" style="max-width:420px;margin:24px auto 0 auto;">
+      <h3>Nutzerinfo</h3>
+      <div class="input-group"><label>Benutzername</label><div class="muted">{{ user.username }}</div></div>
+      <div class="input-group"><label>E-Mail</label><div class="muted">{{ user.email }}</div></div>
+      <div class="input-group"><label>Rolle</label><div class="muted">{{ user.role }}</div></div>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 320px;gap:12px;margin-top:12px">
       <div>
         <div class="card">
@@ -38,6 +44,21 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
+const user = ref({ username: '', email: '', role: '' });
+onMounted(async () => {
+  const token = localStorage.getItem('access_token');
+  if (!token) return;
+  try {
+    const response = await fetch('http://127.0.0.1:8000/users/me/', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    user.value.username = data.username;
+    user.value.email = data.email;
+    user.value.role = data.profile?.role || '';
+  } catch (e) {}
+});
 import { computed } from 'vue';
 import { useRole, capitalize } from '~/composables/useDemoData';
 

@@ -6,6 +6,9 @@ router = DefaultRouter()
 router.register(r"users", UserViewSet)
 router.register(r"profiles", UserProfileViewSet)
 
+from .views import UserViewSet
+
 urlpatterns = [
-    path("", include(router.urls)),
+    path('', include(router.urls)),
+    path('me/', UserViewSet.as_view({'get': 'me'})),
 ]
