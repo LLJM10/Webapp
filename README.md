@@ -13,7 +13,7 @@ Setup Instructions
 2. Create virtual environment
     Open Git Bash Terminal
     navigate to Webapp Folder
-    source venv/bin/activate #WINDOWS: source .venv/Scripts/activate
+    source venv/bin/activate #WINDOWS: source venv/Scripts/activate
 
 3. Start Backend Server
     cd backend

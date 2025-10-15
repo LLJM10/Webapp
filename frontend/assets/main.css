@@ -221,3 +221,121 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
     font-size: 2.5rem; /* Max-Größe festlegen */
   }
 }
+
+/* Hauptlayout für den Feed und die Sidebar */
+.feed-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Linke Spalte ist doppelt so breit */
+  gap: 24px;
+  align-items: start; /* Verhindert, dass die Sidebar nach unten gestreckt wird */
+}
+
+/* Linke Spalte: Feed mit Beiträgen */
+.posts-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.post {
+  padding: 16px; /* Spezifisches Padding für Posts */
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.post-content {
+  margin: 16px 0;
+  line-height: 1.6;
+}
+
+.post-image {
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.post-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 24px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.post-actions a {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.post-actions a:hover {
+  color: var(--accent);
+}
+
+/* Rechte Spalte: Sidebar */
+.sidebar-profile {
+  display: flex;
+  align-items: flex-start; /* Richtet Bild und Info-Block oben aus */
+  gap: 16px;
+  padding: 16px; /* Gibt der Karte inneren Abstand */
+}
+
+.avatar-rounded {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px; /* Abgerundete Ecken statt Kreis */
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column; /* Ordnet die Elemente (Info, Tags, Button) untereinander an */
+  flex-grow: 1;          /* Nimmt den restlichen Platz ein */
+}
+
+.post-actions {
+  margin-top: 16px;
+  display: flex;
+  align-items: center; /* Stellt sicher, dass Icons und Text auf einer Linie sind */
+  gap: 24px;         /* Abstand ZWISCHEN den einzelnen Aktionen */
+  font-size: 14px;
+}
+
+/* Style für jedes einzelne Icon-Text-Paar (z.B. "👍 Gefällt mir") */
+.action-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;            /* Kleiner Abstand ZWISCHEN Icon und Text */
+  color: var(--muted);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+/* Hover-Effekt, damit die Leiste interaktiv wirkt */
+.action-item:hover {
+  color: var(--accent); /* Nutzt die Akzentfarbe aus deinem Design */
+}
+
+.button-wrapper {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end; /* Richtet den Button am rechten Rand aus */
+}
+
+/* Responsive Anpassung: Auf kleineren Bildschirmen alles untereinander */
+@media (max-width: 960px) {
+  .feed-container {
+    grid-template-columns: 1fr;
+  }
+}
