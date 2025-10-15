@@ -17,6 +17,11 @@
 <NuxtLink to="/profile">Profil</NuxtLink>
 </nav>
 <RoleToggle />
+
+<NuxtLink to="/login" class="btn ghost" style="margin-left:8px">
+    Login
+</NuxtLink>
+
 </div>
 </header>
 </template>
