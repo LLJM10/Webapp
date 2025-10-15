@@ -1,75 +1,50 @@
 <template>
-  <section id="page-market">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-      <div>
-        <h2>Marktplatz</h2>
-        <div class="muted">Vollständige Listings mit KPIs & Aktionen (Demo-Daten).</div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input 
-          v-model="searchTerm" 
-          placeholder="Suchen nach Name, Branche..." 
-          style="padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.02);color:#fff" 
-          @keyup.enter="filterList"
-        />
-        <button class="btn ghost" @click="filterList">Suchen</button>
-      </div>
-    </div>
+  <div class="test-container">
+    <h1>{{ headingText }}</h1>
 
-    <div style="margin-top:14px">
-      <div class="list">
-        <div v-for="s in filteredStartups" :key="s.id" class="pitch">
-          <div class="meta">
-            <div>
-              <strong>{{ s.title }}</strong>
-              <div class="muted">{{ s.sector }} · {{ s.stage }}</div>
-            </div>
-            <div style="text-align:right">
-              <div class="tag">{{ s.equity }} · {{ s.goal }}</div>
-            </div>
-          </div>
-          <img :src="s.img" :alt="s.title">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
-            <div class="muted" style="flex:1">{{ s.desc }}</div>
-            <div style="flex-basis:220px;text-align:right">
-              <div class="muted">Valuation: {{ s.kpis?.valuation || '—' }}</div>
-            </div>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end">
-            <NuxtLink :to="`/detail/${s.id}`" class="btn ghost">Details</NuxtLink>
-            <button class="btn primary" @click="dummyApi('/api/action?startup=' + s.id + '&role=' + currentRole)">
-              {{ actionLabel }}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    <button class="btn primary" @click="runTestScript">Test erneut ausführen</button>
+  </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { startups, useRole, dummyApi } from '~/composables/useDemoData';
+import { ref, onMounted } from 'vue';
 
-const currentRole = useRole();
-const searchTerm = ref('');
+// 1. Eine reaktive Variable für den Text der Überschrift erstellen.
+const headingText = ref('Warte auf das Skript...');
 
-const filteredStartups = computed(() => {
-  const term = searchTerm.value.toLowerCase();
-  return startups.filter(s => 
-    (s.title + s.desc + s.sector + s.stage).toLowerCase().includes(term)
-  );
-});
+// 2. Die Test-Logik in eine Funktion packen.
+function runTestScript() {
+  // Zeigt eine Pop-up-Nachricht an.
+  alert('✅ Vue-Testskript wurde erfolgreich ausgeführt!');
 
-const actionLabel = computed(() => {
-  return currentRole.value === 'investor' ? 'Investieren' : 'Pitch bearbeiten';
-});
+  // Ändert den Wert der reaktiven Variable. Vue aktualisiert das HTML automatisch.
+  headingText.value = 'Skript wurde ausgeführt!';
 
-function filterList() {
-  console.log('Suche ausgeführt für:', searchTerm.value);
+  // Gibt eine Nachricht in der Entwicklerkonsole aus (F12 drücken).
+  console.log('Dies ist eine Test-Nachricht für die Konsole aus der Vue-Komponente.');
 }
 
-useHead({
-  title: 'Marktplatz - investify'
+// 3. Den 'onMounted' Hook verwenden, um das Skript automatisch auszuführen,
+//    sobald die Komponente auf der Seite geladen und "eingehängt" ist.
+//    Dies ist das Vue-Äquivalent zu 'DOMContentLoaded' in normalem JavaScript.
+onMounted(() => {
+  runTestScript();
 });
 </script>
+
+<style scoped>
+/* Etwas Styling, damit die Seite gut aussieht */
+.test-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px;
+}
+
+h1 {
+  color: var(--accent-2); /* Nutzt die Farben aus deiner main.css */
+  margin-bottom: 24px;
+}
+</style>

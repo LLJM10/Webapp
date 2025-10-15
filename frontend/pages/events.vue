@@ -1,38 +1,50 @@
 <template>
-  <section id="page-events">
-    <h2>Events & Sessions</h2>
-    <div class="muted">Live-Pitches, Panels und Matchmaking — Demo-Termine.</div>
+  <div class="test-container">
+    <h1>{{ headingText }}</h1>
 
-    <div style="margin-top:14px" class="events-grid">
-      <div v-for="ev in events" :key="ev.id" class="card">
-        <img :src="ev.img" :alt="ev.title" style="width:100%;border-radius:8px;object-fit:cover">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-          <div>
-            <strong>{{ ev.title }}</strong>
-            <div class="muted">{{ ev.date }} · {{ ev.platform }}</div>
-          </div>
-          <div class="muted">Hosts: {{ ev.hosts.join(', ') }}</div>
-        </div>
-        <p class="muted" style="margin-top:8px">{{ ev.desc }}</p>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button class="btn ghost" @click="dummyApi('/api/join?event='+ev.id)">Teilnehmen</button>
-          <button class="btn ghost" @click="dummyApi('/api/info?event='+ev.id)">Details</button>
-        </div>
-      </div>
-    </div>
-  </section>
+    <button class="btn primary" @click="runTestScript">Test erneut ausführen</button>
+  </div>
 </template>
 
 <script setup>
-// Die Daten und Logik werden aus dem zentralen Composable importiert
-import { events, dummyApi } from '~/composables/useDemoData';
+import { ref, onMounted } from 'vue';
 
-// Optionale Logik: Setzen des Seitentitels (SEO)
-useHead({
-  title: 'Events & Sessions - investify'
+// 1. Eine reaktive Variable für den Text der Überschrift erstellen.
+const headingText = ref('Warte auf das Skript...');
+
+// 2. Die Test-Logik in eine Funktion packen.
+function runTestScript() {
+  // Zeigt eine Pop-up-Nachricht an.
+  alert('✅ Vue-Testskript wurde erfolgreich ausgeführt!');
+
+  // Ändert den Wert der reaktiven Variable. Vue aktualisiert das HTML automatisch.
+  headingText.value = 'Skript wurde ausgeführt!';
+
+  // Gibt eine Nachricht in der Entwicklerkonsole aus (F12 drücken).
+  console.log('Dies ist eine Test-Nachricht für die Konsole aus der Vue-Komponente.');
+}
+
+// 3. Den 'onMounted' Hook verwenden, um das Skript automatisch auszuführen,
+//    sobald die Komponente auf der Seite geladen und "eingehängt" ist.
+//    Dies ist das Vue-Äquivalent zu 'DOMContentLoaded' in normalem JavaScript.
+onMounted(() => {
+  runTestScript();
 });
 </script>
 
 <style scoped>
-/* Hier könnten spezifische Stile für diese Seite stehen, wenn nötig */
+/* Etwas Styling, damit die Seite gut aussieht */
+.test-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px;
+}
+
+h1 {
+  color: var(--accent-2); /* Nutzt die Farben aus deiner main.css */
+  margin-bottom: 24px;
+}
 </style>
