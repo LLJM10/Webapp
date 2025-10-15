@@ -1,6 +1,6 @@
 <template>
   <section id="page-network">
-    <div style="display:flex;justify-content:space-between;align-items:center">
+    <div style="display:flex;justify-content:space-between;align-items:center; margin-bottom: 24px;">
       <div>
         <h2>Networking</h2>
         <div class="muted">Finde Co-Investoren, Berater & Partner — Profile rollenbasiert hervorgehoben.</div>
@@ -16,7 +16,7 @@
       </div>
     </div>
 
-    <div style="margin-top:12px" class="profiles">
+    <div class="profile-list">
       <div v-for="p in filteredProfiles" :key="p.id" class="card" :style="{ border: getHighlightStyle(p.type) }">
         <div style="display:flex;gap:12px;align-items:center">
           <img :src="p.img" style="width:64px;height:64px;border-radius:8px;object-fit:cover">
@@ -24,7 +24,7 @@
             <strong>{{ p.name }}</strong>
             <div class="muted">{{ p.role }} · {{ p.type }}</div>
             <div class="muted" style="margin-top:6px">{{ p.bio }}</div>
-            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+            <div class="tags" style="margin-top:12px">
               <div v-for="s in p.skills" :key="s" class="tag">{{ s }}</div>
             </div>
           </div>
@@ -51,7 +51,6 @@ const filteredProfiles = computed(() => {
   );
 });
 
-// Logik für die Rollen-basierte Hervorhebung
 const getHighlightStyle = (profileType) => {
   const highlight = (currentRole.value === 'investor' && profileType === 'Startup') || 
                     (currentRole.value === 'startup' && profileType === 'Investor');

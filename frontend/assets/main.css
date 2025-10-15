@@ -92,6 +92,14 @@ nav a.nuxt-link-exact-active{color:#fff;background:rgba(255,255,255,0.03)}
   color:#021;border:none
 }
 
+.profile-list {
+  display: flex;
+  flex-direction: column; /* Ordnet die Elemente untereinander an */
+  gap: 24px;              /* Fügt den gewünschten großen Abstand hinzu */
+  max-width: 800px;       /* Sorgt für bessere Lesbarkeit auf breiten Bildschirmen */
+  margin: 24px auto 0;  /* Zentriert die Liste horizontal und gibt Abstand nach oben */
+}
+
 
 /* -------------------------------------- */
 /* GRIDS & LAYOUT (Mobile First Stacking) */
