@@ -25,7 +25,7 @@ Setup Instructions
 4. Start frontend
     Open new terminal
     cd frontend
-    (pip install npm)
+    (pip install npm) #npm install
     npm run dev
 
     
