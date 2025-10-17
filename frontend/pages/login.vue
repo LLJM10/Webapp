@@ -78,23 +78,7 @@ const handleLogin = async () => {
 };
 </script>
 
-<style>
-:root {
-  --bg: #061022;
-  --card: #0b1320;
-  --muted: #9fb0c8;
-  --accent: #5eead4;
-  --accent-2: #60a5fa;
-  --radius: 12px;
-}
-
-body {
-  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  background: linear-gradient(180deg, #020a14, #071126 65%);
-  color: #eaf6fb;
-  margin: 0;
-}
-
+<style scoped>
 .auth-container {
   display: flex;
   justify-content: center;
