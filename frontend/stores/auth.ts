@@ -35,6 +35,15 @@ export const useAuthStore = defineStore("auth", {
       this.access = null
       this.refresh = null
       this.user = null
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.removeItem('user_username');
+          localStorage.removeItem('user_email');
+          localStorage.removeItem('user_role');
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+        } catch (e) {}
+      }
     }
   }
 })

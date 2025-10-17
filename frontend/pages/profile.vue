@@ -54,9 +54,10 @@ onMounted(async () => {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await response.json();
-    user.value.username = data.username;
-    user.value.email = data.email;
-    user.value.role = data.profile?.role || '';
+    console.debug('/users/me/ response:', data);
+    user.value.username = data.username || '';
+    user.value.email = data.email || '';
+    user.value.role = data.profile?.role || data.role || '';
   } catch (e) {}
 });
 import { computed } from 'vue';

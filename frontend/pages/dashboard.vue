@@ -73,12 +73,31 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 const user = ref({ username: '', email: '', role: '' });
-onMounted(() => {
-  user.value.username = localStorage.getItem('user_username') || '';
-  user.value.email = localStorage.getItem('user_email') || '';
-  user.value.role = localStorage.getItem('user_role') || '';
+onMounted(async () => {
+  // Versuche, den aktuellen User vom Backend zu holen, wenn ein Token vorhanden ist.
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  if (!token) {
+    console.debug('No access token found; leaving user empty');
+    return;
+  }
+  try {
+    const res = await fetch('http://127.0.0.1:8000/users/me/', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) {
+      console.debug('/users/me/ returned not ok', res.status);
+      return;
+    }
+    const data = await res.json();
+    console.debug('/users/me/ response (dashboard):', data);
+    user.value.username = data.username || '';
+    user.value.email = data.email || '';
+    user.value.role = data.profile?.role || data.role || '';
+  } catch (e) {
+    console.error('Failed fetching /users/me/:', e);
+  }
 });
 
 
