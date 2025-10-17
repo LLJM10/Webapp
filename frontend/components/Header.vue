@@ -1,7 +1,7 @@
 <template>
 <header>
 <div class="brand">
-<div class="logo">iv</div>
+<NuxtLink to="/" class="logo" style="text-decoration:none;color:inherit;display:flex;align-items:center;justify-content:center">iv</NuxtLink>
 <div>
 <div style="font-weight:800">investify</div>
 <div style="font-size:12px;color:var(--muted);margin-top:2px">Marktplatz · Netzwerk · Events</div>
