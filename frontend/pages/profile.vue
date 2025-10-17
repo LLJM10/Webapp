@@ -31,13 +31,14 @@
       </div>
 
       <aside>
-        <div class="card">
-          <strong>Account</strong>
-          <div class="muted" style="margin-top:8px">Rolle: <span>{{ capitalizedRole }}</span></div>
-          <div style="margin-top:10px">
-            <button class="btn ghost" @click="toggleRole">Rolle wechseln</button>
+          <div class="card">
+            <strong>Account</strong>
+            <div class="muted" style="margin-top:8px">Rolle: <span>{{ capitalizedRole }}</span></div>
+            <div style="margin-top:10px;display:flex;gap:8px">
+              <button class="btn ghost" @click="toggleRole">Rolle wechseln</button>
+              <button class="btn" @click="handleLogout">Abmelden</button>
+            </div>
           </div>
-        </div>
       </aside>
     </div>
   </section>
@@ -62,6 +63,21 @@ onMounted(async () => {
 });
 import { computed } from 'vue';
 import { useRole, capitalize } from '~/composables/useDemoData';
+import { useAuthStore } from '~/stores/auth';
+
+const auth = useAuthStore();
+
+function handleLogout() {
+  auth.logout();
+  // Entferne Tokens und leite zur Login-Seite
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+    } catch(e) {}
+  }
+  navigateTo('/login');
+}
 
 const currentRole = useRole();
 const capitalizedRole = computed(() => capitalize(currentRole.value));
