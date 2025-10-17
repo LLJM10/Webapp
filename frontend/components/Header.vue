@@ -16,7 +16,7 @@
 <NuxtLink to="/dashboard">Dashboard</NuxtLink>
 <NuxtLink to="/profile">Profil</NuxtLink>
 </nav>
-<RoleToggle />
+
 
 <NuxtLink to="/login" class="btn ghost" style="margin-left:8px">
     Login
@@ -26,6 +26,6 @@
 </header>
 </template>
 <script setup>
-import RoleToggle from './RoleToggle.vue'; 
+
 </script>
  

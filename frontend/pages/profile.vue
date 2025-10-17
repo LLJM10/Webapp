@@ -35,7 +35,6 @@
             <strong>Account</strong>
             <div class="muted" style="margin-top:8px">Rolle: <span>{{ capitalizedRole }}</span></div>
             <div style="margin-top:10px;display:flex;gap:8px">
-              <button class="btn ghost" @click="toggleRole">Rolle wechseln</button>
               <button class="btn" @click="handleLogout">Abmelden</button>
             </div>
           </div>

@@ -2,7 +2,6 @@
   <section id="page-dashboard">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <h2>Dashboard</h2>
-      <div class="muted">Rolle: <strong>{{ capitalizedRole }}</strong></div>
     </div>
     <div class="card" style="max-width:420px;margin:24px auto 0 auto;">
       <h3>Nutzerinfo</h3>
