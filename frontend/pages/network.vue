@@ -90,16 +90,16 @@ import { ref, computed } from 'vue';
 const alert = (msg) => window.alert(msg);
 
 const profiles = ref([
-  { id: 1, name: 'EcoLogistics', img: '/demo/logo1.webp', role: 'Founder', type: 'Startup', bio: 'Logistikoptimierung für lokale Lieferketten.', skills: ['Logistics', 'SaaS', 'Sustainability'] },
-  { id: 2, name: 'Anna Müller', img: '/demo/p1.webp', role: 'Angel', type: 'Investor', bio: 'Investiert in ClimateTech & Health.', skills: ['ClimateTech', 'Health', 'Seed'] },
-  { id: 3, name: 'M&A Partner', img: '/demo/p2.webp', role: 'Advisor', type: 'Advisor', bio: 'Berät bei M&A & Transaktionen.', skills: ['M&A', 'Legal'] },
-  { id: 4, name: 'FoodoraX', img: '/demo/logo2.webp', role: 'Founder', type: 'Startup', bio: 'D2C Plattform für Food Brands.', skills: ['Marketing', 'D2C'] },
-  { id: 5, name: 'SmartHome Energy', img: '/demo/logo3.webp', role: 'Founder', type: 'Startup', bio: 'Energiemanagement für dein Zuhause.', skills: ['IoT', 'Energy', 'Hardware'] }
+  { id: 1, name: 'EcoLogistics', img: null, role: 'Founder', type: 'Startup', bio: 'Logistikoptimierung für lokale Lieferketten.', skills: ['Logistics', 'SaaS', 'Sustainability'] },
+  { id: 2, name: 'Anna Müller', img: null, role: 'Angel', type: 'Investor', bio: 'Investiert in ClimateTech & Health.', skills: ['ClimateTech', 'Health', 'Seed'] },
+  { id: 3, name: 'M&A Partner', img: null, role: 'Advisor', type: 'Advisor', bio: 'Berät bei M&A & Transaktionen.', skills: ['M&A', 'Legal'] },
+  { id: 4, name: 'FoodoraX', img: null, role: 'Founder', type: 'Startup', bio: 'D2C Plattform für Food Brands.', skills: ['Marketing', 'D2C'] },
+  { id: 5, name: 'SmartHome Energy', img: null, role: 'Founder', type: 'Startup', bio: 'Energiemanagement für dein Zuhause.', skills: ['IoT', 'Energy', 'Hardware'] }
 ]);
 
 const posts = ref([
   { id: 1, author: 'Anna Müller', timestamp: 'vor 2h', content: 'Habe gerade Medico kontaktiert! Ihr Fixed Deal ist sehr interessant.', image: null },
-  { id: 2, author: 'SmartHome Energy', timestamp: 'vor 4h', content: 'Wir suchen einen Head of Sales in der DACH-Region! 🚀 Jetzt bewerben!', image: '/demo/post1.webp' }
+  { id: 2, author: 'SmartHome Energy', timestamp: 'vor 4h', content: 'Wir suchen einen Head of Sales in der DACH-Region! 🚀 Jetzt bewerben!', image: null}
 ]);
 
 const searchQuery = ref('');
