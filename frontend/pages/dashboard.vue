@@ -13,14 +13,14 @@
                 <div class="muted" style="margin-top:8px">Management deiner Pitches & Kontakte</div>
             </div>
             <!-- Button zum Öffnen des Modals -->
-            <button class="btn primary" @click="showCreateModal = true">
+            <button class="btn primary" @click="openCreateModal">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
               Neues Angebot anlegen
             </button>
         </div>
         <div style="margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px">
             <!-- Bestehende Pitches mit der PitchCard Komponente anzeigen -->
-            <PitchCard v-for="pitch in myPitches" :key="pitch.id" :pitch="pitch" />
+            <PitchCard v-for="pitch in myPitches" :key="pitch.id" :pitch="pitch" :id="`pitch-${pitch.id}`" />
             <div v-if="!myPitches.length" class="card muted" style="text-align:center; padding: 24px;">
               Du hast noch keine Angebote erstellt. Klicke auf "Neues Angebot anlegen", um zu starten!
             </div>
@@ -75,7 +75,7 @@
      </div>
 
     <!-- Modales Fenster zum Erstellen eines neuen Pitches -->
-    <div v-if="showCreateModal" class="modal-overlay" @click.self="showCreateModal = false">
+    <div v-if="showCreateModal" id="create-pitch-modal" class="modal-overlay" @click.self="showCreateModal = false">
       <div class="card modal-content">
         <h3>Neues Angebot erstellen</h3>
         <p class="muted">Fülle die Felder aus, um eine neue Pitch Card zu erstellen.</p>
@@ -112,7 +112,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 // Importiere deine PitchCard Komponente
 import PitchCard from '~/components/PitchCard.vue';
 
@@ -157,6 +157,17 @@ onMounted(async () => {
       ];
   }
 });
+
+async function openCreateModal() {
+  showCreateModal.value = true;
+  // Warte, bis das Modal im DOM ist
+  await nextTick();
+  // Scrolle zum Modal
+  const modalElement = document.getElementById('create-pitch-modal');
+  if (modalElement) {
+    modalElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
 
 function handleCreatePitch() {
   // Erstelle eine Kopie der Daten und weise eine eindeutige ID zu (in echt vom Backend)

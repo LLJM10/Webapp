@@ -333,6 +333,44 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
   justify-content: flex-end; /* Richtet den Button am rechten Rand aus */
 }
 
+/* --- NEU: Formular-Styling --- */
+.input-group {
+    margin-bottom: 16px;
+}
+.input-group label {
+    display: block;
+    margin-bottom: 8px; /* Etwas mehr Abstand */
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--muted);
+}
+.input-group input,
+.input-group textarea {
+    width: 100%;
+    background-color: var(--bg); /* Passt zum Hintergrund */
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 10px; /* Abgerundete Ecken wie bei Buttons */
+    padding: 12px 14px;
+    color: #eaf6fb;
+    font-size: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.input-group input:focus,
+.input-group textarea:focus {
+    outline: none;
+    border-color: var(--accent-2); /* Hebt das aktive Feld hervor */
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2); /* Weicher Fokus-Schatten */
+}
+.input-group textarea {
+    resize: vertical; /* Erlaubt nur vertikales Ändern der Größe */
+    min-height: 80px;
+}
+::placeholder {
+    color: var(--muted);
+    opacity: 0.6;
+}
+/* --- ENDE: Formular-Styling --- */
+
 /* Responsive Anpassung: Auf kleineren Bildschirmen alles untereinander */
 @media (max-width: 960px) {
   .feed-container {
