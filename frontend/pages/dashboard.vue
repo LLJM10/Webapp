@@ -63,14 +63,6 @@
             <div class="input-group"><label>E-Mail</label><div class="muted">{{ user.email }}</div></div>
             <div class="input-group"><label>Rolle</label><div class="muted">{{ user.role }}</div></div>
         </div>
-        <div class="card" style="margin-top:12px">
-            <strong>Quick Actions</strong>
-            <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
-                <NuxtLink to="/market" class="btn ghost">Marktplatz</NuxtLink>
-                <NuxtLink to="/events" class="btn ghost">Events</NuxtLink>
-                <NuxtLink to="/network" class="btn ghost">Networking</NuxtLink>
-            </div>
-        </div>
       </aside>
      </div>
 
@@ -89,13 +81,38 @@
             <input id="sector" v-model="newPitch.sector" type="text" placeholder="z.B. Energie, SaaS" required>
           </div>
           <div class="input-group">
-            <label for="stage">Phase</label>
-            <input id="stage" v-model="newPitch.stage" type="text" placeholder="z.B. Seed, Series A" required>
+            <label>Phase</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <button
+                v-for="phase in phases"
+                :key="phase"
+                type="button"
+                class="btn"
+                :class="{ 'primary': newPitch.stage === phase, 'ghost': newPitch.stage !== phase }"
+                @click="newPitch.stage = phase"
+              >
+                {{ phase }}
+              </button>
+            </div>
+            <!-- Verstecktes Input-Feld, um die `required`-Validierung beizubehalten -->
+            <input type="hidden" :value="newPitch.stage" required />
           </div>
-          <div class="input-group">
-            <label for="goal">Finanzierungsziel</label>
-            <input id="goal" v-model="newPitch.goal" type="text" placeholder="z.B. 500.000€" required>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="input-group">
+              <label for="goal">Finanzierungsziel</label>
+              <input id="goal" v-model="newPitch.goal" type="text" placeholder="z.B. 500.000€" required>
+            </div>
+            <div class="input-group">
+              <label for="equity">Anteil in %</label>
+              <input id="equity" v-model.number="newPitch.equity" type="number" min="1" max="100" placeholder="z.B. 10" required>
+            </div>
           </div>
+          <div v-if="calculatedValuation" class="input-group">
+             <label>Geschätzter Firmenwert</label>
+             <div class="card" style="font-size: 1.2rem; font-weight: bold; color: var(--accent); padding: 12px;">{{ calculatedValuation }}</div>
+          </div>
+          
           <div class="input-group">
             <label for="desc">Kurzbeschreibung</label>
             <textarea id="desc" v-model="newPitch.desc" rows="3" placeholder="Beschreibe kurz deine Idee..."></textarea>
@@ -112,9 +129,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, computed } from 'vue';
 // Importiere deine PitchCard Komponente
 import PitchCard from '~/components/PitchCard.vue';
+
+const phases = ref(['Pre-Seed', 'Seed', 'Series A', 'Wachstum', 'Reife']);
 
 const user = ref({ username: 'Startup-User', email: 'demo@startup.com', role: 'startup' }); // Default-Werte für Demo
 const myPitches = ref([]); // Startet mit einer leeren Liste
@@ -125,10 +144,23 @@ const newPitch = ref({
   id: null,
   title: '',
   sector: '',
-  stage: '',
+  stage: '', 
   goal: '',
+  equity: null,
   desc: '',
-  img: 'https://placehold.co/600x400/22c55e/ffffff?text=Neu' // Platzhalter-Bild
+  img: 'https://placehold.co/600x400/22c55e/ffffff?text=Neu'
+});
+
+// NEU: Berechnet den Firmenwert automatisch
+const calculatedValuation = computed(() => {
+  const goal = Number(String(newPitch.value.goal).replace(/[^0-9]/g, ''));
+  const equity = newPitch.value.equity;
+
+  if (goal > 0 && equity > 0 && equity <= 100) {
+    const valuation = (goal / equity) * 100;
+    return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(valuation);
+  }
+  return null;
 });
 
 onMounted(async () => {
@@ -142,27 +174,23 @@ onMounted(async () => {
         const data = await res.json();
         user.value.username = data.username || '';
         user.value.email = data.email || '';
-        user.value.role = data.profile?.role || data.role || 'startup'; // Fallback auf 'startup'
+        user.value.role = data.profile?.role || data.role || 'startup';
       }
     } catch (e) {
       console.error('Failed fetching /users/me/:', e);
     }
   }
 
-  // Hier würdest du normalerweise die Pitches des Nutzers vom Backend laden.
-  // Für diese Demo fügen wir ein Beispiel hinzu, wenn die Liste leer ist.
   if (user.value.role === 'startup') {
       myPitches.value = [
-        { id: 1, title: 'EcoSolutions', sector: 'Nachhaltigkeit', stage: 'Seed', goal: '250.000€', desc: 'Eine Plattform zur Reduzierung von Plastikmüll in Unternehmen.', img: 'https://placehold.co/600x400/3b82f6/ffffff?text=Eco' },
+        { id: 1, title: 'EcoSolutions', sector: 'Nachhaltigkeit', stage: 'Seed', goal: '250.000€', equity: 15, desc: 'Eine Plattform zur Reduzierung von Plastikmüll in Unternehmen.', img: 'https://placehold.co/600x400/3b82f6/ffffff?text=Eco', valuation: '1.666.667 €' },
       ];
   }
 });
 
 async function openCreateModal() {
   showCreateModal.value = true;
-  // Warte, bis das Modal im DOM ist
   await nextTick();
-  // Scrolle zum Modal
   const modalElement = document.getElementById('create-pitch-modal');
   if (modalElement) {
     modalElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -170,21 +198,19 @@ async function openCreateModal() {
 }
 
 function handleCreatePitch() {
-  // Erstelle eine Kopie der Daten und weise eine eindeutige ID zu (in echt vom Backend)
-  const pitchToAdd = { ...newPitch.value, id: Date.now() };
+  const pitchToAdd = { 
+    ...newPitch.value, 
+    id: Date.now(),
+    valuation: calculatedValuation.value // Fügt den berechneten Wert hinzu
+  };
 
-  // Füge den neuen Pitch zur Liste hinzu
-  myPitches.value.unshift(pitchToAdd); // unshift, damit er vorne erscheint
-
-  // Logge die Daten (hier würdest du den API-Aufruf zum Speichern senden)
+  myPitches.value.unshift(pitchToAdd);
   console.log('Neuer Pitch erstellt:', pitchToAdd);
-
-  // Schließe das Modal
   showCreateModal.value = false;
 
-  // Setze das Formular zurück
   newPitch.value = {
-    id: null, title: '', sector: '', stage: '', goal: '', desc: '', img: 'https://placehold.co/600x400/22c55e/ffffff?text=Neu'
+    id: null, title: '', sector: '', stage: '', goal: '', equity: null, desc: '', img: 'https://placehold.co/600x400/22c55e/ffffff?text=Neu'
   };
 }
 </script>
+
