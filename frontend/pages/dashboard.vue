@@ -72,7 +72,7 @@
                 <!-- Liste der existierenden Events -->
                 <div v-for="event in myEvents" :key="event.id" class="card">
                      <strong>{{ event.name }}</strong>
-                     <div class="muted" style="margin-top: 4px;">{{ event.topic }} · {{ event.location }} · {{ event.duration }}</div>
+                     <div class="muted" style="margin-top: 4px;">{{ event.topic }} · {{ event.location }} · {{ event.duration }} Minuten</div>
                 </div>
                 <div v-if="!myEvents.length" class="card muted" style="text-align:center; padding: 24px;">
                     Du hast noch keine Events erstellt.
@@ -86,6 +86,14 @@
             <div class="input-group"><label>Benutzername</label><div class="muted">{{ user.username }}</div></div>
             <div class="input-group"><label>E-Mail</label><div class="muted">{{ user.email }}</div></div>
             <div class="input-group"><label>Rolle</label><div class="muted">{{ user.role }}</div></div>
+        </div>
+        <div class="card" style="margin-top:12px">
+            <strong>Quick Actions</strong>
+            <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+                <NuxtLink to="/market" class="btn ghost">Marktplatz</NuxtLink>
+                <NuxtLink to="/events" class="btn ghost">Events</NuxtLink>
+                <NuxtLink to="/network" class="btn ghost">Networking</NuxtLink>
+            </div>
         </div>
       </aside>
      </div>
@@ -163,8 +171,8 @@
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <div class="input-group">
-                <label for="eventDuration">Dauer</label>
-                <input id="eventDuration" v-model="newEvent.duration" type="text" placeholder="z.B. 90 Minuten" required>
+                <label for="eventDuration">Dauer in Minuten</label>
+                <input id="eventDuration" v-model.number="newEvent.duration" type="number" min="1" placeholder="z.B. 90" required>
               </div>
               <div class="input-group">
                 <label for="eventLocation">Ort</label>
@@ -223,7 +231,7 @@ const newPitch = ref({
 const newEvent = ref({
   id: null,
   name: '',
-  duration: '',
+  duration: null,
   location: '',
   topic: '',
   link: '',
@@ -268,7 +276,7 @@ onMounted(async () => {
 
   // Dummy-Daten für Events
   myEvents.value = [
-    { id: 1, name: 'Tech Meetup Berlin', duration: '3 Stunden', location: 'Berlin', topic: 'AI & Web3', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.' }
+    { id: 1, name: 'Tech Meetup Berlin', duration: 180, location: 'Berlin', topic: 'AI & Web3', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.' }
   ];
 });
 
@@ -319,7 +327,7 @@ function handleCreateEvent() {
   showCreateEventModal.value = false;
 
   newEvent.value = {
-    id: null, name: '', duration: '', location: '', topic: '', link: '', description: ''
+    id: null, name: '', duration: null, location: '', topic: '', link: '', description: ''
   };
 }
 </script>
