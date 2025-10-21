@@ -14,9 +14,7 @@ const headingText = ref('Warte auf das Skript...');
 
 // 2. Die Test-Logik in eine Funktion packen.
 function runTestScript() {
-  // Zeigt eine Pop-up-Nachricht an.
-  alert('✅ Vue-Testskript wurde erfolgreich ausgeführt!');
-
+  
   // Ändert den Wert der reaktiven Variable. Vue aktualisiert das HTML automatisch.
   headingText.value = 'Skript wurde ausgeführt!';
 
