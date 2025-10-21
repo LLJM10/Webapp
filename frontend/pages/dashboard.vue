@@ -55,6 +55,30 @@
              </div>
            </div>
          </div>
+
+         <!-- NEU: Event Sektion -->
+         <div class="card" style="margin-top:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <strong>Meine Events</strong>
+                    <div class="muted" style="margin-top:8px">Verwalte deine geplanten Events</div>
+                </div>
+                <button class="btn primary" @click="openCreateEventModal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+                    Neues Event erstellen
+                </button>
+            </div>
+            <div style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
+                <!-- Liste der existierenden Events -->
+                <div v-for="event in myEvents" :key="event.id" class="card">
+                     <strong>{{ event.name }}</strong>
+                     <div class="muted" style="margin-top: 4px;">{{ event.topic }} · {{ event.location }} · {{ event.duration }}</div>
+                </div>
+                <div v-if="!myEvents.length" class="card muted" style="text-align:center; padding: 24px;">
+                    Du hast noch keine Events erstellt.
+                </div>
+            </div>
+        </div>
       </div>
        <aside>
          <div class="card">
@@ -108,8 +132,10 @@
               <input id="equity" v-model.number="newPitch.equity" type="number" min="1" max="100" placeholder="z.B. 10" required>
             </div>
           </div>
+
+          <!-- NEU: Anzeige für berechneten Firmenwert -->
           <div v-if="calculatedValuation" class="input-group">
-             <label>Geschätzter Firmenwert</label>
+             <label>Geschätzter Firmenwert (Pre-Money)</label>
              <div class="card" style="font-size: 1.2rem; font-weight: bold; color: var(--accent); padding: 12px;">{{ calculatedValuation }}</div>
           </div>
           
@@ -120,6 +146,46 @@
           <div class="modal-actions">
             <button type="button" class="btn ghost" @click="showCreateModal = false">Abbrechen</button>
             <button type="submit" class="btn primary">Angebot erstellen</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- NEU: Modales Fenster zum Erstellen eines neuen Events -->
+    <div v-if="showCreateEventModal" id="create-event-modal" class="modal-overlay" @click.self="showCreateEventModal = false">
+      <div class="card modal-content">
+        <h3>Neues Event erstellen</h3>
+        <p class="muted">Fülle die Felder aus, um ein neues Event zu planen.</p>
+        <form @submit.prevent="handleCreateEvent">
+          <div class="input-group">
+            <label for="eventName">Name des Events</label>
+            <input id="eventName" v-model="newEvent.name" type="text" placeholder="z.B. Tech Meetup Berlin" required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="input-group">
+                <label for="eventDuration">Dauer</label>
+                <input id="eventDuration" v-model="newEvent.duration" type="text" placeholder="z.B. 90 Minuten" required>
+              </div>
+              <div class="input-group">
+                <label for="eventLocation">Ort</label>
+                <input id="eventLocation" v-model="newEvent.location" type="text" placeholder="z.B. Berlin oder Online" required>
+              </div>
+          </div>
+          <div class="input-group">
+            <label for="eventTopic">Thema</label>
+            <input id="eventTopic" v-model="newEvent.topic" type="text" placeholder="z.B. AI & Web3" required>
+          </div>
+          <div class="input-group">
+            <label for="eventLink">Online Link (optional)</label>
+            <input id="eventLink" v-model="newEvent.link" type="url" placeholder="https://teams.microsoft.com/...">
+          </div>
+          <div class="input-group">
+            <label for="eventDesc">Beschreibung</label>
+            <textarea id="eventDesc" v-model="newEvent.description" rows="3" placeholder="Beschreibe kurz das Event..."></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn ghost" @click="showCreateEventModal = false">Abbrechen</button>
+            <button type="submit" class="btn primary">Event erstellen</button>
           </div>
         </form>
       </div>
@@ -137,7 +203,9 @@ const phases = ref(['Pre-Seed', 'Seed', 'Series A', 'Wachstum', 'Reife']);
 
 const user = ref({ username: 'Startup-User', email: 'demo@startup.com', role: 'startup' }); // Default-Werte für Demo
 const myPitches = ref([]); // Startet mit einer leeren Liste
+const myEvents = ref([]); // NEU: Liste für Events
 const showCreateModal = ref(false);
+const showCreateEventModal = ref(false); // NEU: State für Event-Modal
 
 // Datenmodell für einen neuen Pitch
 const newPitch = ref({
@@ -151,7 +219,18 @@ const newPitch = ref({
   img: 'https://placehold.co/600x400/22c55e/ffffff?text=Neu'
 });
 
-// NEU: Berechnet den Firmenwert automatisch
+// NEU: Datenmodell für ein neues Event
+const newEvent = ref({
+  id: null,
+  name: '',
+  duration: '',
+  location: '',
+  topic: '',
+  link: '',
+  description: ''
+});
+
+// Berechnet den Firmenwert automatisch
 const calculatedValuation = computed(() => {
   const goal = Number(String(newPitch.value.goal).replace(/[^0-9]/g, ''));
   const equity = newPitch.value.equity;
@@ -186,6 +265,11 @@ onMounted(async () => {
         { id: 1, title: 'EcoSolutions', sector: 'Nachhaltigkeit', stage: 'Seed', goal: '250.000€', equity: 15, desc: 'Eine Plattform zur Reduzierung von Plastikmüll in Unternehmen.', img: 'https://placehold.co/600x400/3b82f6/ffffff?text=Eco', valuation: '1.666.667 €' },
       ];
   }
+
+  // Dummy-Daten für Events
+  myEvents.value = [
+    { id: 1, name: 'Tech Meetup Berlin', duration: '3 Stunden', location: 'Berlin', topic: 'AI & Web3', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.' }
+  ];
 });
 
 async function openCreateModal() {
@@ -212,5 +296,30 @@ function handleCreatePitch() {
     id: null, title: '', sector: '', stage: '', goal: '', equity: null, desc: '', img: 'https://placehold.co/600x400/22c55e/ffffff?text=Neu'
   };
 }
-</script>
 
+// NEU: Funktion zum Öffnen des Event-Modals
+async function openCreateEventModal() {
+  showCreateEventModal.value = true;
+  await nextTick();
+  const modalElement = document.getElementById('create-event-modal');
+  if (modalElement) {
+    modalElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+// NEU: Funktion zum Erstellen eines Events
+function handleCreateEvent() {
+  const eventToAdd = { 
+    ...newEvent.value, 
+    id: Date.now()
+  };
+
+  myEvents.value.unshift(eventToAdd);
+  console.log('Neues Event erstellt:', eventToAdd);
+  showCreateEventModal.value = false;
+
+  newEvent.value = {
+    id: null, name: '', duration: '', location: '', topic: '', link: '', description: ''
+  };
+}
+</script>
