@@ -1,5 +1,5 @@
 <template>
-  <div class="pitch" @click="navigateToDetail">
+  <div class="pitch" @click="navigateToEdit">
     <div class="meta">
       <div>
         <strong>{{ pitch.title }}</strong>
@@ -32,10 +32,8 @@ const props = defineProps({
 // Router-Instanz für die Navigation
 const router = useRouter();
 
-// Navigation zur Detailseite, wenn die Karte geklickt wird
-function navigateToDetail() {
-  // Achtung: Wenn Sie die pages/detail/[id].vue noch nicht korrigiert haben,
-  // kann dieser Aufruf fehlschlagen.
-  router.push(`/detail/${props.pitch.id}`);
+// Navigation zur Edit-Seite (Formular) wenn die Karte geklickt wird
+function navigateToEdit() {
+  router.push({ path: '/pitches/formular', query: { id: props.pitch.id } });
 }
 </script>

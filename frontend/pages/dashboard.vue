@@ -12,11 +12,11 @@
                 <strong>Meine Pitches</strong>
                 <div class="muted" style="margin-top:8px">Management deiner Pitches & Kontakte</div>
             </div>
-            <!-- Button zum Öffnen des Modals -->
-            <button class="btn primary" @click="openCreateModal">
+            <!-- Button navigiert jetzt zur eigenen Formular-Seite -->
+            <NuxtLink to="/pitches/formular" class="btn primary">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
               Neues Angebot anlegen
-            </button>
+            </NuxtLink>
         </div>
         <div style="margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px">
             <!-- Bestehende Pitches mit der PitchCard Komponente anzeigen -->
@@ -98,66 +98,7 @@
       </aside>
      </div>
 
-    <!-- Modales Fenster zum Erstellen eines neuen Pitches -->
-    <div v-if="showCreateModal" id="create-pitch-modal" class="modal-overlay" @click.self="showCreateModal = false">
-      <div class="card modal-content">
-        <h3>Neues Angebot erstellen</h3>
-        <p class="muted">Fülle die Felder aus, um eine neue Pitch Card zu erstellen.</p>
-        <form @submit.prevent="handleCreatePitch">
-          <div class="input-group">
-            <label for="title">Titel des Startups</label>
-            <input id="title" v-model="newPitch.title" type="text" placeholder="z.B. GreenCharge" required>
-          </div>
-          <div class="input-group">
-            <label for="sector">Sektor</label>
-            <input id="sector" v-model="newPitch.sector" type="text" placeholder="z.B. Energie, SaaS" required>
-          </div>
-          <div class="input-group">
-            <label>Phase</label>
-            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-              <button
-                v-for="phase in phases"
-                :key="phase"
-                type="button"
-                class="btn"
-                :class="{ 'primary': newPitch.stage === phase, 'ghost': newPitch.stage !== phase }"
-                @click="newPitch.stage = phase"
-              >
-                {{ phase }}
-              </button>
-            </div>
-            <!-- Verstecktes Input-Feld, um die `required`-Validierung beizubehalten -->
-            <input type="hidden" :value="newPitch.stage" required />
-          </div>
-          
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="input-group">
-              <label for="goal">Finanzierungsziel</label>
-              <input id="goal" v-model="newPitch.goal" type="text" placeholder="z.B. 500.000€" required>
-            </div>
-            <div class="input-group">
-              <label for="equity">Anteil in %</label>
-              <input id="equity" v-model.number="newPitch.equity" type="number" min="1" max="100" placeholder="z.B. 10" required>
-            </div>
-          </div>
-
-          <!-- NEU: Anzeige für berechneten Firmenwert -->
-          <div v-if="calculatedValuation" class="input-group">
-             <label>Geschätzter Firmenwert (Pre-Money)</label>
-             <div class="card" style="font-size: 1.2rem; font-weight: bold; color: var(--accent); padding: 12px;">{{ calculatedValuation }}</div>
-          </div>
-          
-          <div class="input-group">
-            <label for="desc">Kurzbeschreibung</label>
-            <textarea id="desc" v-model="newPitch.desc" rows="3" placeholder="Beschreibe kurz deine Idee..."></textarea>
-          </div>
-          <div class="modal-actions">
-            <button type="button" class="btn ghost" @click="showCreateModal = false">Abbrechen</button>
-            <button type="submit" class="btn primary">Angebot erstellen</button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <!-- Pitch-Erstellung wurde in eine eigene Seite verschoben: /pitches/formular -->
 
     <!-- NEU: Modales Fenster zum Erstellen eines neuen Events -->
     <div v-if="showCreateEventModal" id="create-event-modal" class="modal-overlay" @click.self="showCreateEventModal = false">
