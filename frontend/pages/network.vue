@@ -90,11 +90,11 @@ import { ref, computed } from 'vue';
 const alert = (msg) => window.alert(msg);
 
 const profiles = ref([
-  { id: 1, name: 'EcoLogistics', img: null, role: 'Founder', type: 'Startup', bio: 'Logistikoptimierung für lokale Lieferketten.', skills: ['Logistics', 'SaaS', 'Sustainability'] },
-  { id: 2, name: 'Anna Müller', img: null, role: 'Angel', type: 'Investor', bio: 'Investiert in ClimateTech & Health.', skills: ['ClimateTech', 'Health', 'Seed'] },
-  { id: 3, name: 'M&A Partner', img: null, role: 'Advisor', type: 'Advisor', bio: 'Berät bei M&A & Transaktionen.', skills: ['M&A', 'Legal'] },
-  { id: 4, name: 'FoodoraX', img: null, role: 'Founder', type: 'Startup', bio: 'D2C Plattform für Food Brands.', skills: ['Marketing', 'D2C'] },
-  { id: 5, name: 'SmartHome Energy', img: null, role: 'Founder', type: 'Startup', bio: 'Energiemanagement für dein Zuhause.', skills: ['IoT', 'Energy', 'Hardware'] }
+  { id: 1, name: 'EcoLogistics', img: 'https://picsum.photos/seed/ecologistics/200', role: 'Founder', type: 'Startup', bio: 'Logistikoptimierung für lokale Lieferketten.', skills: ['Logistics', 'SaaS', 'Sustainability'] },
+  { id: 2, name: 'Anna Müller', img: 'https://picsum.photos/seed/annamueller/200', role: 'Angel', type: 'Investor', bio: 'Investiert in ClimateTech & Health.', skills: ['ClimateTech', 'Health', 'Seed'] },
+  { id: 3, name: 'M&A Partner', img: 'https://picsum.photos/seed/mapartner/200', role: 'Advisor', type: 'Advisor', bio: 'Berät bei M&A & Transaktionen.', skills: ['M&A', 'Legal'] },
+  { id: 4, name: 'FoodoraX', img: 'https://picsum.photos/seed/foodorax/200', role: 'Founder', type: 'Startup', bio: 'D2C Plattform für Food Brands.', skills: ['Marketing', 'D2C'] },
+  { id: 5, name: 'SmartHome Energy', img: 'https://picsum.photos/seed/smarthome/200', role: 'Founder', type: 'Startup', bio: 'Energiemanagement für dein Zuhause.', skills: ['IoT', 'Energy', 'Hardware'] }
 ]);
 
 const posts = ref([
