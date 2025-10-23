@@ -87,14 +87,6 @@
             <div class="input-group"><label>E-Mail</label><div class="muted">{{ user.email }}</div></div>
             <div class="input-group"><label>Rolle</label><div class="muted">{{ user.role }}</div></div>
         </div>
-        <div class="card" style="margin-top:12px">
-            <strong>Quick Actions</strong>
-            <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
-                <NuxtLink to="/market" class="btn ghost">Marktplatz</NuxtLink>
-                <NuxtLink to="/events" class="btn ghost">Events</NuxtLink>
-                <NuxtLink to="/network" class="btn ghost">Networking</NuxtLink>
-            </div>
-        </div>
       </aside>
      </div>
 
