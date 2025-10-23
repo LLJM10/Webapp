@@ -1,33 +1,25 @@
 <template>
-  <div class="test-container">
-    <h1>{{ headingText }}</h1>
-
-    <button class="btn primary" @click="runTestScript">Test erneut ausführen</button>
+  <div style="margin-top:28px">
+  <h2>Marktplatz — Vorschau</h2>
+  <p class="muted">Eine Auswahl interessanter Pitches. Voller Zugriff im Marktplatz.</p>
+  <div class="list">
+  <PitchCard v-for="s in previewStartups" :key="s.id" :pitch="s" />
+  </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+// Demo-Daten (Im echten Nuxt würden diese aus einem Store/API geladen)
+const startups = [
+ { id:'s1', title:'SmartHome Energy', sector:'Energy', stage:'Seed', desc:'Dezentrale Energieoptimierung für Privathaushalte mittels Edge-AI und Lastverschiebung.', img:'https://picsum.photos/seed/s1/900/480', kpis:{revenue:'420k€ TTM', growth:'+72% YoY', customers:'1.2k'}, traction:'Pilot in 3 Städten', market:'DACH', goal:'400k€', equity:'8%'},
+ { id:'s2', title:'GreenCharge', sector:'AI', stage:'Series A', desc:'Batterie-Management für EV-Flotten mit optimierter Ladeplanung und Flotten-Analytics.', img:'https://picsum.photos/seed/s2/900/480', kpis:{revenue:'1.1M€ TTM', growth:'+120% YoY', customers:'35 fleets'}, traction:'Verträge mit 2 großen Flottenbetreibern', market:'EU', goal:'2.5M€', equity:'12%'},
+ { id:'s3', title:'Medico', sector:'Health', stage:'Seed', desc:'Telehealth für chronisch Kranke mit KI-Triage & Adhärenz-Programmen.', img:'https://picsum.photos/seed/s3/900/480', kpis:{revenue:'320k€ TTM', growth:'+48% YoY', customers:'4k'}, traction:'Pilot mit Klinikgruppe; 85% Retention', market:'EU', goal:'500k€', equity:'6%'},
+ { id:'s4', title:'OrbitSense', sector:'SpaceTech', stage:'Pre-Seed', desc:'Low-cost Sensor-Satellites zur Erfassung von Luftqualität & Emissionen.', img:'https://picsum.photos/seed/s4/900/480', kpis:{revenue:'—', growth:'—', customers:'2 research projects'}, traction:'1 Test-Sat in LEO erfolgreich', market:'Global', goal:'800k€', equity:'15%'}
+];
+// Zeige die ersten 3 Startups für die Vorschau
+const previewStartups = startups.slice(0, 3);
 
-// 1. Eine reaktive Variable für den Text der Überschrift erstellen.
-const headingText = ref('Warte auf das Skript...');
-
-// 2. Die Test-Logik in eine Funktion packen.
-function runTestScript() {
-  
-  // Ändert den Wert der reaktiven Variable. Vue aktualisiert das HTML automatisch.
-  headingText.value = 'Skript wurde ausgeführt!';
-
-  // Gibt eine Nachricht in der Entwicklerkonsole aus (F12 drücken).
-  console.log('Dies ist eine Test-Nachricht für die Konsole aus der Vue-Komponente.');
-}
-
-// 3. Den 'onMounted' Hook verwenden, um das Skript automatisch auszuführen,
-//    sobald die Komponente auf der Seite geladen und "eingehängt" ist.
-//    Dies ist das Vue-Äquivalent zu 'DOMContentLoaded' in normalem JavaScript.
-onMounted(() => {
-  runTestScript();
-});
 </script>
 
 <style scoped>

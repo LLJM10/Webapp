@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <!-- Nutzerinfo und Quick Actions bleiben unverändert, aber in einem Grid für besseres Layout -->
+    
      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 360px;gap:12px">
       <div>
          <div class="card">
