@@ -238,6 +238,27 @@ const newEvent = ref({
   description: ''
 });
 
+// LocalStorage helpers: load/save lists so created items survive page reloads (Option A)
+function savePitchesToLocalStorage() {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem('myPitches', JSON.stringify(myPitches.value));
+    } catch (e) {
+      console.warn('Failed to save myPitches to localStorage', e);
+    }
+  }
+}
+
+function saveEventsToLocalStorage() {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem('myEvents', JSON.stringify(myEvents.value));
+    } catch (e) {
+      console.warn('Failed to save myEvents to localStorage', e);
+    }
+  }
+}
+
 // Berechnet den Firmenwert automatisch
 const calculatedValuation = computed(() => {
   const goal = Number(String(newPitch.value.goal).replace(/[^0-9]/g, ''));
@@ -268,16 +289,40 @@ onMounted(async () => {
     }
   }
 
-  if (user.value.role === 'startup') {
-      myPitches.value = [
-        { id: 1, title: 'EcoSolutions', sector: 'Nachhaltigkeit', stage: 'Seed', goal: '250.000€', equity: 15, desc: 'Eine Plattform zur Reduzierung von Plastikmüll in Unternehmen.', img: 'https://placehold.co/600x400/3b82f6/ffffff?text=Eco', valuation: '1.666.667 €' },
-      ];
-  }
+  // Load saved Pitches/Events from localStorage if available, otherwise use demo data
+  try {
+    if (typeof window !== 'undefined') {
+      const savedPitches = localStorage.getItem('myPitches');
+      if (savedPitches) {
+        myPitches.value = JSON.parse(savedPitches);
+      } else if (user.value.role === 'startup') {
+        myPitches.value = [
+          { id: 1, title: 'EcoSolutions', sector: 'Nachhaltigkeit', stage: 'Seed', goal: '250.000€', equity: 15, desc: 'Eine Plattform zur Reduzierung von Plastikmüll in Unternehmen.', img: 'https://placehold.co/600x400/3b82f6/ffffff?text=Eco', valuation: '1.666.667 €' },
+        ];
+      }
 
-  // Dummy-Daten für Events
-  myEvents.value = [
-    { id: 1, name: 'Tech Meetup Berlin', duration: 180, location: 'Berlin', topic: 'AI & Web3', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.' }
-  ];
+      const savedEvents = localStorage.getItem('myEvents');
+      if (savedEvents) {
+        myEvents.value = JSON.parse(savedEvents);
+      } else {
+        myEvents.value = [
+          { id: 1, name: 'Tech Meetup Berlin', duration: 180, location: 'Berlin', topic: 'AI & Web3', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.' }
+        ];
+      }
+    } else {
+      // Server-side / non-browser: set demo data
+      if (user.value.role === 'startup') {
+        myPitches.value = [
+          { id: 1, title: 'EcoSolutions', sector: 'Nachhaltigkeit', stage: 'Seed', goal: '250.000€', equity: 15, desc: 'Eine Plattform zur Reduzierung von Plastikmüll in Unternehmen.', img: 'https://placehold.co/600x400/3b82f6/ffffff?text=Eco', valuation: '1.666.667 €' },
+        ];
+      }
+      myEvents.value = [
+        { id: 1, name: 'Tech Meetup Berlin', duration: 180, location: 'Berlin', topic: 'AI & Web3', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.' }
+      ];
+    }
+  } catch (e) {
+    console.warn('Error loading saved data from localStorage', e);
+  }
 });
 
 async function openCreateModal() {
@@ -297,6 +342,8 @@ function handleCreatePitch() {
   };
 
   myPitches.value.unshift(pitchToAdd);
+  // Persist immediately so the pitch remains after reload
+  savePitchesToLocalStorage();
   console.log('Neuer Pitch erstellt:', pitchToAdd);
   showCreateModal.value = false;
 
@@ -323,6 +370,8 @@ function handleCreateEvent() {
   };
 
   myEvents.value.unshift(eventToAdd);
+  // Persist events as well
+  saveEventsToLocalStorage();
   console.log('Neues Event erstellt:', eventToAdd);
   showCreateEventModal.value = false;
 
