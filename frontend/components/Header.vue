@@ -29,3 +29,13 @@
 
 </script>
  
+<style scoped>
+#topnav a[aria-current="page"],
+#topnav .router-link-active,
+#topnav .router-link-exact-active,
+#topnav .nuxt-link-active,
+#topnav .active {
+    color: var(--accent);
+    transition: color .12s ease;
+}
+</style>
