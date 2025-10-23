@@ -1,7 +1,7 @@
 <template>
   <div style="margin-top:28px">
   <h2>Marktplatz — Vorschau</h2>
-  <p class="muted">Eine Auswahl interessanter Pitches. Voller Zugriff im Marktplatz.</p>
+  <p class="muted">Eine Auswahl interessanter Pitches.</p>
   <div class="list">
   <PitchCard v-for="s in previewStartups" :key="s.id" :pitch="s" />
   </div>
