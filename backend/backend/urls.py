@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+import auto_admin  
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
