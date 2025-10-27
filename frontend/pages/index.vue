@@ -49,13 +49,48 @@
 </section>
 </template>
 <script setup>
-// Demo-Daten (Im echten Nuxt würden diese aus einem Store/API geladen)
-const startups = [
- { id:'s1', title:'SmartHome Energy', sector:'Energy', stage:'Seed', desc:'Dezentrale Energieoptimierung für Privathaushalte mittels Edge-AI und Lastverschiebung.', img:'https://picsum.photos/seed/s1/900/480', kpis:{revenue:'420k€ TTM', growth:'+72% YoY', customers:'1.2k'}, traction:'Pilot in 3 Städten', market:'DACH', goal:'400k€', equity:'8%'},
- { id:'s2', title:'GreenCharge', sector:'AI', stage:'Series A', desc:'Batterie-Management für EV-Flotten mit optimierter Ladeplanung und Flotten-Analytics.', img:'https://picsum.photos/seed/s2/900/480', kpis:{revenue:'1.1M€ TTM', growth:'+120% YoY', customers:'35 fleets'}, traction:'Verträge mit 2 großen Flottenbetreibern', market:'EU', goal:'2.5M€', equity:'12%'},
- { id:'s3', title:'Medico', sector:'Health', stage:'Seed', desc:'Telehealth für chronisch Kranke mit KI-Triage & Adhärenz-Programmen.', img:'https://picsum.photos/seed/s3/900/480', kpis:{revenue:'320k€ TTM', growth:'+48% YoY', customers:'4k'}, traction:'Pilot mit Klinikgruppe; 85% Retention', market:'EU', goal:'500k€', equity:'6%'},
- { id:'s4', title:'OrbitSense', sector:'SpaceTech', stage:'Pre-Seed', desc:'Low-cost Sensor-Satellites zur Erfassung von Luftqualität & Emissionen.', img:'https://picsum.photos/seed/s4/900/480', kpis:{revenue:'—', growth:'—', customers:'2 research projects'}, traction:'1 Test-Sat in LEO erfolgreich', market:'Global', goal:'800k€', equity:'15%'}
-];
-// Zeige die ersten 3 Startups für die Vorschau
-const previewStartups = startups.slice(0, 3);
+import { ref, onMounted } from 'vue';
+import { useRuntimeConfig } from '#app';
+
+const previewStartups = ref([]);
+
+onMounted(async () => {
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+
+  // Fetch all public pitches from backend
+  if (apiBase) {
+    try {
+      const res = await fetch(`${apiBase}/pitches/`, {
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+      });
+      if (res.ok) {
+        const backendPitches = await res.json();
+        // Zeige nur die ersten 3 Pitches
+        previewStartups.value = backendPitches.slice(0, 3);
+        console.debug('Loaded preview pitches from backend:', previewStartups.value.length);
+      } else {
+        console.warn('Backend pitches request failed with status', res.status);
+        // Fallback to demo data
+        loadDemoPitches();
+      }
+    } catch (e) {
+      console.warn('Failed to fetch pitches from backend, falling back to demo data', e);
+      loadDemoPitches();
+    }
+  } else {
+    loadDemoPitches();
+  }
+});
+
+function loadDemoPitches() {
+  // Fallback: show demo pitches if backend unavailable
+  const startups = [
+    { id:'s1', title:'SmartHome Energy', sector:'Energy', stage:'Seed', desc:'Dezentrale Energieoptimierung für Privathaushalte mittels Edge-AI und Lastverschiebung.', img:'https://picsum.photos/seed/s1/900/480', goal:'400k€', equity:8 },
+    { id:'s2', title:'GreenCharge', sector:'AI', stage:'Series A', desc:'Batterie-Management für EV-Flotten mit optimierter Ladeplanung und Flotten-Analytics.', img:'https://picsum.photos/seed/s2/900/480', goal:'2.5M€', equity:12 },
+    { id:'s3', title:'Medico', sector:'Health', stage:'Seed', desc:'Telehealth für chronisch Kranke mit KI-Triage & Adhärenz-Programmen.', img:'https://picsum.photos/seed/s3/900/480', goal:'500k€', equity:6 }
+  ];
+  previewStartups.value = startups;
+}
 </script>
