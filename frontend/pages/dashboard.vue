@@ -222,7 +222,54 @@ onMounted(async () => {
     }
   }
 
-  // Load saved Pitches/Events from localStorage if available, otherwise use demo data
+  // NEW: Load Pitches from backend API first
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  if (apiBase && token) {
+    try {
+      const res = await fetch(`${apiBase}/pitches/?mine=true`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const backendPitches = await res.json();
+        myPitches.value = backendPitches;
+        console.debug('Loaded pitches from backend:', backendPitches.length);
+      } else {
+        console.warn('Backend pitches request failed with status', res.status);
+        // Fallback to localStorage
+        loadPitchesFromLocalStorage();
+      }
+    } catch (e) {
+      console.warn('Failed to fetch pitches from backend, falling back to localStorage', e);
+      loadPitchesFromLocalStorage();
+    }
+  } else {
+    // No apiBase or no token: fallback to localStorage
+    loadPitchesFromLocalStorage();
+  }
+
+  // Load saved Events from localStorage if available, otherwise use demo data
+  try {
+    if (typeof window !== 'undefined') {
+      const savedEvents = localStorage.getItem('myEvents');
+      if (savedEvents) {
+        myEvents.value = JSON.parse(savedEvents);
+      } else {
+        myEvents.value = [
+          { id: 1, name: 'Tech Meetup Berlin', duration: 180, location: 'Berlin', topic: 'AI & Web3', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.' }
+        ];
+      }
+    } else {
+      myEvents.value = [
+        { id: 1, name: 'Tech Meetup Berlin', duration: 180, location: 'Berlin', topic: 'AI & Web3', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.' }
+      ];
+    }
+  } catch (e) {
+    console.warn('Error loading events from localStorage', e);
+  }
+});
+
+function loadPitchesFromLocalStorage() {
   try {
     if (typeof window !== 'undefined') {
       const savedPitches = localStorage.getItem('myPitches');
@@ -233,15 +280,6 @@ onMounted(async () => {
           { id: 1, title: 'EcoSolutions', sector: 'Nachhaltigkeit', stage: 'Seed', goal: '250.000€', equity: 15, desc: 'Eine Plattform zur Reduzierung von Plastikmüll in Unternehmen.', img: 'https://placehold.co/600x400/3b82f6/ffffff?text=Eco', valuation: '1.666.667 €' },
         ];
       }
-
-      const savedEvents = localStorage.getItem('myEvents');
-      if (savedEvents) {
-        myEvents.value = JSON.parse(savedEvents);
-      } else {
-        myEvents.value = [
-          { id: 1, name: 'Tech Meetup Berlin', duration: 180, location: 'Berlin', topic: 'AI & Web3', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.' }
-        ];
-      }
     } else {
       // Server-side / non-browser: set demo data
       if (user.value.role === 'startup') {
@@ -249,14 +287,11 @@ onMounted(async () => {
           { id: 1, title: 'EcoSolutions', sector: 'Nachhaltigkeit', stage: 'Seed', goal: '250.000€', equity: 15, desc: 'Eine Plattform zur Reduzierung von Plastikmüll in Unternehmen.', img: 'https://placehold.co/600x400/3b82f6/ffffff?text=Eco', valuation: '1.666.667 €' },
         ];
       }
-      myEvents.value = [
-        { id: 1, name: 'Tech Meetup Berlin', duration: 180, location: 'Berlin', topic: 'AI & Web3', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.' }
-      ];
     }
   } catch (e) {
     console.warn('Error loading saved data from localStorage', e);
   }
-});
+}
 
 async function openCreateModal() {
   showCreateModal.value = true;

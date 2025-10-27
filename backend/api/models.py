@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 # Create your models here.
 from django.db import models
@@ -17,3 +18,35 @@ class Todo(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Pitch(models.Model):
+    """
+    Model to store startup pitches created by users.
+    Each pitch is owned by a user (ForeignKey to AUTH_USER_MODEL).
+    """
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='pitches',
+        help_text='User who created this pitch'
+    )
+    title = models.CharField(max_length=200, help_text='Startup name or pitch title')
+    sector = models.CharField(max_length=100, blank=True, help_text='Industry sector')
+    stage = models.CharField(max_length=50, blank=True, help_text='Funding stage (e.g., Seed, Series A)')
+    goal = models.CharField(max_length=64, blank=True, help_text='Funding goal (e.g., 500.000€)')
+    equity = models.IntegerField(null=True, blank=True, help_text='Equity percentage offered')
+    desc = models.TextField(blank=True, help_text='Pitch description')
+    img = models.URLField(blank=True, help_text='Image URL for pitch card')
+    valuation = models.CharField(max_length=64, blank=True, help_text='Calculated valuation')
+    is_public = models.BooleanField(default=True, help_text='Whether pitch is visible on marketplace')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Pitch'
+        verbose_name_plural = 'Pitches'
+
+    def __str__(self):
+        return f'{self.title} ({self.owner.username})'
