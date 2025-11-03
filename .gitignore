@@ -2,3 +2,43 @@
 venv/
 __pycache__/
 *.pyc
+
+# Django/DB
+/backend/db.sqlite3
+
+
+# Secrets / env
+.env
+.env.*
+.env.local
+passwords.txt
+!.env.example
+
+# Node
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Python packaging / build
+*.egg-info/
+dist/
+build/
+pip-wheel-metadata/
+.eggs/
+
+# Tests / coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Misc
+*.log
+.backups/
+coverage/
