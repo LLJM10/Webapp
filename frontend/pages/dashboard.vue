@@ -19,8 +19,76 @@
             </NuxtLink>
         </div>
   <div class="mt-16 grid-auto-fit-280">
-            <!-- Bestehende Pitches mit der PitchCard Komponente anzeigen -->
-            <PitchCard v-for="pitch in myPitches" :key="pitch.id" :pitch="pitch" :id="`pitch-${pitch.id}`" />
+            <!-- Bestehende Pitches mit Edit/Delete Buttons -->
+            <div v-for="pitch in myPitches" :key="pitch.id" class="card">
+              <!-- Normaler Anzeigemodus -->
+              <div v-if="editingPitch?.id !== pitch.id">
+                <img :src="pitch.img || 'https://placehold.co/600x400/3b82f6/ffffff?text=Pitch'" :alt="pitch.title" style="width:100%;border-radius:8px;object-fit:cover;height:200px">
+                <div style="margin-top:8px">
+                  <strong>{{ pitch.title }}</strong>
+                  <div class="muted">{{ pitch.sector }} · {{ pitch.stage }}</div>
+                </div>
+                <p class="muted" style="margin-top:8px">{{ pitch.desc }}</p>
+                <div style="display:flex;justify-content:space-between;margin-top:8px">
+                  <div class="muted">Ziel: {{ pitch.goal }}</div>
+                  <div class="muted">Equity: {{ pitch.equity }}%</div>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <button class="btn ghost" @click="startEditPitch(pitch)">Bearbeiten</button>
+                  <button class="btn ghost danger" @click="confirmDeletePitch(pitch)">Löschen</button>
+                </div>
+              </div>
+
+              <!-- Edit-Modus (inline) -->
+              <div v-else>
+                <div class="input-group">
+                  <label>Titel</label>
+                  <input v-model="editingPitch.title" type="text">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                  <div class="input-group">
+                    <label>Sektor</label>
+                    <input v-model="editingPitch.sector" type="text">
+                  </div>
+                  <div class="input-group">
+                    <label>Stage</label>
+                    <input v-model="editingPitch.stage" type="text">
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                  <div class="input-group">
+                    <label>Ziel</label>
+                    <input v-model="editingPitch.goal" type="text">
+                  </div>
+                  <div class="input-group">
+                    <label>Equity (%)</label>
+                    <input v-model.number="editingPitch.equity" type="number">
+                  </div>
+                </div>
+                <div class="input-group">
+                  <label>Beschreibung</label>
+                  <textarea v-model="editingPitch.desc" rows="3"></textarea>
+                </div>
+                <div class="input-group">
+                  <label>Bild URL</label>
+                  <input v-model="editingPitch.img" type="url">
+                </div>
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <button class="btn primary" @click="savePitchEdit">Speichern</button>
+                  <button class="btn ghost" @click="cancelEditPitch">Abbrechen</button>
+                </div>
+              </div>
+
+              <!-- Delete Confirmation (inline) -->
+              <div v-if="pitchToDelete?.id === pitch.id" style="margin-top:8px;padding:12px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca">
+                <strong style="color:#dc2626">Wirklich löschen?</strong>
+                <p class="muted" style="margin-top:4px">Dieser Pitch wird dauerhaft gelöscht.</p>
+                <div style="display:flex;gap:8px;margin-top:8px">
+                  <button class="btn danger small" @click="deletePitch">Ja, löschen</button>
+                  <button class="btn ghost small" @click="cancelDeletePitch">Abbrechen</button>
+                </div>
+              </div>
+            </div>
             <div v-if="!myPitches.length" class="card muted text-center p-24">
               Du hast noch keine Angebote erstellt. Klicke auf "Neues Angebot anlegen", um zu starten!
             </div>
@@ -280,8 +348,6 @@
 
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
-// Importiere deine PitchCard Komponente
-import PitchCard from '~/components/PitchCard.vue';
 
 const phases = ref(['Pre-Seed', 'Seed', 'Series A', 'Wachstum', 'Reife']);
 
@@ -295,6 +361,10 @@ const showDeleteConfirmation = ref(false); // State für Delete-Confirmation
 const eventToDelete = ref(null); // Event das gelöscht werden soll
 const editingEvent = ref(null); // Event das bearbeitet wird
 const validationErrors = ref({}); // Validierungsfehler
+
+// NEU: Pitch Edit/Delete States (inline, keine Modals)
+const pitchToDelete = ref(null);
+const editingPitch = ref(null);
 
 // Datenmodell für einen neuen Pitch
 const newPitch = ref({
@@ -703,6 +773,93 @@ async function deleteEvent() {
     }
   }
 }
+
+// Pitch bearbeiten (inline)
+function startEditPitch(pitch) {
+  editingPitch.value = { ...pitch };
+}
+
+function cancelEditPitch() {
+  editingPitch.value = null;
+}
+
+async function savePitchEdit() {
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+
+  if (apiBase && token) {
+    try {
+      const res = await fetch(`${apiBase}/pitches/${editingPitch.value.id}/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(editingPitch.value)
+      });
+      
+      if (res.ok) {
+        const updated = await res.json();
+        const idx = myPitches.value.findIndex(p => p.id === updated.id);
+        if (idx !== -1) myPitches.value[idx] = updated;
+        console.log('Pitch erfolgreich aktualisiert');
+        editingPitch.value = null; // Beende Edit-Modus
+      } else {
+        const errorData = await res.json();
+        console.error('Fehler beim Aktualisieren:', errorData);
+        alert('Fehler: ' + JSON.stringify(errorData));
+      }
+    } catch (e) {
+      console.error('Update failed:', e);
+      alert('Netzwerkfehler beim Aktualisieren.');
+    }
+  }
+}
+
+// Pitch löschen (inline)
+function confirmDeletePitch(pitch) {
+  // Schließe Edit-Modus falls offen
+  if (editingPitch.value?.id === pitch.id) {
+    editingPitch.value = null;
+  }
+  pitchToDelete.value = pitch;
+}
+
+function cancelDeletePitch() {
+  pitchToDelete.value = null;
+}
+
+async function deletePitch() {
+  if (!pitchToDelete.value) return;
+  
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  if (apiBase && token) {
+    try {
+      const res = await fetch(`${apiBase}/pitches/${pitchToDelete.value.id}/`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (res.ok || res.status === 204) {
+        myPitches.value = myPitches.value.filter(p => p.id !== pitchToDelete.value.id);
+        console.log('Pitch erfolgreich gelöscht');
+        pitchToDelete.value = null;
+      } else {
+        console.error('Fehler beim Löschen:', res.status);
+        alert('Pitch konnte nicht gelöscht werden. Bist du der Eigentümer?');
+      }
+    } catch (e) {
+      console.error('Delete failed:', e);
+      alert('Netzwerkfehler beim Löschen.');
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -725,5 +882,10 @@ textarea.error {
 
 .btn.danger:hover {
   background: #dc2626;
+}
+
+.btn.small {
+  padding: 4px 12px;
+  font-size: 0.875rem;
 }
 </style>
