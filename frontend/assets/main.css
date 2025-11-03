@@ -377,3 +377,32 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
     grid-template-columns: 1fr;
   }
 }
+
+/* --- Utility classes to replace inline styles (helpers) --- */
+.mt-8 { margin-top: 8px; }
+.mt-10 { margin-top: 10px; }
+.mt-12 { margin-top: 12px; }
+.mt-16 { margin-top: 16px; }
+.mt-20 { margin-top: 20px; }
+.mt-28 { margin-top: 28px; }
+
+.p-24 { padding: 24px; }
+
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-between { display:flex; justify-content:space-between; align-items:center; }
+.align-center { align-items:center; }
+.flex-wrap { flex-wrap: wrap; }
+
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+
+.text-center { text-align: center; }
+
+.img-round-8 { border-radius: 8px; }
+.img-full { width: 100%; }
+
+.grid-auto-fit-280 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 12px; }
+.grid-auto-fit-220 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 8px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; }
+.grid-1fr-360 { display: grid; grid-template-columns: 1fr 360px; gap: 12px; }

@@ -13,6 +13,9 @@ export default defineNuxtConfig({
   // 2. APP KONFIGURATION: Hier wird der HTML <head> Tag konfiguriert
   app: {
     head: {
+      meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' }
+      ],
       link: [
         // Die <link rel="preconnect" ...> Tags
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },

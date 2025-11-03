@@ -1,16 +1,16 @@
 <template>
   <section id="page-dashboard">
-    <div style="display:flex;justify-content:space-between;align-items:center">
+    <div class="flex-between">
       <h2>Dashboard</h2>
     </div>
 
     <!-- START: Nur für Startup-Rolle -->
     <div v-if="user.role === 'startup'">
       <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
+  <div class="flex-between">
             <div>
                 <strong>Meine Pitches</strong>
-                <div class="muted" style="margin-top:8px">Management deiner Pitches & Kontakte</div>
+                <div class="muted mt-8">Management deiner Pitches & Kontakte</div>
             </div>
             <!-- Button navigiert jetzt zur eigenen Formular-Seite -->
             <NuxtLink to="/pitches/formular" class="btn primary">
@@ -18,10 +18,10 @@
               Neues Angebot anlegen
             </NuxtLink>
         </div>
-        <div style="margin-top:16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px">
+  <div class="mt-16 grid-auto-fit-280">
             <!-- Bestehende Pitches mit der PitchCard Komponente anzeigen -->
             <PitchCard v-for="pitch in myPitches" :key="pitch.id" :pitch="pitch" :id="`pitch-${pitch.id}`" />
-            <div v-if="!myPitches.length" class="card muted" style="text-align:center; padding: 24px;">
+            <div v-if="!myPitches.length" class="card muted text-center p-24">
               Du hast noch keine Angebote erstellt. Klicke auf "Neues Angebot anlegen", um zu starten!
             </div>
         </div>
@@ -32,26 +32,26 @@
     <!-- Fallback für andere Rollen wie Investor -->
     <div v-else class="card">
       <strong>Investor Dashboard</strong>
-      <div class="muted" style="margin-top:8px">Portfolio-Übersicht & Investment Opportunities</div>
-      <div style="margin-top:10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px">
-        <div class="card"><strong>Portfolio</strong><div class="muted" style="margin-top:6px">Total Investiert: 1.2M€</div></div>
-        <div class="card"><strong>Watchlist</strong><div class="muted" style="margin-top:6px">3 Startups</div></div>
+      <div class="muted mt-8">Portfolio-Übersicht & Investment Opportunities</div>
+      <div class="mt-10 grid-auto-fit-220">
+        <div class="card"><strong>Portfolio</strong><div class="muted mt-6">Total Investiert: 1.2M€</div></div>
+        <div class="card"><strong>Watchlist</strong><div class="muted mt-6">3 Startups</div></div>
       </div>
     </div>
 
     
-     <div style="margin-top:12px;display:grid;grid-template-columns:1fr 360px;gap:12px">
+  <div class="mt-12 grid-1fr-360">
       <div>
          <div class="card">
           <strong>Matching Vorschläge</strong>
-           <div style="margin-top:8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px">
+           <div class="mt-8 grid-auto-fit-220">
              <div v-if="user.role === 'startup'" class="card">
                <strong>Investoren Matches</strong>
-               <div class="muted" style="margin-top:8px">Anna Müller · Interesse: Energy</div>
+               <div class="muted mt-8">Anna Müller · Interesse: Energy</div>
              </div>
              <div v-else class="card">
                <strong>Suggested Deals</strong>
-               <div class="muted" style="margin-top:8px">GreenCharge · Match: 87%</div>
+               <div class="muted mt-8">GreenCharge · Match: 87%</div>
              </div>
            </div>
          </div>

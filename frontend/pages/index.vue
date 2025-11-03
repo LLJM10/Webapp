@@ -13,33 +13,33 @@
 <FeatureCard title="Verifiziertes Netzwerk" desc="KYC & OpenVerify Workflows, Co-Investor Matching und Due Diligence Tools." />
 <FeatureCard title="Intelligente Matches" desc="AI-gestützte Empfehlungen für Deals, basierend auf Präferenzen & Track Record." />
 </div>
-<div style="margin-top:20px;display:flex;gap:12px;align-items:center">
-<div class="badge">Demo & Mock Data</div>
-<div class="muted">Seiten vollständig im Look gefüllt — klick dich durch.</div>
+<div class="flex gap-12 mt-20 align-center">
+  <div class="badge">Demo & Mock Data</div>
+  <div class="muted">Seiten vollständig im Look gefüllt — klick dich durch.</div>
 </div>
 </div>
 <aside>
 <div class="hero-card">
-<div style="display:flex;justify-content:space-between;align-items:center">
-<div>
-<div class="muted">Top-Pitch</div>
-<strong>SmartHome Energy</strong>
+  <div class="flex-between">
+    <div>
+      <div class="muted">Top-Pitch</div>
+      <strong>SmartHome Energy</strong>
+    </div>
+    <div class="tag">AI · Energy</div>
+  </div>
+  <img src="https://picsum.photos/seed/hero/900/520" alt="mockup" class="mt-12 img-round-8" />
+  <div class="flex-between mt-10">
+    <div class="muted">Funding Ziel: 400k €</div>
+    <div class="muted">Anteile: 8%</div>
+  </div>
 </div>
-<div class="tag">AI · Energy</div>
-</div>
-<img src="https://picsum.photos/seed/hero/900/520" alt="mockup" style="margin-top:12px;border-radius:8px" />
-<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
-<div class="muted">Funding Ziel: 400k €</div>
-<div class="muted">Anteile: 8%</div>
-</div>
-</div>
-<div style="margin-top:12px" class="card">
-<strong>Unsere Versprechen</strong>
-<div class="muted" style="margin-top:8px">Kuratiert, transparent und datengetrieben — vorbereitet für echte Investitionsprozesse.</div>
+<div class="card mt-12">
+  <strong>Unsere Versprechen</strong>
+  <div class="muted mt-8">Kuratiert, transparent und datengetrieben — vorbereitet für echte Investitionsprozesse.</div>
 </div>
 </aside>
 </div>
-<div style="margin-top:28px">
+<div class="mt-28">
 <h2>Marktplatz — Vorschau</h2>
 <p class="muted">Eine Auswahl interessanter Pitches. Voller Zugriff im Marktplatz.</p>
 <div class="list">
