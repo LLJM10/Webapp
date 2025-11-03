@@ -1,6 +1,9 @@
 <template>
-  <div class="auth-container">
-    <div class="card">
+  <div class="page-auth-wrapper">
+    <TextType text="Willkommen bei Investify — Registrierung" className="header-typetext" />
+
+    <div class="auth-container">
+      <div class="card">
       <div class="brand">
         <div class="logo">iv</div>
         <h1 class="title">Konto erstellen</h1>
@@ -63,14 +66,16 @@
       
       <p class="link-text">
         Schon ein Konto? 
-        <NuxtLink to="/">Hier anmelden</NuxtLink>
+        <NuxtLink to="/login">Hier anmelden</NuxtLink>
       </p>
     </div>
+  </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import TextType from '~/components/TextType.vue';
 
 const username = ref('');
 const email = ref('');
@@ -252,6 +257,21 @@ body {
   border-radius: 10px;
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
+}
+
+.header-typetext {
+  display: block;
+  text-align: center;
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin: 1rem 0 1.25rem;
+  color: var(--accent);
+}
+
+.page-auth-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>
 

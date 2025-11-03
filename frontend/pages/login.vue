@@ -1,11 +1,14 @@
 <template>
-  <div class="auth-container">
-    <div class="card">
-      <div class="brand">
-        <div class="logo">iv</div>
-        <h1 class="title">Login bei investify</h1>
-      </div>
-      <p class="subtitle">Bitte melde dich an, um fortzufahren.</p>
+  <div class="page-auth-wrapper">
+    <TextType text="Willkommen bei Investify — Login" className="header-typetext" />
+
+    <div class="auth-container">
+      <div class="card">
+        <div class="brand">
+          <div class="logo">iv</div>
+          <h1 class="title">Login bei investify</h1>
+        </div>
+        <p class="subtitle">Bitte melde dich an, um fortzufahren.</p>
 
       <div v-if="errorMessage" class="error-message">
         {{ errorMessage }}
@@ -29,12 +32,14 @@
         Noch kein Konto? 
         <NuxtLink to="/registration">Jetzt registrieren</NuxtLink>
       </p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import TextType from '~/components/TextType.vue';
 
 const username = ref('');
 const password = ref('');
@@ -85,6 +90,21 @@ const handleLogin = async () => {
   align-items: center;
   min-height: 100vh;
   padding: 1rem;
+}
+
+.header-typetext {
+  display: block;
+  text-align: center;
+  font-size: 2.25rem; /* etwas größer */
+  font-weight: 800;
+  margin: 1rem 0 1.25rem;
+  color: var(--accent);
+}
+
+.page-auth-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .card {
