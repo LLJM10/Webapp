@@ -3,8 +3,8 @@ from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, BasePermission
 
-from .models import Todo, Pitch
-from .serializers import TodoSerializer, PitchSerializer
+from .models import Todo, Pitch, Event
+from .serializers import TodoSerializer, PitchSerializer, EventSerializer
 
 
 @api_view(["GET"])
@@ -66,6 +66,48 @@ class PitchViewSet(viewsets.ModelViewSet):
             return qs
         else:
             # Public users see only public pitches
+            return qs.filter(is_public=True)
+        
+        return qs
+
+
+class EventViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for Event model.
+    - Anonymous users can list/read public events.
+    - Authenticated users can create events (owner set automatically).
+    - Only owner can update/delete their events.
+    - ?mine=true filter returns only events of the authenticated user.
+    """
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+
+    def perform_create(self, serializer):
+        """Set owner to the current user when creating an event."""
+        serializer.save(owner=self.request.user)
+
+    def get_queryset(self):
+        """
+        Optionally filter queryset:
+        - ?mine=true returns only user's own events (requires auth)
+        - Otherwise returns public events (is_public=True) or all if staff
+        """
+        qs = super().get_queryset()
+        
+        # If user requests their own events
+        if self.request.query_params.get('mine') in ['1', 'true', 'True']:
+            if self.request.user.is_authenticated:
+                return qs.filter(owner=self.request.user)
+            else:
+                return qs.none()  # Anonymous users have no events
+        
+        # For public listing (marketplace)
+        if self.request.user.is_authenticated and self.request.user.is_staff:
+            # Staff can see all events
+            return qs
+        else:
+            # Public users see only public events
             return qs.filter(is_public=True)
         
         return qs

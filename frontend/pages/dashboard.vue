@@ -71,8 +71,19 @@
             <div style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
                 <!-- Liste der existierenden Events -->
                 <div v-for="event in myEvents" :key="event.id" class="card">
-                     <strong>{{ event.name }}</strong>
-                     <div class="muted" style="margin-top: 4px;">{{ event.topic }} · {{ event.location }} · {{ event.duration }} Minuten</div>
+                  <img :src="event.img || 'https://picsum.photos/seed/event/900/480'" :alt="event.name" style="width:100%;border-radius:8px;object-fit:cover;height:200px">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+                    <div>
+                      <strong>{{ event.name }}</strong>
+                      <div class="muted">{{ formatEventDate(event.date) }} · {{ event.location }}</div>
+                    </div>
+                    <div class="muted">Host: {{ event.host }}</div>
+                  </div>
+                  <p class="muted" style="margin-top:8px">{{ event.description }}</p>
+                  <div style="display:flex;gap:8px;margin-top:8px">
+                    <button class="btn ghost" @click="openEditEventModal(event)">Bearbeiten</button>
+                    <button class="btn ghost danger" @click="confirmDeleteEvent(event)">Löschen</button>
+                  </div>
                 </div>
                 <div v-if="!myEvents.length" class="card muted" style="text-align:center; padding: 24px;">
                     Du hast noch keine Events erstellt.
@@ -99,36 +110,168 @@
         <p class="muted">Fülle die Felder aus, um ein neues Event zu planen.</p>
         <form @submit.prevent="handleCreateEvent">
           <div class="input-group">
-            <label for="eventName">Name des Events</label>
-            <input id="eventName" v-model="newEvent.name" type="text" placeholder="z.B. Tech Meetup Berlin" required>
+            <label for="eventName">Name des Events *</label>
+            <input 
+              id="eventName" 
+              v-model="newEvent.name" 
+              type="text" 
+              placeholder="z.B. Tech Meetup Berlin" 
+              :class="{ 'error': validationErrors.name }"
+              required
+            >
+            <span v-if="validationErrors.name" class="error-text">{{ validationErrors.name }}</span>
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <div class="input-group">
-                <label for="eventDuration">Dauer in Minuten</label>
-                <input id="eventDuration" v-model.number="newEvent.duration" type="number" min="1" placeholder="z.B. 90" required>
+                <label for="eventDuration">Dauer (Minuten) *</label>
+                <input 
+                  id="eventDuration" 
+                  v-model.number="newEvent.duration" 
+                  type="number" 
+                  min="1" 
+                  max="480"
+                  placeholder="z.B. 90" 
+                  :class="{ 'error': validationErrors.duration }"
+                  required
+                >
+                <span v-if="validationErrors.duration" class="error-text">{{ validationErrors.duration }}</span>
               </div>
               <div class="input-group">
-                <label for="eventLocation">Ort</label>
-                <input id="eventLocation" v-model="newEvent.location" type="text" placeholder="z.B. Berlin oder Online" required>
+                <label for="eventLocation">Ort/Platform *</label>
+                <input 
+                  id="eventLocation" 
+                  v-model="newEvent.location" 
+                  type="text" 
+                  placeholder="z.B. MS Teams, Zoom" 
+                  :class="{ 'error': validationErrors.location }"
+                  required
+                >
+                <span v-if="validationErrors.location" class="error-text">{{ validationErrors.location }}</span>
               </div>
           </div>
           <div class="input-group">
-            <label for="eventTopic">Thema</label>
-            <input id="eventTopic" v-model="newEvent.topic" type="text" placeholder="z.B. AI & Web3" required>
+            <label for="eventTopic">Thema *</label>
+            <input 
+              id="eventTopic" 
+              v-model="newEvent.topic" 
+              type="text" 
+              placeholder="z.B. AI & Web3" 
+              :class="{ 'error': validationErrors.topic }"
+              required
+            >
+            <span v-if="validationErrors.topic" class="error-text">{{ validationErrors.topic }}</span>
+          </div>
+          <div class="input-group">
+            <label for="eventDate">Datum und Uhrzeit *</label>
+            <input 
+              id="eventDate" 
+              v-model="newEvent.date" 
+              type="datetime-local" 
+              :class="{ 'error': validationErrors.date }"
+              required
+            >
+            <span v-if="validationErrors.date" class="error-text">{{ validationErrors.date }}</span>
+          </div>
+          <div class="input-group">
+            <label for="eventHost">Host/Organisation</label>
+            <input 
+              id="eventHost" 
+              v-model="newEvent.host" 
+              type="text" 
+              placeholder="z.B. HealthInvest (optional)"
+            >
           </div>
           <div class="input-group">
             <label for="eventLink">Online Link (optional)</label>
             <input id="eventLink" v-model="newEvent.link" type="url" placeholder="https://teams.microsoft.com/...">
           </div>
           <div class="input-group">
-            <label for="eventDesc">Beschreibung</label>
-            <textarea id="eventDesc" v-model="newEvent.description" rows="3" placeholder="Beschreibe kurz das Event..."></textarea>
+            <label for="eventImg">Titelbild URL</label>
+            <input id="eventImg" v-model="newEvent.img" type="url" placeholder="https://picsum.photos/seed/e1/900/480">
+          </div>
+          <div class="input-group">
+            <label for="eventDesc">Beschreibung *</label>
+            <textarea 
+              id="eventDesc" 
+              v-model="newEvent.description" 
+              rows="3" 
+              placeholder="Panel: Regulierung & Markteintritt..."
+              :class="{ 'error': validationErrors.description }"
+              required
+            ></textarea>
+            <span v-if="validationErrors.description" class="error-text">{{ validationErrors.description }}</span>
           </div>
           <div class="modal-actions">
             <button type="button" class="btn ghost" @click="showCreateEventModal = false">Abbrechen</button>
             <button type="submit" class="btn primary">Event erstellen</button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- NEU: Edit Event Modal -->
+    <div v-if="showEditEventModal" class="modal-overlay" @click.self="showEditEventModal = false">
+      <div class="card modal-content">
+        <h3>Event bearbeiten</h3>
+        <form @submit.prevent="handleUpdateEvent">
+          <div class="input-group">
+            <label>Name des Events *</label>
+            <input v-model="editingEvent.name" type="text" required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="input-group">
+                <label>Dauer (Minuten) *</label>
+                <input v-model.number="editingEvent.duration" type="number" min="1" max="480" required>
+              </div>
+              <div class="input-group">
+                <label>Ort/Platform *</label>
+                <input v-model="editingEvent.location" type="text" required>
+              </div>
+          </div>
+          <div class="input-group">
+            <label>Thema *</label>
+            <input v-model="editingEvent.topic" type="text" required>
+          </div>
+          <div class="input-group">
+            <label>Datum und Uhrzeit *</label>
+            <input v-model="editingEvent.date" type="datetime-local" required>
+          </div>
+          <div class="input-group">
+            <label>Host/Organisation</label>
+            <input v-model="editingEvent.host" type="text">
+          </div>
+          <div class="input-group">
+            <label>Online Link</label>
+            <input v-model="editingEvent.link" type="url">
+          </div>
+          <div class="input-group">
+            <label>Titelbild URL</label>
+            <input v-model="editingEvent.img" type="url">
+          </div>
+          <div class="input-group">
+            <label>Beschreibung *</label>
+            <textarea v-model="editingEvent.description" rows="3" required></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn ghost" @click="showEditEventModal = false">Abbrechen</button>
+            <button type="submit" class="btn primary">Speichern</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- NEU: Delete Confirmation Modal -->
+    <div v-if="showDeleteConfirmation" class="modal-overlay" @click.self="showDeleteConfirmation = false">
+      <div class="card modal-content">
+        <h3>Event löschen?</h3>
+        <p class="muted">
+          Möchtest du das Event "{{ eventToDelete?.name }}" wirklich löschen? 
+          Diese Aktion kann nicht rückgängig gemacht werden.
+        </p>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <button class="btn ghost" @click="showDeleteConfirmation = false">Abbrechen</button>
+          <button class="btn danger" @click="deleteEvent">Löschen bestätigen</button>
+        </div>
       </div>
     </div>
 
@@ -147,6 +290,11 @@ const myPitches = ref([]); // Startet mit einer leeren Liste
 const myEvents = ref([]); // NEU: Liste für Events
 const showCreateModal = ref(false);
 const showCreateEventModal = ref(false); // NEU: State für Event-Modal
+const showEditEventModal = ref(false); // State für Edit-Modal
+const showDeleteConfirmation = ref(false); // State für Delete-Confirmation
+const eventToDelete = ref(null); // Event das gelöscht werden soll
+const editingEvent = ref(null); // Event das bearbeitet wird
+const validationErrors = ref({}); // Validierungsfehler
 
 // Datenmodell für einen neuen Pitch
 const newPitch = ref({
@@ -167,8 +315,11 @@ const newEvent = ref({
   duration: null,
   location: '',
   topic: '',
+  date: '',
+  host: '',
   link: '',
-  description: ''
+  description: '',
+  img: ''
 });
 
 // LocalStorage helpers: load/save lists so created items survive page reloads (Option A)
@@ -249,23 +400,25 @@ onMounted(async () => {
   }
 
   // Load saved Events from localStorage if available, otherwise use demo data
-  try {
-    if (typeof window !== 'undefined') {
-      const savedEvents = localStorage.getItem('myEvents');
-      if (savedEvents) {
-        myEvents.value = JSON.parse(savedEvents);
+  if (apiBase && token) {
+    try {
+      const res = await fetch(`${apiBase}/events/?mine=true`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const backendEvents = await res.json();
+        myEvents.value = backendEvents;
+        console.debug('Loaded events from backend:', backendEvents.length);
       } else {
-        myEvents.value = [
-          { id: 1, name: 'Tech Meetup Berlin', duration: 180, location: 'Berlin', topic: 'AI & Web3', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.' }
-        ];
+        console.warn('Backend events request failed with status', res.status);
+        loadEventsFromLocalStorage();
       }
-    } else {
-      myEvents.value = [
-        { id: 1, name: 'Tech Meetup Berlin', duration: 180, location: 'Berlin', topic: 'AI & Web3', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.' }
-      ];
+    } catch (e) {
+      console.warn('Failed to fetch events from backend, falling back to localStorage', e);
+      loadEventsFromLocalStorage();
     }
-  } catch (e) {
-    console.warn('Error loading events from localStorage', e);
+  } else {
+    loadEventsFromLocalStorage();
   }
 });
 
@@ -291,6 +444,39 @@ function loadPitchesFromLocalStorage() {
   } catch (e) {
     console.warn('Error loading saved data from localStorage', e);
   }
+}
+
+function loadEventsFromLocalStorage() {
+  try {
+    if (typeof window !== 'undefined') {
+      const savedEvents = localStorage.getItem('myEvents');
+      if (savedEvents) {
+        myEvents.value = JSON.parse(savedEvents);
+      } else {
+        myEvents.value = [
+          { id: 1, name: 'Tech Meetup Berlin', duration: 180, location: 'MS Teams', topic: 'AI & Web3', date: '2025-11-15T14:00', host: 'TechHub', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.', img: 'https://picsum.photos/seed/e1/900/480' }
+        ];
+      }
+    } else {
+      myEvents.value = [
+        { id: 1, name: 'Tech Meetup Berlin', duration: 180, location: 'MS Teams', topic: 'AI & Web3', date: '2025-11-15T14:00', host: 'TechHub', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.', img: 'https://picsum.photos/seed/e1/900/480' }
+      ];
+    }
+  } catch (e) {
+    console.warn('Error loading events from localStorage', e);
+  }
+}
+
+// Datum-Formatierung: "Do, 09.10 · 14:00"
+function formatEventDate(dateString) {
+  if (!dateString) return 'Datum nicht verfügbar';
+  const date = new Date(dateString);
+  const weekday = date.toLocaleDateString('de-DE', { weekday: 'short' });
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${weekday}, ${day}.${month} · ${hours}:${minutes}`;
 }
 
 async function openCreateModal() {
@@ -323,6 +509,7 @@ function handleCreatePitch() {
 // NEU: Funktion zum Öffnen des Event-Modals
 async function openCreateEventModal() {
   showCreateEventModal.value = true;
+  validationErrors.value = {};
   await nextTick();
   const modalElement = document.getElementById('create-event-modal');
   if (modalElement) {
@@ -330,21 +517,213 @@ async function openCreateEventModal() {
   }
 }
 
-// NEU: Funktion zum Erstellen eines Events
-function handleCreateEvent() {
-  const eventToAdd = { 
-    ...newEvent.value, 
-    id: Date.now()
+// Validation für Event-Formular
+function validateEventForm() {
+  validationErrors.value = {};
+  let isValid = true;
+  
+  if (!newEvent.value.name || newEvent.value.name.trim().length < 3) {
+    validationErrors.value.name = 'Event-Name muss mindestens 3 Zeichen haben.';
+    isValid = false;
+  }
+  
+  if (!newEvent.value.duration || newEvent.value.duration <= 0) {
+    validationErrors.value.duration = 'Dauer muss größer als 0 sein.';
+    isValid = false;
+  } else if (newEvent.value.duration > 480) {
+    validationErrors.value.duration = 'Event kann maximal 8 Stunden (480 Min) dauern.';
+    isValid = false;
+  }
+  
+  const eventDate = new Date(newEvent.value.date);
+  const now = new Date();
+  if (!newEvent.value.date) {
+    validationErrors.value.date = 'Bitte wähle ein Datum aus.';
+    isValid = false;
+  } else if (eventDate < now) {
+    validationErrors.value.date = 'Event-Datum muss in der Zukunft liegen.';
+    isValid = false;
+  }
+  
+  if (!newEvent.value.topic || newEvent.value.topic.trim().length === 0) {
+    validationErrors.value.topic = 'Thema ist erforderlich.';
+    isValid = false;
+  }
+  
+  if (!newEvent.value.location || newEvent.value.location.trim().length === 0) {
+    validationErrors.value.location = 'Ort/Platform ist erforderlich.';
+    isValid = false;
+  }
+  
+  if (!newEvent.value.description || newEvent.value.description.trim().length === 0) {
+    validationErrors.value.description = 'Beschreibung ist erforderlich.';
+    isValid = false;
+  }
+  
+  return isValid;
+}
+
+// NEU: Funktion zum Erstellen eines Events (mit Backend)
+async function handleCreateEvent() {
+  if (!validateEventForm()) {
+    return;
+  }
+
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+
+  const eventData = {
+    name: newEvent.value.name,
+    topic: newEvent.value.topic,
+    location: newEvent.value.location,
+    duration: newEvent.value.duration,
+    date: newEvent.value.date,
+    link: newEvent.value.link || '',
+    description: newEvent.value.description,
+    img: newEvent.value.img || 'https://picsum.photos/seed/event/900/480',
+    host: newEvent.value.host || user.value.username
   };
 
-  myEvents.value.unshift(eventToAdd);
-  // Persist events as well
-  saveEventsToLocalStorage();
-  console.log('Neues Event erstellt:', eventToAdd);
-  showCreateEventModal.value = false;
+  if (apiBase && token) {
+    try {
+      const res = await fetch(`${apiBase}/events/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(eventData)
+      });
+      
+      if (res.ok) {
+        const createdEvent = await res.json();
+        myEvents.value.unshift(createdEvent);
+        console.log('Event erfolgreich erstellt:', createdEvent);
+        showCreateEventModal.value = false;
+        // Reset form
+        newEvent.value = {
+          id: null, name: '', duration: null, location: '', topic: '', date: '', host: '', link: '', description: '', img: ''
+        };
+      } else {
+        const errorData = await res.json();
+        console.error('Fehler beim Erstellen:', errorData);
+        alert('Fehler beim Erstellen: ' + JSON.stringify(errorData));
+      }
+    } catch (e) {
+      console.error('Create event failed:', e);
+      alert('Netzwerkfehler beim Erstellen des Events.');
+    }
+  } else {
+    // Fallback: localStorage
+    const eventToAdd = { ...eventData, id: Date.now() };
+    myEvents.value.unshift(eventToAdd);
+    saveEventsToLocalStorage();
+    showCreateEventModal.value = false;
+    newEvent.value = {
+      id: null, name: '', duration: null, location: '', topic: '', date: '', host: '', link: '', description: '', img: ''
+    };
+  }
+}
 
-  newEvent.value = {
-    id: null, name: '', duration: null, location: '', topic: '', link: '', description: ''
-  };
+// Event bearbeiten
+function openEditEventModal(event) {
+  editingEvent.value = { ...event };
+  showEditEventModal.value = true;
+}
+
+async function handleUpdateEvent() {
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+
+  if (apiBase && token) {
+    try {
+      const res = await fetch(`${apiBase}/events/${editingEvent.value.id}/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(editingEvent.value)
+      });
+      
+      if (res.ok) {
+        const updated = await res.json();
+        const idx = myEvents.value.findIndex(e => e.id === updated.id);
+        if (idx !== -1) myEvents.value[idx] = updated;
+        console.log('Event erfolgreich aktualisiert');
+        showEditEventModal.value = false;
+      } else {
+        const errorData = await res.json();
+        console.error('Fehler beim Aktualisieren:', errorData);
+        alert('Fehler: ' + JSON.stringify(errorData));
+      }
+    } catch (e) {
+      console.error('Update failed:', e);
+      alert('Netzwerkfehler beim Aktualisieren.');
+    }
+  }
+}
+
+// Event löschen
+function confirmDeleteEvent(event) {
+  eventToDelete.value = event;
+  showDeleteConfirmation.value = true;
+}
+
+async function deleteEvent() {
+  if (!eventToDelete.value) return;
+  
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  if (apiBase && token) {
+    try {
+      const res = await fetch(`${apiBase}/events/${eventToDelete.value.id}/`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (res.ok || res.status === 204) {
+        myEvents.value = myEvents.value.filter(e => e.id !== eventToDelete.value.id);
+        console.log('Event erfolgreich gelöscht');
+        showDeleteConfirmation.value = false;
+        eventToDelete.value = null;
+      } else {
+        console.error('Fehler beim Löschen:', res.status);
+        alert('Event konnte nicht gelöscht werden. Bist du der Eigentümer?');
+      }
+    } catch (e) {
+      console.error('Delete failed:', e);
+      alert('Netzwerkfehler beim Löschen.');
+    }
+  }
 }
 </script>
+
+<style scoped>
+input.error,
+textarea.error {
+  border-color: #ef4444;
+}
+
+.error-text {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 4px;
+  display: block;
+}
+
+.btn.danger {
+  background: #ef4444;
+  color: white;
+}
+
+.btn.danger:hover {
+  background: #dc2626;
+}
+</style>

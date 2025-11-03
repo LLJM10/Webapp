@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "gsap": "^3.13.0",
     "motion-v": "^1.7.2"
   }
 }

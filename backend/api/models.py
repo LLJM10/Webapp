@@ -50,3 +50,36 @@ class Pitch(models.Model):
 
     def __str__(self):
         return f'{self.title} ({self.owner.username})'
+
+
+class Event(models.Model):
+    """
+    Model to store events created by users.
+    Each event is owned by a user (ForeignKey to AUTH_USER_MODEL).
+    """
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='events',
+        help_text='User who created this event'
+    )
+    name = models.CharField(max_length=200, help_text='Event name')
+    topic = models.CharField(max_length=200, help_text='Event topic or panel description')
+    location = models.CharField(max_length=200, help_text='Location or platform (e.g., MS Teams, Zoom)')
+    duration = models.IntegerField(help_text='Duration in minutes')
+    date = models.DateTimeField(help_text='Event date and time')
+    link = models.URLField(blank=True, help_text='Meeting link or registration URL')
+    description = models.TextField(help_text='Detailed event description')
+    img = models.URLField(blank=True, help_text='Event cover image URL')
+    host = models.CharField(max_length=200, blank=True, help_text='Host name or organization')
+    is_public = models.BooleanField(default=True, help_text='Whether event is visible on marketplace')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['date']  # Order by event date (upcoming first)
+        verbose_name = 'Event'
+        verbose_name_plural = 'Events'
+
+    def __str__(self):
+        return f'{self.name} ({self.owner.username})'
