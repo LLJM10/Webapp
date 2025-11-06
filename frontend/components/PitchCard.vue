@@ -1,5 +1,5 @@
 <template>
-  <div class="pitch" :class="{ 'pitch-clickable': isOwner }" @click="handleCardClick">
+  <div class="pitch pitch-clickable" @click="handleCardClick">
     <div class="meta">
       <div>
         <strong>{{ pitch.title }}</strong>
@@ -46,7 +46,7 @@
     </div>
     
     <div style="display:flex;gap:8px;margin-top:8px">
-      <NuxtLink :to="`/detail/${pitch.id}`" class="btn ghost" @click.stop>Vorschau</NuxtLink>
+      <button class="btn ghost" @click.stop="navigateToDetail">Vorschau</button>
       <button class="btn primary" @click.stop="dummyApi('/api/favorite?startup='+pitch.id)">Merken</button>
     </div>
   </div>
@@ -76,12 +76,19 @@ const isOwner = computed(() => {
   return auth.user?.id === props.pitch.owner;
 });
 
-// Navigation zur Edit-Seite nur wenn der User der Owner ist
+// Navigation zur Edit-Seite nur wenn der User der Owner ist und auf die Card klickt
+// Sonst zur Detail-Seite für Nicht-Owner
 function handleCardClick() {
   if (isOwner.value) {
     router.push({ path: '/pitches/formular', query: { id: props.pitch.id } });
+  } else {
+    router.push({ path: '/detail/' + props.pitch.id });
   }
-  // Wenn nicht Owner: nichts tun (später Detail-Seite)
+}
+
+// Vorschau-Button führt IMMER zur Detail-Ansicht (auch für Owner)
+function navigateToDetail() {
+  router.push({ path: '/detail/' + props.pitch.id });
 }
 </script>
 
