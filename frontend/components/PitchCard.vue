@@ -1,5 +1,5 @@
 <template>
-  <div class="pitch" @click="navigateToEdit">
+  <div class="pitch" :class="{ 'pitch-clickable': isOwner }" @click="handleCardClick">
     <div class="meta">
       <div>
         <strong>{{ pitch.title }}</strong>
@@ -53,7 +53,9 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '~/stores/auth';
 // Wir importieren nur die dummyApi, da die Pitch-Daten über Props kommen
 import { dummyApi } from '~/composables/useDemoData'; 
 
@@ -67,9 +69,29 @@ const props = defineProps({
 
 // Router-Instanz für die Navigation
 const router = useRouter();
+const auth = useAuthStore();
 
-// Navigation zur Edit-Seite (Formular) wenn die Karte geklickt wird
-function navigateToEdit() {
-  router.push({ path: '/pitches/formular', query: { id: props.pitch.id } });
+// Prüfen, ob der aktuelle User der Owner des Pitches ist
+const isOwner = computed(() => {
+  return auth.user?.id === props.pitch.owner;
+});
+
+// Navigation zur Edit-Seite nur wenn der User der Owner ist
+function handleCardClick() {
+  if (isOwner.value) {
+    router.push({ path: '/pitches/formular', query: { id: props.pitch.id } });
+  }
+  // Wenn nicht Owner: nichts tun (später Detail-Seite)
 }
 </script>
+
+<style scoped>
+.pitch-clickable {
+  cursor: pointer;
+}
+
+.pitch-clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+</style>
