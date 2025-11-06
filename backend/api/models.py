@@ -39,6 +39,27 @@ class Pitch(models.Model):
     desc = models.TextField(blank=True, help_text='Pitch description')
     img = models.URLField(blank=True, help_text='Image URL for pitch card')
     valuation = models.CharField(max_length=64, blank=True, help_text='Calculated valuation')
+    
+    # PDF file uploads
+    pitch_deck = models.FileField(
+        upload_to='pitch_decks/',
+        blank=True,
+        null=True,
+        help_text='Pitch Deck PDF file'
+    )
+    business_plan = models.FileField(
+        upload_to='business_plans/',
+        blank=True,
+        null=True,
+        help_text='Business Plan PDF file'
+    )
+    financial_report = models.FileField(
+        upload_to='financial_reports/',
+        blank=True,
+        null=True,
+        help_text='Financial Report PDF file'
+    )
+    
     is_public = models.BooleanField(default=True, help_text='Whether pitch is visible on marketplace')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

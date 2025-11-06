@@ -9,6 +9,42 @@
     </div>
     <img :src="pitch.img" :alt="pitch.title">
     <div class="muted">{{ pitch.desc }}</div>
+    
+    <!-- PDF Download Links -->
+    <div v-if="pitch.pitch_deck || pitch.business_plan || pitch.financial_report" 
+         class="card mt-12" 
+         style="background:var(--glass);border:1px solid rgba(255,255,255,0.04);padding:12px">
+      <div class="muted" style="font-size:0.875rem;margin-bottom:8px;font-weight:600">
+        📎 Dokumente
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a v-if="pitch.pitch_deck" 
+           :href="pitch.pitch_deck" 
+           target="_blank" 
+           class="btn ghost" 
+           style="font-size:0.875rem;padding:8px 12px"
+           @click.stop>
+          📄 Pitch Deck
+        </a>
+        <a v-if="pitch.business_plan" 
+           :href="pitch.business_plan" 
+           target="_blank" 
+           class="btn ghost" 
+           style="font-size:0.875rem;padding:8px 12px"
+           @click.stop>
+          📊 Business Plan
+        </a>
+        <a v-if="pitch.financial_report" 
+           :href="pitch.financial_report" 
+           target="_blank" 
+           class="btn ghost" 
+           style="font-size:0.875rem;padding:8px 12px"
+           @click.stop>
+          💰 Financial Report
+        </a>
+      </div>
+    </div>
+    
     <div style="display:flex;gap:8px;margin-top:8px">
       <NuxtLink :to="`/detail/${pitch.id}`" class="btn ghost" @click.stop>Vorschau</NuxtLink>
       <button class="btn primary" @click.stop="dummyApi('/api/favorite?startup='+pitch.id)">Merken</button>

@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, BasePermission
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from .models import Todo, Pitch, Event
 from .serializers import TodoSerializer, PitchSerializer, EventSerializer
@@ -40,6 +41,7 @@ class PitchViewSet(viewsets.ModelViewSet):
     queryset = Pitch.objects.all()
     serializer_class = PitchSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def perform_create(self, serializer):
         """Set owner to the current user when creating a pitch."""

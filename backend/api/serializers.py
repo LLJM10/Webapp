@@ -14,15 +14,45 @@ class PitchSerializer(serializers.ModelSerializer):
     owner is read-only and set automatically in the viewset.
     """
     owner = serializers.CharField(source='owner.username', read_only=True)
+    
+    # FileFields explizit deklarieren für bessere Kontrolle
+    pitch_deck = serializers.FileField(required=False, allow_null=True)
+    business_plan = serializers.FileField(required=False, allow_null=True)
+    financial_report = serializers.FileField(required=False, allow_null=True)
 
     class Meta:
         model = Pitch
         fields = [
             'id', 'owner', 'title', 'sector', 'stage', 'goal', 
-            'equity', 'desc', 'img', 'valuation', 'is_public', 
+            'equity', 'desc', 'img', 'valuation', 'is_public',
+            'pitch_deck', 'business_plan', 'financial_report',
             'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'owner', 'created_at', 'updated_at']
+    
+    def validate_pitch_deck(self, value):
+        """Validate pitch deck PDF file"""
+        if value and not value.name.endswith('.pdf'):
+            raise serializers.ValidationError("Nur PDF-Dateien erlaubt.")
+        if value and value.size > 10485760:  # 10MB
+            raise serializers.ValidationError("Datei zu groß. Maximum: 10MB")
+        return value
+    
+    def validate_business_plan(self, value):
+        """Validate business plan PDF file"""
+        if value and not value.name.endswith('.pdf'):
+            raise serializers.ValidationError("Nur PDF-Dateien erlaubt.")
+        if value and value.size > 10485760:
+            raise serializers.ValidationError("Datei zu groß. Maximum: 10MB")
+        return value
+    
+    def validate_financial_report(self, value):
+        """Validate financial report PDF file"""
+        if value and not value.name.endswith('.pdf'):
+            raise serializers.ValidationError("Nur PDF-Dateien erlaubt.")
+        if value and value.size > 10485760:
+            raise serializers.ValidationError("Datei zu groß. Maximum: 10MB")
+        return value
 
 
 class EventSerializer(serializers.ModelSerializer):
