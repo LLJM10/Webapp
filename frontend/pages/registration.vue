@@ -11,7 +11,11 @@
       <p class="subtitle">Werde Teil von investify.</p>
 
       <div v-if="successMessage" class="success-message">
+        <div style="font-size:48px;margin-bottom:12px">📧</div>
         {{ successMessage }}
+        <p style="margin-top:12px;font-size:0.875rem">
+          Falls du keine E-Mail erhältst, überprüfe bitte deinen Spam-Ordner.
+        </p>
       </div>
       <div v-if="errorMessage" class="error-message">
         {{ errorMessage }}
@@ -93,7 +97,7 @@ const handleRegister = async () => {
     return;
   }
   try {
-    const response = await fetch('http://127.0.0.1:8000/users/users/', {
+    const response = await fetch('http://127.0.0.1:8000/api/users/users/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: username.value, email: email.value, password: password.value, role: role.value }),
@@ -103,8 +107,12 @@ const handleRegister = async () => {
       const errorText = Object.values(data).join(' ');
       throw new Error(errorText || 'Registrierung fehlgeschlagen.');
     }
-    successMessage.value = 'Erfolgreich! Du wirst zum Login weitergeleitet...';
-    setTimeout(() => navigateTo('/'), 2500); // Angepasst auf die Startseite
+    successMessage.value = 'Registrierung erfolgreich! Bitte überprüfe deine E-Mails für den Verifizierungslink.';
+    // Formular leeren
+    username.value = '';
+    email.value = '';
+    password.value = '';
+    password2.value = '';
   } catch (error: any) {
     errorMessage.value = error.message || 'Ein unbekannter Fehler ist aufgetreten.';
   }
