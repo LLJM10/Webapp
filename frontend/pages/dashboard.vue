@@ -576,6 +576,21 @@ async function openCreateEventModal() {
   }
 }
 
+// Helper: convert an ISO datetime (possibly with timezone) to a string
+// accepted by <input type="datetime-local"> ("YYYY-MM-DDTHH:MM").
+function isoToDatetimeLocal(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const pad = (n) => String(n).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  const MM = pad(d.getMonth() + 1);
+  const dd = pad(d.getDate());
+  const hh = pad(d.getHours());
+  const mm = pad(d.getMinutes());
+  return `${yyyy}-${MM}-${dd}T${hh}:${mm}`;
+}
+
 // Validation für Event-Formular
 function validateEventForm() {
   validationErrors.value = {};
@@ -637,7 +652,8 @@ async function handleCreateEvent() {
     topic: newEvent.value.topic,
     location: newEvent.value.location,
     duration: newEvent.value.duration,
-    date: newEvent.value.date,
+    // convert local datetime-local value to ISO before sending to backend
+    date: newEvent.value.date ? new Date(newEvent.value.date).toISOString() : null,
     link: newEvent.value.link || '',
     description: newEvent.value.description,
     img: newEvent.value.img || 'https://picsum.photos/seed/event/900/480',
@@ -687,7 +703,8 @@ async function handleCreateEvent() {
 
 // Event bearbeiten
 function openEditEventModal(event) {
-  editingEvent.value = { ...event };
+  // copy event and normalize date for datetime-local input
+  editingEvent.value = { ...event, date: isoToDatetimeLocal(event.date) };
   showEditEventModal.value = true;
 }
 
@@ -704,7 +721,11 @@ async function handleUpdateEvent() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(editingEvent.value)
+        // ensure date is sent as ISO string (backend expects timezone-aware datetime)
+        body: JSON.stringify({
+          ...editingEvent.value,
+          date: editingEvent.value.date ? new Date(editingEvent.value.date).toISOString() : null
+        })
       });
       
       if (res.ok) {
