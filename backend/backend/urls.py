@@ -27,7 +27,7 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("api.urls")),  # ruft api/urls.py auf
-    path("users/", include("users.urls")),
+    path("api/users/", include("users.urls")),  # users unter /api/users/
 
     #JWT Endpoints
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),

@@ -12,9 +12,23 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+env_path = BASE_DIR / '.env'
+load_dotenv(dotenv_path=env_path)
+
+# Debug: Print if .env file was found
+if env_path.exists():
+    print(f"✅ .env file found at: {env_path}")
+else:
+    print(f"❌ .env file NOT found at: {env_path}")
+print(f"EMAIL_HOST_USER from env: {os.environ.get('EMAIL_HOST_USER', 'NOT SET')}")
+print(f"EMAIL_HOST_PASSWORD from env: {'SET' if os.environ.get('EMAIL_HOST_PASSWORD') else 'NOT SET'}")
+print("="*50)
 
 
 # Quick-start development settings - unsuitable for production
@@ -162,5 +176,19 @@ PAYPAL_CLIENT_ID = os.environ.get("PAYPAL_CLIENT_ID", "")
 PAYPAL_CLIENT_SECRET = os.environ.get("PAYPAL_CLIENT_SECRET", "")
 # If you use PayPal Webhook verification you'll need your webhook id
 PAYPAL_WEBHOOK_ID = os.environ.get("PAYPAL_WEBHOOK_ID", "")
+
+# Email settings
+# Development: Console Backend (E-Mails im Terminal)
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Production: SMTP Backend (echte E-Mails versenden)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')  # Ihre Gmail-Adresse
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')  # App-Passwort
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@investify.com')
+
 
 
