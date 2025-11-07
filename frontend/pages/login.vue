@@ -39,7 +39,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useAuthStore } from '~/stores/auth';
 import TextType from '~/components/TextType.vue';
+
+const authStore = useAuthStore();
 
 const username = ref('');
 const password = ref('');
@@ -58,24 +61,19 @@ const handleLogin = async () => {
     });
     if (!response.ok) throw new Error('Benutzername oder Passwort ist falsch.');
     const data = await response.json();
+    
+    // Speichere die Tokens im localStorage
     if (typeof window !== 'undefined') {
-      // Nur Tokens im localStorage speichern (sicherer)
       localStorage.setItem('access_token', data.access);
       localStorage.setItem('refresh_token', data.refresh);
-      // Optional: schnelle Validierung des Tokens durch Abruf des eigenen Profils
-      try {
-        const profileRes = await fetch('http://127.0.0.1:8000/users/me/', {
-          headers: { 'Authorization': `Bearer ${data.access}` }
-        });
-        if (profileRes.ok) {
-          // Wir holen die Userdaten nur zur Validierung, speichern sie aber nicht in localStorage
-          const profileData = await profileRes.json();
-          console.debug('Logged in user:', profileData);
-        }
-      } catch (e) {
-        // ignore
-      }
     }
+    
+    // Aktualisiere den Auth Store
+    authStore.$patch({
+      access: data.access,
+      refresh: data.refresh
+    });
+    
     await navigateTo('/dashboard'); // Redirect to a protected page
   } catch (error: any) {
     errorMessage.value = error.message || 'Ein unbekannter Fehler ist aufgetreten.';
