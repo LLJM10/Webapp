@@ -15,6 +15,7 @@ router.register(r'events', EventViewSet, basename='event')
 urlpatterns = [
     path('hello/', hello),
     path('', include(router.urls)),
+    path('payments/', include('payments.urls')),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

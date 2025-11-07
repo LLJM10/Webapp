@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'api',
     'users',
+    'payments',
     "rest_framework_simplejwt.token_blacklist",
 ]
 
@@ -153,4 +154,13 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 }
+
+
+# PayPal settings (set real credentials as environment variables in production)
+PAYPAL_MODE = os.environ.get("PAYPAL_MODE", "sandbox")  # "live" for production
+PAYPAL_CLIENT_ID = os.environ.get("PAYPAL_CLIENT_ID", "")
+PAYPAL_CLIENT_SECRET = os.environ.get("PAYPAL_CLIENT_SECRET", "")
+# If you use PayPal Webhook verification you'll need your webhook id
+PAYPAL_WEBHOOK_ID = os.environ.get("PAYPAL_WEBHOOK_ID", "")
+
 

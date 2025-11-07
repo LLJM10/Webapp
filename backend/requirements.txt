@@ -1,0 +1,2 @@
+requests>=2.28
+# The project likely already has Django and DRF installed. This file only lists the new library used by payments service.

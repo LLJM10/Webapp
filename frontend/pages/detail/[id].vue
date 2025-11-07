@@ -21,7 +21,9 @@
 
             <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
               <button class="btn primary" @click="dummyApi('/api/favorite?pitch=' + pitch.id)">Merken</button>
-              <button class="btn ghost" @click="dummyApi('/api/contact?pitch=' + pitch.id)">Kontakt aufnehmen</button>
+                      <button class="btn ghost" @click="dummyApi('/api/contact?pitch=' + pitch.id)">Kontakt aufnehmen</button>
+                      <!-- Payment button: amount is a simple numeric placeholder. Replace with real value when available. -->
+                      <PaymentButton v-if="pitch" :amount="paymentAmount" label="Investieren" />
             </div>
           </div>
         </div>
@@ -78,9 +80,12 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useRuntimeConfig } from '#app';
 import { dummyApi } from '~/composables/useDemoData';
+import PaymentButton from '~/components/PaymentButton.vue';
 
 const route = useRoute();
 const pitch = ref(null);
+// local state for payment amount
+const paymentAmount = ref('10.00')
 
 onMounted(async () => {
   const config = useRuntimeConfig();
@@ -97,6 +102,10 @@ onMounted(async () => {
       if (res.ok) {
         pitch.value = await res.json();
         console.log('Pitch loaded:', pitch.value);
+        // Derzeit ist pitch.goal ein freitext-Feld; versuche eine einfache numerische Parsung
+        const numeric = pitch.value?.goal?.toString().replace(/[€ ,]/g, '') || ''
+        const parsed = parseFloat(numeric) || 10.00
+        paymentAmount.value = parsed.toFixed(2)
       } else {
         console.error('Failed to load pitch:', res.status);
       }
