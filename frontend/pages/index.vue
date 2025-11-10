@@ -1,57 +1,80 @@
 <template>
 <section id="page-landing">
-<div class="hero">
-<div>
-<h1 class="large">Investiere in die Innovation von morgen — mit <span style="color:var(--accent)">investify</span>.</h1>
-<p class="lead">Eine sichere B2B-Plattform, die Gründer & verifizierte Investoren zusammenbringt. Pitch hochladen, Investoren finden, Co-Investments organisieren und Wachstum skalieren — alles an einem Ort.</p>
-<div class="cta-row">
-<NuxtLink to="/profile" class="btn primary">Jetzt Demo-Profil ansehen</NuxtLink>
-<NuxtLink to="/market" class="btn ghost">Marktplatz vorschau</NuxtLink>
-</div>
-<div class="grid-3">
-<FeatureCard title="Pitching & Dokumente" desc="Strukturierte Pitch-Profile mit Video, Cap Table und KPIs für bessere Entscheidungen." />
-<FeatureCard title="Verifiziertes Netzwerk" desc="KYC & OpenVerify Workflows, Co-Investor Matching und Due Diligence Tools." />
-<FeatureCard title="Intelligente Matches" desc="AI-gestützte Empfehlungen für Deals, basierend auf Präferenzen & Track Record." />
-</div>
-<div class="flex gap-12 mt-20 align-center">
-  <div class="badge">Demo & Mock Data</div>
-  <div class="muted">Seiten vollständig im Look gefüllt — klick dich durch.</div>
-</div>
-</div>
-<aside>
-<div class="hero-card">
-  <div class="flex-between">
-    <div>
-      <div class="muted">Top-Pitch</div>
-      <strong>SmartHome Energy</strong>
+<div class="hero-centered">
+  <div class="hero-content">
+    <h1 class="large">Investiere in die Innovation von morgen — mit <span style="color:var(--accent)">investify</span>.</h1>
+    <p class="lead">Eine sichere B2B-Plattform, die Gründer & verifizierte Investoren zusammenbringt. Pitch hochladen, Investoren finden, Co-Investments organisieren und Wachstum skalieren — alles an einem Ort.</p>
+    <div class="cta-row">
+      <!-- Dynamischer Button basierend auf Login-Status -->
+      <NuxtLink 
+        :to="authStore.access ? '/profile' : '/login'" 
+        class="btn primary">
+        {{ authStore.access ? 'Jetzt Profil bearbeiten' : 'Jetzt einloggen' }}
+      </NuxtLink>
+      <!-- Marktplatz-Button nur für eingeloggte User -->
+      <NuxtLink 
+        v-if="authStore.access" 
+        to="/market" 
+        class="btn ghost">
+        Zum Marktplatz
+      </NuxtLink>
     </div>
-    <div class="tag">AI · Energy</div>
-  </div>
-  <img src="https://picsum.photos/seed/hero/900/520" alt="mockup" class="mt-12 img-round-8" />
-  <div class="flex-between mt-10">
-    <div class="muted">Funding Ziel: 400k €</div>
-    <div class="muted">Anteile: 8%</div>
   </div>
 </div>
-<div class="card mt-12">
-  <strong>Unsere Versprechen</strong>
-  <div class="muted mt-8">Kuratiert, transparent und datengetrieben — vorbereitet für echte Investitionsprozesse.</div>
+
+<!-- Features Grid -->
+<div class="features-section">
+  <div class="grid-3">
+    <FeatureCard title="Pitching & Dokumente" desc="Strukturierte Pitch-Profile mit Video, Cap Table und KPIs für bessere Entscheidungen." />
+    <FeatureCard title="Verifiziertes Netzwerk" desc="KYC & OpenVerify Workflows, Co-Investor Matching und Due Diligence Tools." />
+    <FeatureCard title="Intelligente Matches" desc="AI-gestützte Empfehlungen für Deals, basierend auf Präferenzen & Track Record." />
+  </div>
 </div>
-</aside>
+
+<!-- KPI Section -->
+<div class="kpi-section">
+  <div class="kpi-grid">
+    <KPICard 
+      :value="98" 
+      suffix="%" 
+      label="Kundenzufriedenheit" 
+    />
+    <KPICard 
+      :value="150" 
+      prefix=">" 
+      label="Deals abgeschlossen" 
+    />
+    <KPICard 
+      :value="10.5" 
+      prefix=">" 
+      suffix="M €" 
+      label="Transaktionsvolumen" 
+    />
+    <KPICard 
+      :value="100" 
+      prefix=">" 
+      label="Aktive Investoren" 
+    />
+  </div>
 </div>
-<div class="mt-28">
-<h2>Marktplatz — Vorschau</h2>
-<p class="muted">Eine Auswahl interessanter Pitches. Voller Zugriff im Marktplatz.</p>
-<div class="list">
-<PitchCard v-for="s in previewStartups" :key="s.id" :pitch="s" />
-</div>
+
+<!-- Marktplatz-Vorschau nur für eingeloggte User -->
+<div v-if="authStore.access" class="marketplace-preview">
+  <h2>Zum Marktplatz</h2>
+  <p class="muted">Eine Auswahl interessanter Pitches. Voller Zugriff im Marktplatz.</p>
+  <div class="list">
+    <PitchCard v-for="s in previewStartups" :key="s.id" :pitch="s" />
+  </div>
 </div>
 </section>
 </template>
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRuntimeConfig } from '#app';
+import { useAuthStore } from '~/stores/auth';
+import KPICard from '~/components/KPICard.vue';
 
+const authStore = useAuthStore();
 const previewStartups = ref([]);
 
 onMounted(async () => {
@@ -94,3 +117,106 @@ function loadDemoPitches() {
   previewStartups.value = startups;
 }
 </script>
+
+<style scoped>
+#page-landing {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.hero-centered {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-content .large {
+  font-size: 3.5rem;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+}
+
+.hero-content .lead {
+  font-size: 1.25rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-row {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 4rem;
+}
+
+.features-section {
+  margin: 4rem 0;
+}
+
+.kpi-section {
+  padding: 4rem 0;
+  background: linear-gradient(to bottom, transparent, rgba(var(--accent-rgb), 0.03), transparent);
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.marketplace-preview {
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.marketplace-preview h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.marketplace-preview .list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .hero-content .large {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hero-content .large {
+    font-size: 2.5rem;
+  }
+  
+  .cta-row {
+    flex-direction: column;
+  }
+  
+  .cta-row .btn {
+    width: 100%;
+  }
+}
+</style>
