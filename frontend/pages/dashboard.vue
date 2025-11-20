@@ -48,7 +48,7 @@
                     <span class="badge-pill">{{ pitch.stage }}</span>
                   </div>
                 </div>
-                <p class="muted pitch-desc">{{ pitch.desc }}</p>
+                <p class="muted pitch-desc">{{ truncateText(pitch.desc, 50) }}</p>
                 
                 <div class="pitch-stats">
                   <div class="stat-item">
@@ -617,6 +617,13 @@ function formatEventDate(dateString) {
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
   return `${weekday}, ${day}.${month} · ${hours}:${minutes}`;
+}
+
+// Text kürzen mit "..." am Ende
+function truncateText(text, maxLength) {
+  if (!text) return '';
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + '...';
 }
 
 async function openCreateModal() {
