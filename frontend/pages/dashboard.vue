@@ -83,8 +83,8 @@
             
             <div v-if="!myPitches.length" class="empty-state">
               <div class="empty-icon">📊</div>
-              <p>Noch keine Angebote erstellt</p>
-              <NuxtLink to="/pitches/formular" class="btn primary" style="margin-top: 16px">
+              <p class="empty-text">Noch keine Angebote erstellt</p>
+              <NuxtLink to="/pitches/formular" class="btn primary empty-cta">
                 Erstes Angebot anlegen
               </NuxtLink>
             </div>
@@ -125,8 +125,8 @@
             
             <div v-if="!myEvents.length" class="empty-state">
               <div class="empty-icon">📅</div>
-              <p>Noch keine Events erstellt</p>
-              <button class="btn primary" @click="openCreateEventModal" style="margin-top: 16px">
+              <p class="empty-text">Noch keine Events erstellt</p>
+              <button class="btn primary empty-cta" @click="openCreateEventModal">
                 Erstes Event erstellen
               </button>
             </div>
@@ -1251,17 +1251,25 @@ async function deletePitch() {
   background: rgba(255, 255, 255, 0.02);
   border: 1px dashed rgba(255, 255, 255, 0.1);
   border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
 .empty-icon {
-  font-size: 3rem;
-  margin-bottom: 16px;
+  font-size: 3.5rem;
   opacity: 0.5;
 }
 
-.empty-state p {
+.empty-text {
   color: var(--muted);
   margin: 0;
+  font-size: 1rem;
+}
+
+.empty-cta {
+  margin-top: 8px;
 }
 
 /* Responsive */
