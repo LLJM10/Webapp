@@ -52,11 +52,9 @@
 
         <div v-if="generatedText" class="result-section">
           <label>Generierte Beschreibung</label>
-          <textarea 
-            v-model="generatedText" 
-            rows="5"
-            class="result-textarea"
-          ></textarea>
+          <div class="result-box">
+            <p class="result-text">{{ generatedText }}</p>
+          </div>
           <div class="result-actions">
             <button class="btn ghost" @click="regenerate">
               🔄 Neu generieren
@@ -367,9 +365,22 @@ function useDescription() {
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.result-textarea {
+.result-box {
   background: rgba(94, 234, 212, 0.05);
-  border-color: rgba(94, 234, 212, 0.2);
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 8px;
+  min-height: 120px;
+}
+
+.result-text {
+  color: white;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .result-actions {
