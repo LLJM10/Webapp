@@ -467,20 +467,32 @@ const calculatedValuation = computed(() => {
 
 onMounted(async () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  console.log('Token found:', token ? 'Yes' : 'No');
+  
   if (token) {
     try {
-      const res = await fetch('http://127.0.0.1:8000/users/me/', {
+      const res = await fetch('http://127.0.0.1:8000/api/users/me/', {
         headers: { Authorization: `Bearer ${token}` }
       });
+      console.log('API Response status:', res.status);
+      
       if (res.ok) {
         const data = await res.json();
+        console.log('API Response data:', data);
         user.value.username = data.username || '';
         user.value.email = data.email || '';
         user.value.role = data.profile?.role || data.role || 'startup';
+        console.log('User data updated to:', user.value);
+      } else {
+        console.error('Failed to load user data:', res.status);
+        const errorText = await res.text();
+        console.error('Error response:', errorText);
       }
     } catch (e) {
-      console.error('Failed fetching /users/me/:', e);
+      console.error('Failed fetching /api/users/me/:', e);
     }
+  } else {
+    console.warn('No access token found - user may not be logged in');
   }
 
   // NEW: Load Pitches from backend API first
