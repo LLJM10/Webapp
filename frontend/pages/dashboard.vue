@@ -70,10 +70,10 @@
               </div>
 
               <!-- Delete Confirmation (inline) -->
-              <div v-if="pitchToDelete?.id === pitch.id" style="margin-top:8px;padding:12px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca">
-                <strong style="color:#dc2626">Wirklich löschen?</strong>
-                <p class="muted" style="margin-top:4px">Dieser Pitch wird dauerhaft gelöscht.</p>
-                <div style="display:flex;gap:8px;margin-top:8px">
+              <div v-if="pitchToDelete?.id === pitch.id" class="delete-confirmation">
+                <strong style="color:#ef4444">Wirklich löschen?</strong>
+                <p style="margin-top:8px;color:#cbd5e1;font-size:0.9rem">Dieser Pitch wird dauerhaft gelöscht.</p>
+                <div style="display:flex;gap:8px;margin-top:12px">
                   <button class="btn danger small" @click="deletePitch">Ja, löschen</button>
                   <button class="btn ghost small" @click="cancelDeletePitch">Abbrechen</button>
                 </div>
@@ -850,5 +850,15 @@ textarea.error {
 .btn.small {
   padding: 4px 12px;
   font-size: 0.875rem;
+}
+
+/* Delete Confirmation Styling */
+.delete-confirmation {
+  margin-top: 12px;
+  padding: 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
 }
 </style>
