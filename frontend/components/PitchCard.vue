@@ -8,7 +8,38 @@
       <div class="tags"><div class="tag">{{ pitch.goal }} Ziel</div></div>
     </div>
     <img :src="pitch.img" :alt="pitch.title">
-    <div class="muted">{{ pitch.desc }}</div>
+    
+    <!-- Investment Details Grid -->
+    <div class="investment-details">
+      <div class="detail-box">
+        <div class="detail-icon">💰</div>
+        <div class="detail-content">
+          <div class="detail-label">Funding Ziel</div>
+          <div class="detail-value">{{ pitch.goal }}€</div>
+        </div>
+      </div>
+      <div class="detail-box">
+        <div class="detail-icon">📊</div>
+        <div class="detail-content">
+          <div class="detail-label">Equity</div>
+          <div class="detail-value">{{ pitch.equity }}%</div>
+        </div>
+      </div>
+      <div v-if="pitch.valuation" class="detail-box">
+        <div class="detail-icon">💎</div>
+        <div class="detail-content">
+          <div class="detail-label">Bewertung</div>
+          <div class="detail-value">{{ formatValuation(pitch.valuation) }}</div>
+        </div>
+      </div>
+      <div class="detail-box">
+        <div class="detail-icon">🚀</div>
+        <div class="detail-content">
+          <div class="detail-label">Stage</div>
+          <div class="detail-value">{{ pitch.stage }}</div>
+        </div>
+      </div>
+    </div>
     
     <!-- PDF Download Links -->
     <div v-if="pitch.pitch_deck || pitch.business_plan || pitch.financial_report" 
@@ -90,6 +121,12 @@ function handleCardClick() {
 function navigateToDetail() {
   router.push({ path: '/detail/' + props.pitch.id });
 }
+
+function formatValuation(val) {
+  if (!val) return '';
+  // Remove € and spaces, keep the number
+  return val.replace(/\s+/g, ' ');
+}
 </script>
 
 <style scoped>
@@ -100,5 +137,53 @@ function navigateToDetail() {
 .pitch-clickable:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.investment-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.detail-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s;
+}
+
+.detail-box:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(94, 234, 212, 0.3);
+}
+
+.detail-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.detail-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.detail-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
