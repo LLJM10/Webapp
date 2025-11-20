@@ -122,10 +122,20 @@
                   <span>📅 {{ formatEventDate(event.date) }}</span>
                   <span>📍 {{ event.location }}</span>
                 </div>
-                <p class="muted event-desc">{{ event.description }}</p>
+                <p class="muted event-desc">{{ truncateText(event.description, 50) }}</p>
                 <div class="event-actions">
                   <button class="btn-small ghost" @click="openEditEventModal(event)">Bearbeiten</button>
                   <button class="btn-small danger-outline" @click="confirmDeleteEvent(event)">Löschen</button>
+                </div>
+
+                <!-- Delete Confirmation (inline) -->
+                <div v-if="eventToDelete?.id === event.id" class="delete-confirmation">
+                  <strong style="color:#ef4444">Wirklich löschen?</strong>
+                  <p style="margin-top:8px;color:#cbd5e1;font-size:0.9rem">Dieses Event wird dauerhaft gelöscht.</p>
+                  <div style="display:flex;gap:8px;margin-top:12px">
+                    <button class="btn danger small" @click="deleteEvent">Ja, löschen</button>
+                    <button class="btn ghost small" @click="cancelDeleteEvent">Abbrechen</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -386,21 +396,6 @@
       </div>
     </div>
 
-    <!-- NEU: Delete Confirmation Modal -->
-    <div v-if="showDeleteConfirmation" class="modal-overlay" @click.self="showDeleteConfirmation = false">
-      <div class="card modal-content">
-        <h3>Event löschen?</h3>
-        <p class="muted">
-          Möchtest du das Event "{{ eventToDelete?.name }}" wirklich löschen? 
-          Diese Aktion kann nicht rückgängig gemacht werden.
-        </p>
-        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
-          <button class="btn ghost" @click="showDeleteConfirmation = false">Abbrechen</button>
-          <button class="btn danger" @click="deleteEvent">Löschen bestätigen</button>
-        </div>
-      </div>
-    </div>
-
   </section>
 </template>
 
@@ -416,7 +411,6 @@ const showCreateModal = ref(false);
 const showCreateEventModal = ref(false); // NEU: State für Event-Modal
 const showAiModal = ref(false);
 const showEditEventModal = ref(false); // State für Edit-Modal
-const showDeleteConfirmation = ref(false); // State für Delete-Confirmation
 const eventToDelete = ref(null); // Event das gelöscht werden soll
 const editingEvent = ref(null); // Event das bearbeitet wird
 const validationErrors = ref({}); // Validierungsfehler
@@ -837,7 +831,10 @@ async function handleUpdateEvent() {
 // Event löschen
 function confirmDeleteEvent(event) {
   eventToDelete.value = event;
-  showDeleteConfirmation.value = true;
+}
+
+function cancelDeleteEvent() {
+  eventToDelete.value = null;
 }
 
 async function deleteEvent() {
@@ -859,7 +856,6 @@ async function deleteEvent() {
       if (res.ok || res.status === 204) {
         myEvents.value = myEvents.value.filter(e => e.id !== eventToDelete.value.id);
         console.log('Event erfolgreich gelöscht');
-        showDeleteConfirmation.value = false;
         eventToDelete.value = null;
       } else {
         console.error('Fehler beim Löschen:', res.status);
@@ -869,6 +865,13 @@ async function deleteEvent() {
       console.error('Delete failed:', e);
       alert('Netzwerkfehler beim Löschen.');
     }
+  } else {
+    // Fallback: localStorage
+    myEvents.value = myEvents.value.filter(e => e.id !== eventToDelete.value.id);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('myEvents', JSON.stringify(myEvents.value));
+    }
+    eventToDelete.value = null;
   }
 }
 
@@ -1403,5 +1406,36 @@ textarea.error {
 .ai-assist-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(94, 234, 212, 0.4);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.modal-content {
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: auto;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    max-width: 100%;
+    max-height: 95vh;
+  }
 }
 </style>

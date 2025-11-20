@@ -121,7 +121,7 @@ async function generateDescription() {
   try {
     const config = useRuntimeConfig();
     const apiBase = config.public?.apiBase;
-    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+    let token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
     
     if (!token) {
       error.value = 'Bitte melde dich an, um die KI zu nutzen';
@@ -129,7 +129,7 @@ async function generateDescription() {
       return;
     }
     
-    const response = await fetch(`${apiBase}/ai/generate-description/`, {
+    let response = await fetch(`${apiBase}/ai/generate-description/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -142,12 +142,46 @@ async function generateDescription() {
       })
     });
     
+    // Token expired? Try refresh
+    if (response.status === 401) {
+      const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
+      if (refreshToken) {
+        const refreshResponse = await fetch(`${apiBase}/token/refresh/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh: refreshToken })
+        });
+        
+        if (refreshResponse.ok) {
+          const refreshData = await refreshResponse.json();
+          token = refreshData.access;
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('access_token', token);
+          }
+          
+          // Retry original request with new token
+          response = await fetch(`${apiBase}/ai/generate-description/`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              type: props.type,
+              keywords: keywords.value,
+              tone: tone.value
+            })
+          });
+        }
+      }
+    }
+    
     const data = await response.json();
     
     if (response.ok) {
       generatedText.value = data.description;
     } else {
-      error.value = data.error || 'Fehler beim Generieren der Beschreibung';
+      error.value = data.error || data.detail || 'Fehler beim Generieren der Beschreibung';
     }
   } catch (err) {
     error.value = 'Netzwerkfehler. Bitte versuche es erneut.';
