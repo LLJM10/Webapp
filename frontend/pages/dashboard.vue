@@ -1,5 +1,12 @@
 <template>
   <section id="page-dashboard">
+    <AiDescriptionModal 
+      :is-open="showAiModal"
+      type="event"
+      @close="showAiModal = false"
+      @generated="handleAiGenerated"
+    />
+    
     <!-- Dashboard Header -->
     <div class="dashboard-header">
       <div>
@@ -300,14 +307,24 @@
           </div>
           <div class="input-group">
             <label for="eventDesc">Beschreibung *</label>
-            <textarea 
-              id="eventDesc" 
-              v-model="newEvent.description" 
-              rows="3" 
-              placeholder="Panel: Regulierung & Markteintritt..."
-              :class="{ 'error': validationErrors.description }"
-              required
-            ></textarea>
+            <div style="position: relative">
+              <textarea 
+                id="eventDesc" 
+                v-model="newEvent.description" 
+                rows="3" 
+                placeholder="Panel: Regulierung & Markteintritt..."
+                :class="{ 'error': validationErrors.description }"
+                required
+              ></textarea>
+              <button 
+                type="button" 
+                class="ai-assist-btn" 
+                @click="showAiModal = true"
+                title="Mit KI verbessern"
+              >
+                ✨ KI-Assistent
+              </button>
+            </div>
             <span v-if="validationErrors.description" class="error-text">{{ validationErrors.description }}</span>
           </div>
           <div class="modal-actions">
@@ -397,6 +414,7 @@ const myPitches = ref([]); // Startet mit einer leeren Liste
 const myEvents = ref([]); // NEU: Liste für Events
 const showCreateModal = ref(false);
 const showCreateEventModal = ref(false); // NEU: State für Event-Modal
+const showAiModal = ref(false);
 const showEditEventModal = ref(false); // State für Edit-Modal
 const showDeleteConfirmation = ref(false); // State für Delete-Confirmation
 const eventToDelete = ref(null); // Event das gelöscht werden soll
@@ -886,6 +904,10 @@ async function deletePitch() {
     }
   }
 }
+
+function handleAiGenerated(description) {
+  newEvent.value.description = description;
+}
 </script>
 
 <style scoped>
@@ -1350,5 +1372,29 @@ textarea.error {
   border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: 8px;
   backdrop-filter: blur(8px);
+}
+
+.ai-assist-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 6px 12px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border: none;
+  border-radius: 6px;
+  color: #021;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 10;
+}
+
+.ai-assist-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(94, 234, 212, 0.4);
 }
 </style>

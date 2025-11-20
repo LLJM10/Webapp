@@ -1,5 +1,12 @@
 <template>
   <section id="page-pitch-form">
+    <AiDescriptionModal 
+      :is-open="showAiModal"
+      type="pitch"
+      @close="showAiModal = false"
+      @generated="handleAiGenerated"
+    />
+    
     <div class="card" style="max-width:900px;margin:24px auto;">
       <h2>Neues Angebot erstellen</h2>
       <p class="muted">Fülle die Felder aus, um eine neue Pitch Card zu erstellen.</p>
@@ -48,7 +55,17 @@
 
         <div class="input-group">
           <label for="desc">Kurzbeschreibung</label>
-          <textarea id="desc" v-model="newPitch.desc" rows="3" placeholder="Beschreibe kurz deine Idee..."></textarea>
+          <div style="position: relative">
+            <textarea id="desc" v-model="newPitch.desc" rows="3" placeholder="Beschreibe kurz deine Idee..."></textarea>
+            <button 
+              type="button" 
+              class="ai-assist-btn" 
+              @click="showAiModal = true"
+              title="Mit KI verbessern"
+            >
+              ✨ KI-Assistent
+            </button>
+          </div>
         </div>
 
         <!-- PDF Upload Felder -->
@@ -120,6 +137,8 @@ const config = useRuntimeConfig();
 const auth = useAuthStore();
 
 const phases = ref(['Pre-Seed', 'Seed', 'Series A', 'Wachstum', 'Reife']);
+
+const showAiModal = ref(false);
 
 const newPitch = ref({
   id: null,
@@ -329,4 +348,33 @@ async function handleCreatePitch() {
 
   router.push('/dashboard');
 }
+
+function handleAiGenerated(description) {
+  newPitch.value.desc = description;
+}
 </script>
+
+<style scoped>
+.ai-assist-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 6px 12px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border: none;
+  border-radius: 6px;
+  color: #021;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ai-assist-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(94, 234, 212, 0.4);
+}
+</style>

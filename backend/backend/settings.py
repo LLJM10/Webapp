@@ -190,5 +190,8 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')  # Ihre Gmail-Adresse
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')  # App-Passwort
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@investify.com')
 
+# Groq AI API Key
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
+
 
 

@@ -1,8 +1,9 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, BasePermission
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework import viewsets, status
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, BasePermission, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from django.conf import settings
 
 from .models import Todo, Pitch, Event
 from .serializers import TodoSerializer, PitchSerializer, EventSerializer
@@ -113,3 +114,93 @@ class EventViewSet(viewsets.ModelViewSet):
             return qs.filter(is_public=True)
         
         return qs
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def generate_ai_description(request):
+    """
+    Generate AI description using Groq API.
+    Expects: { "type": "pitch"|"event", "keywords": "...", "tone": "professional"|"creative"|"technical" }
+    Returns: { "description": "..." }
+    """
+    try:
+        from groq import Groq
+    except ImportError:
+        return Response(
+            {"error": "Groq package not installed. Run: pip install groq"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+    
+    # Get request data
+    content_type = request.data.get('type', 'pitch')
+    keywords = request.data.get('keywords', '')
+    tone = request.data.get('tone', 'professional')
+    
+    if not keywords:
+        return Response(
+            {"error": "Keywords are required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Check if API key is configured
+    api_key = getattr(settings, 'GROQ_API_KEY', None)
+    if not api_key:
+        return Response(
+            {"error": "GROQ_API_KEY not configured in settings"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+    
+    # Build prompt based on type and tone
+    tone_map = {
+        'professional': 'professionell und überzeugend',
+        'creative': 'kreativ und einzigartig',
+        'technical': 'technisch detailliert und präzise'
+    }
+    tone_desc = tone_map.get(tone, 'professionell')
+    
+    if content_type == 'event':
+        prompt = f"""Schreibe eine ansprechende Event-Beschreibung auf Deutsch. 
+Die Beschreibung soll {tone_desc} sein.
+Stichworte: {keywords}
+
+Schreibe 2-3 Sätze, die klar erklären worum es geht und warum Teilnehmer kommen sollten.
+Antworte NUR mit der Beschreibung, ohne zusätzliche Kommentare."""
+    else:  # pitch
+        prompt = f"""Schreibe eine überzeugende Pitch-Beschreibung für ein Startup auf Deutsch.
+Die Beschreibung soll {tone_desc} sein.
+Stichworte: {keywords}
+
+Schreibe 2-3 Sätze, die das Problem, die Lösung und den Mehrwert klar kommunizieren.
+Antworte NUR mit der Beschreibung, ohne zusätzliche Kommentare."""
+    
+    try:
+        # Call Groq API
+        client = Groq(api_key=api_key)
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Du bist ein Experte für Marketing-Texte und Startup-Pitches. Du schreibst prägnante, überzeugende Beschreibungen."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.7,
+            max_tokens=200
+        )
+        
+        description = response.choices[0].message.content.strip()
+        
+        return Response({
+            "description": description
+        })
+        
+    except Exception as e:
+        return Response(
+            {"error": f"AI generation failed: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
