@@ -1,163 +1,214 @@
 <template>
   <section id="page-dashboard">
-    <div class="flex-between">
-      <h2>Dashboard</h2>
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <div>
+        <h2 style="margin-bottom: 8px">Dashboard</h2>
+        <p class="muted">Willkommen zurück, {{ user.username }}</p>
+      </div>
     </div>
 
     <!-- START: Nur für Startup-Rolle -->
-    <div v-if="user.role === 'startup'">
-      <div class="card">
-  <div class="flex-between">
+    <div v-if="user.role === 'startup'" class="dashboard-layout">
+      
+      <!-- Hauptbereich: 2-Spalten Layout -->
+      <div class="dashboard-main">
+        
+        <!-- Linke Spalte: Pitches -->
+        <div class="dashboard-section">
+          <div class="section-header">
             <div>
-                <strong>Meine Pitches</strong>
-                <div class="muted mt-8">Management deiner Pitches & Kontakte</div>
+              <h3>Meine Pitches</h3>
+              <p class="muted">Verwalte deine Angebote und Kontakte</p>
             </div>
-            <!-- Button navigiert jetzt zur eigenen Formular-Seite -->
             <NuxtLink to="/pitches/formular" class="btn primary">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
-              Neues Angebot anlegen
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+              </svg>
+              Neues Angebot
             </NuxtLink>
-        </div>
-  <div class="mt-16 grid-auto-fit-280">
-            <!-- Bestehende Pitches mit Edit/Delete Buttons -->
-            <div v-for="pitch in myPitches" :key="pitch.id" class="card">
-              <img :src="pitch.img || 'https://placehold.co/600x400/3b82f6/ffffff?text=Pitch'" :alt="pitch.title" style="width:100%;border-radius:8px;object-fit:cover;height:200px">
-              <div style="margin-top:8px">
-                <strong>{{ pitch.title }}</strong>
-                <div class="muted">{{ pitch.sector }} · {{ pitch.stage }}</div>
-              </div>
-              <p class="muted" style="margin-top:8px">{{ pitch.desc }}</p>
-              <div style="display:flex;justify-content:space-between;margin-top:8px">
-                <div class="muted">Ziel: {{ pitch.goal }}</div>
-                <div class="muted">Equity: {{ pitch.equity }}%</div>
-              </div>
-              
-              <!-- PDF Download Links -->
-              <div v-if="pitch.pitch_deck || pitch.business_plan || pitch.financial_report" 
-                   class="card mt-12" 
-                   style="background:var(--glass);border:1px solid rgba(255,255,255,0.04);padding:12px">
-                <div class="muted" style="font-size:0.875rem;margin-bottom:8px;font-weight:600">
-                  📎 Dokumente
-                </div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap">
-                  <a v-if="pitch.pitch_deck" 
-                     :href="pitch.pitch_deck" 
-                     target="_blank" 
-                     class="btn ghost" 
-                     style="font-size:0.875rem;padding:8px 12px">
-                    📄 Pitch Deck
-                  </a>
-                  <a v-if="pitch.business_plan" 
-                     :href="pitch.business_plan" 
-                     target="_blank" 
-                     class="btn ghost" 
-                     style="font-size:0.875rem;padding:8px 12px">
-                    📊 Business Plan
-                  </a>
-                  <a v-if="pitch.financial_report" 
-                     :href="pitch.financial_report" 
-                     target="_blank" 
-                     class="btn ghost" 
-                     style="font-size:0.875rem;padding:8px 12px">
-                    💰 Financial Report
-                  </a>
-                </div>
-              </div>
-              
-              <div style="display:flex;gap:8px;margin-top:8px">
-                <NuxtLink :to="`/pitches/formular?id=${pitch.id}`" class="btn ghost">Bearbeiten</NuxtLink>
-                <button class="btn ghost danger" @click="confirmDeletePitch(pitch)">Löschen</button>
-              </div>
+          </div>
 
-              <!-- Delete Confirmation (inline) -->
-              <div v-if="pitchToDelete?.id === pitch.id" class="delete-confirmation">
-                <strong style="color:#ef4444">Wirklich löschen?</strong>
-                <p style="margin-top:8px;color:#cbd5e1;font-size:0.9rem">Dieser Pitch wird dauerhaft gelöscht.</p>
-                <div style="display:flex;gap:8px;margin-top:12px">
-                  <button class="btn danger small" @click="deletePitch">Ja, löschen</button>
-                  <button class="btn ghost small" @click="cancelDeletePitch">Abbrechen</button>
+          <div class="pitches-grid">
+            <!-- Bestehende Pitches mit Edit/Delete Buttons -->
+            <div v-for="pitch in myPitches" :key="pitch.id" class="pitch-card">
+              <img :src="pitch.img || 'https://placehold.co/600x400/3b82f6/ffffff?text=Pitch'" :alt="pitch.title" class="pitch-image">
+              <div class="pitch-content">
+                <div class="pitch-header">
+                  <h4>{{ pitch.title }}</h4>
+                  <div class="pitch-meta">
+                    <span class="badge-pill">{{ pitch.sector }}</span>
+                    <span class="badge-pill">{{ pitch.stage }}</span>
+                  </div>
+                </div>
+                <p class="muted pitch-desc">{{ pitch.desc }}</p>
+                
+                <div class="pitch-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">Ziel</span>
+                    <span class="stat-value">{{ pitch.goal }}€</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Equity</span>
+                    <span class="stat-value">{{ pitch.equity }}%</span>
+                  </div>
+                </div>
+                
+                <!-- PDF Dokumente -->
+                <div v-if="pitch.pitch_deck || pitch.business_plan || pitch.financial_report" class="pitch-documents">
+                  <div class="doc-label">📎 Dokumente</div>
+                  <div class="doc-links">
+                    <a v-if="pitch.pitch_deck" :href="pitch.pitch_deck" target="_blank" class="doc-link">📄 Deck</a>
+                    <a v-if="pitch.business_plan" :href="pitch.business_plan" target="_blank" class="doc-link">📊 Plan</a>
+                    <a v-if="pitch.financial_report" :href="pitch.financial_report" target="_blank" class="doc-link">💰 Report</a>
+                  </div>
+                </div>
+                
+                <div class="pitch-actions">
+                  <NuxtLink :to="`/pitches/formular?id=${pitch.id}`" class="btn-small ghost">Bearbeiten</NuxtLink>
+                  <button class="btn-small danger-outline" @click="confirmDeletePitch(pitch)">Löschen</button>
+                </div>
+
+                <!-- Delete Confirmation (inline) -->
+                <div v-if="pitchToDelete?.id === pitch.id" class="delete-confirmation">
+                  <strong style="color:#ef4444">Wirklich löschen?</strong>
+                  <p style="margin-top:8px;color:#cbd5e1;font-size:0.9rem">Dieser Pitch wird dauerhaft gelöscht.</p>
+                  <div style="display:flex;gap:8px;margin-top:12px">
+                    <button class="btn danger small" @click="deletePitch">Ja, löschen</button>
+                    <button class="btn ghost small" @click="cancelDeletePitch">Abbrechen</button>
+                  </div>
                 </div>
               </div>
             </div>
-            <div v-if="!myPitches.length" class="card muted text-center p-24">
-              Du hast noch keine Angebote erstellt. Klicke auf "Neues Angebot anlegen", um zu starten!
+            
+            <div v-if="!myPitches.length" class="empty-state">
+              <div class="empty-icon">📊</div>
+              <p>Noch keine Angebote erstellt</p>
+              <NuxtLink to="/pitches/formular" class="btn primary" style="margin-top: 16px">
+                Erstes Angebot anlegen
+              </NuxtLink>
             </div>
+          </div>
+        </div>
+
+        <!-- Rechte Spalte: Events -->
+        <div class="dashboard-section">
+          <div class="section-header">
+            <div>
+              <h3>Meine Events</h3>
+              <p class="muted">Verwalte deine geplanten Events</p>
+            </div>
+            <button class="btn primary" @click="openCreateEventModal">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+              </svg>
+              Neues Event
+            </button>
+          </div>
+
+          <div class="events-list">
+            <div v-for="event in myEvents" :key="event.id" class="event-card">
+              <img :src="event.img || 'https://picsum.photos/seed/event/900/480'" :alt="event.name" class="event-image">
+              <div class="event-content">
+                <h4>{{ event.name }}</h4>
+                <div class="event-meta">
+                  <span>📅 {{ formatEventDate(event.date) }}</span>
+                  <span>📍 {{ event.location }}</span>
+                </div>
+                <p class="muted event-desc">{{ event.description }}</p>
+                <div class="event-actions">
+                  <button class="btn-small ghost" @click="openEditEventModal(event)">Bearbeiten</button>
+                  <button class="btn-small danger-outline" @click="confirmDeleteEvent(event)">Löschen</button>
+                </div>
+              </div>
+            </div>
+            
+            <div v-if="!myEvents.length" class="empty-state">
+              <div class="empty-icon">📅</div>
+              <p>Noch keine Events erstellt</p>
+              <button class="btn primary" @click="openCreateEventModal" style="margin-top: 16px">
+                Erstes Event erstellen
+              </button>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- Sidebar: Nutzerinfo & Matching -->
+      <aside class="dashboard-sidebar">
+        <div class="sidebar-card">
+          <h3>Nutzerinfo</h3>
+          <div class="user-info">
+            <div class="info-row">
+              <span class="info-label">Benutzername</span>
+              <span class="info-value">{{ user.username }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">E-Mail</span>
+              <span class="info-value">{{ user.email }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Rolle</span>
+              <span class="info-value">{{ user.role }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <h3>Matching Vorschläge</h3>
+          <div class="match-item">
+            <div class="match-avatar">AM</div>
+            <div>
+              <div class="match-name">Anna Müller</div>
+              <div class="muted" style="font-size: 0.875rem">Interesse: Energy</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
     </div>
     <!-- ENDE: Nur für Startup-Rolle -->
 
     <!-- Fallback für andere Rollen wie Investor -->
-    <div v-else class="card">
-      <strong>Investor Dashboard</strong>
-      <div class="muted mt-8">Portfolio-Übersicht & Investment Opportunities</div>
-      <div class="mt-10 grid-auto-fit-220">
-        <div class="card"><strong>Portfolio</strong><div class="muted mt-6">Total Investiert: 1.2M€</div></div>
-        <div class="card"><strong>Watchlist</strong><div class="muted mt-6">3 Startups</div></div>
-      </div>
-    </div>
-
-    
-  <div class="mt-12 grid-1fr-360">
-      <div>
-         <div class="card">
-          <strong>Matching Vorschläge</strong>
-           <div class="mt-8 grid-auto-fit-220">
-             <div v-if="user.role === 'startup'" class="card">
-               <strong>Investoren Matches</strong>
-               <div class="muted mt-8">Anna Müller · Interesse: Energy</div>
-             </div>
-             <div v-else class="card">
-               <strong>Suggested Deals</strong>
-               <div class="muted mt-8">GreenCharge · Match: 87%</div>
-             </div>
-           </div>
-         </div>
-
-         <!-- NEU: Event Sektion -->
-         <div class="card" style="margin-top:12px">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div>
-                    <strong>Meine Events</strong>
-                    <div class="muted" style="margin-top:8px">Verwalte deine geplanten Events</div>
-                </div>
-                <button class="btn primary" @click="openCreateEventModal">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
-                    Neues Event erstellen
-                </button>
+    <div v-else class="dashboard-layout">
+      <div class="dashboard-main">
+        <div class="dashboard-section">
+          <div class="section-header">
+            <h3>Investor Dashboard</h3>
+            <p class="muted">Portfolio-Übersicht & Investment Opportunities</p>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">💼</div>
+              <div>
+                <div class="stat-label">Portfolio</div>
+                <div class="stat-value">1.2M€</div>
+              </div>
             </div>
-            <div style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
-                <!-- Liste der existierenden Events -->
-                <div v-for="event in myEvents" :key="event.id" class="card">
-                  <img :src="event.img || 'https://picsum.photos/seed/event/900/480'" :alt="event.name" style="width:100%;border-radius:8px;object-fit:cover;height:200px">
-                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-                    <div>
-                      <strong>{{ event.name }}</strong>
-                      <div class="muted">{{ formatEventDate(event.date) }} · {{ event.location }}</div>
-                    </div>
-                    <div class="muted">Host: {{ event.host }}</div>
-                  </div>
-                  <p class="muted" style="margin-top:8px">{{ event.description }}</p>
-                  <div style="display:flex;gap:8px;margin-top:8px">
-                    <button class="btn ghost" @click="openEditEventModal(event)">Bearbeiten</button>
-                    <button class="btn ghost danger" @click="confirmDeleteEvent(event)">Löschen</button>
-                  </div>
-                </div>
-                <div v-if="!myEvents.length" class="card muted" style="text-align:center; padding: 24px;">
-                    Du hast noch keine Events erstellt.
-                </div>
+            <div class="stat-card">
+              <div class="stat-icon">⭐</div>
+              <div>
+                <div class="stat-label">Watchlist</div>
+                <div class="stat-value">3 Startups</div>
+              </div>
             </div>
+          </div>
         </div>
       </div>
-       <aside>
-         <div class="card">
-            <h3>Nutzerinfo</h3>
-            <div class="input-group"><label>Benutzername</label><div class="muted">{{ user.username }}</div></div>
-            <div class="input-group"><label>E-Mail</label><div class="muted">{{ user.email }}</div></div>
-            <div class="input-group"><label>Rolle</label><div class="muted">{{ user.role }}</div></div>
+      
+      <aside class="dashboard-sidebar">
+        <div class="sidebar-card">
+          <h3>Matching Vorschläge</h3>
+          <div class="match-item">
+            <div class="match-avatar">GC</div>
+            <div>
+              <div class="match-name">GreenCharge</div>
+              <div class="muted" style="font-size: 0.875rem">Match: 87%</div>
+            </div>
+          </div>
         </div>
       </aside>
-     </div>
+    </div>
 
     <!-- Pitch-Erstellung wurde in eine eigene Seite verschoben: /pitches/formular -->
 
@@ -826,6 +877,425 @@ async function deletePitch() {
 </script>
 
 <style scoped>
+/* Dashboard Layout */
+.dashboard-header {
+  margin-bottom: 32px;
+}
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: start;
+}
+
+.dashboard-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.dashboard-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.section-header h3 {
+  font-size: 1.25rem;
+  margin-bottom: 4px;
+}
+
+.section-header p {
+  font-size: 0.9rem;
+}
+
+/* Pitches Grid */
+.pitches-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pitch-card {
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.pitch-card:hover {
+  border-color: rgba(94, 234, 212, 0.2);
+  transform: translateY(-2px);
+}
+
+.pitch-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.pitch-content {
+  padding: 16px;
+}
+
+.pitch-header {
+  margin-bottom: 12px;
+}
+
+.pitch-header h4 {
+  font-size: 1.1rem;
+  margin: 0 0 8px 0;
+}
+
+.pitch-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge-pill {
+  padding: 4px 12px;
+  background: rgba(94, 234, 212, 0.1);
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.pitch-desc {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.pitch-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.stat-item {
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.pitch-documents {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.doc-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--muted);
+}
+
+.doc-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.doc-link {
+  padding: 6px 12px;
+  background: rgba(94, 234, 212, 0.05);
+  border: 1px solid rgba(94, 234, 212, 0.1);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  text-decoration: none;
+  color: var(--accent);
+  transition: all 0.2s ease;
+}
+
+.doc-link:hover {
+  background: rgba(94, 234, 212, 0.1);
+  border-color: rgba(94, 234, 212, 0.3);
+}
+
+.pitch-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Events List */
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.event-card {
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.event-card:hover {
+  border-color: rgba(96, 165, 250, 0.2);
+  transform: translateY(-2px);
+}
+
+.event-image {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+.event-content {
+  padding: 16px;
+}
+
+.event-content h4 {
+  font-size: 1.05rem;
+  margin: 0 0 8px 0;
+}
+
+.event-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.event-desc {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.event-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Sidebar */
+.dashboard-sidebar {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sidebar-card {
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.sidebar-card h3 {
+  font-size: 1.1rem;
+  margin: 0 0 16px 0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.info-label {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.info-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: white;
+}
+
+.match-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.match-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.match-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #021;
+}
+
+.match-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+/* Stats Grid (für Investor) */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  border-color: rgba(94, 234, 212, 0.2);
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  font-size: 2rem;
+}
+
+/* Button Styles */
+.btn-small {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 0;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-small.ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.btn-small.ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-small.danger-outline {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.btn-small.danger-outline:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+/* Empty State */
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  color: var(--muted);
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 968px) {
+  .dashboard-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .pitch-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 input.error,
 textarea.error {
   border-color: #ef4444;
