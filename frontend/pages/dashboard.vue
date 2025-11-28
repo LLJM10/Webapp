@@ -39,7 +39,7 @@
           <div class="pitches-grid">
             <!-- Bestehende Pitches mit Edit/Delete Buttons -->
             <div v-for="pitch in myPitches" :key="pitch.id" class="pitch-card">
-              <img :src="pitch.img || 'https://placehold.co/600x400/3b82f6/ffffff?text=Pitch'" :alt="pitch.title" class="pitch-image">
+              <img :src="getImageUrl(pitch.img, pitch.title)" :alt="pitch.title" class="pitch-image">
               <div class="pitch-content">
                 <div class="pitch-header">
                   <h4>{{ pitch.title }}</h4>
@@ -105,12 +105,12 @@
               <h3>Meine Events</h3>
               <p class="muted">Verwalte deine geplanten Events</p>
             </div>
-            <button class="btn primary" @click="openCreateEventModal">
+            <NuxtLink to="/events/formular" class="btn primary">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
               </svg>
               Neues Event
-            </button>
+            </NuxtLink>
           </div>
 
           <div class="events-list">
@@ -124,7 +124,7 @@
                 </div>
                 <p class="muted event-desc">{{ truncateText(event.description, 50) }}</p>
                 <div class="event-actions">
-                  <button class="btn-small ghost" @click="openEditEventModal(event)">Bearbeiten</button>
+                  <NuxtLink :to="`/events/formular?id=${event.id}`" class="btn-small ghost">Bearbeiten</NuxtLink>
                   <button class="btn-small danger-outline" @click="confirmDeleteEvent(event)">Löschen</button>
                 </div>
 
@@ -143,9 +143,9 @@
             <div v-if="!myEvents.length" class="empty-state">
               <div class="empty-icon">📅</div>
               <p class="empty-text">Noch keine Events erstellt</p>
-              <button class="btn primary empty-cta" @click="openCreateEventModal">
+              <NuxtLink to="/events/formular" class="btn primary empty-cta">
                 Erstes Event erstellen
-              </button>
+              </NuxtLink>
             </div>
           </div>
         </div>
@@ -312,8 +312,22 @@
             <input id="eventLink" v-model="newEvent.link" type="url" placeholder="https://teams.microsoft.com/...">
           </div>
           <div class="input-group">
-            <label for="eventImg">Titelbild URL</label>
-            <input id="eventImg" v-model="newEvent.img" type="url" placeholder="https://picsum.photos/seed/e1/900/480">
+            <label for="eventImage">🖼️ Event Bild (JPG/PNG, optional, max. 5MB)</label>
+            <input 
+              id="eventImage" 
+              type="file" 
+              accept="image/jpeg,image/png,image/jpg" 
+              @change="handleEventImageChange($event)"
+            >
+            <small v-if="eventImageFile" class="muted" style="display:block;margin-top:4px">
+              Ausgewählt: {{ eventImageFile.name }}
+            </small>
+            <small v-if="existingEventImage" class="muted" style="display:block;margin-top:4px">
+              Aktuell: <a :href="existingEventImage" target="_blank" style="color:var(--accent)">Vorhandenes Bild anzeigen</a>
+            </small>
+            <div v-if="eventImagePreview" style="margin-top: 12px;">
+              <img :src="eventImagePreview" alt="Preview" style="max-width: 300px; max-height: 200px; border-radius: 8px; border: 2px solid var(--accent);">
+            </div>
           </div>
           <div class="input-group">
             <label for="eventDesc">Beschreibung *</label>
@@ -381,8 +395,22 @@
             <input v-model="editingEvent.link" type="url">
           </div>
           <div class="input-group">
-            <label>Titelbild URL</label>
-            <input v-model="editingEvent.img" type="url">
+            <label for="editEventImage">🖼️ Event Bild (JPG/PNG, optional, max. 5MB)</label>
+            <input 
+              id="editEventImage" 
+              type="file" 
+              accept="image/jpeg,image/png,image/jpg" 
+              @change="handleEditEventImageChange($event)"
+            >
+            <small v-if="editEventImageFile" class="muted" style="display:block;margin-top:4px">
+              Ausgewählt: {{ editEventImageFile.name }}
+            </small>
+            <small v-if="editingEvent.img && !editEventImageFile" class="muted" style="display:block;margin-top:4px">
+              Aktuell: <a :href="getImageUrl(editingEvent.img, editingEvent.name)" target="_blank" style="color:var(--accent)">Vorhandenes Bild anzeigen</a>
+            </small>
+            <div v-if="editEventImagePreview" style="margin-top: 12px;">
+              <img :src="editEventImagePreview" alt="Preview" style="max-width: 300px; max-height: 200px; border-radius: 8px; border: 2px solid var(--accent);">
+            </div>
           </div>
           <div class="input-group">
             <label>Beschreibung *</label>
@@ -441,8 +469,15 @@ const newEvent = ref({
   host: '',
   link: '',
   description: '',
-  img: ''
+  img: null
 });
+
+const eventImageFile = ref(null);
+const eventImagePreview = ref(null);
+const existingEventImage = ref(null);
+
+const editEventImageFile = ref(null);
+const editEventImagePreview = ref(null);
 
 // LocalStorage helpers: load/save lists so created items survive page reloads (Option A)
 function savePitchesToLocalStorage() {
@@ -620,6 +655,90 @@ function truncateText(text, maxLength) {
   return text.substring(0, maxLength) + '...';
 }
 
+// Helper function to get the correct image URL
+function getImageUrl(imgPath, fallbackText = 'Image') {
+  if (!imgPath) {
+    return 'https://placehold.co/600x400/3b82f6/ffffff?text=' + encodeURIComponent(fallbackText);
+  }
+  
+  // If it's already a full URL (http/https), return as is
+  if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) {
+    return imgPath;
+  }
+  
+  // If it's a relative path from backend (e.g., /media/pitch_images/...)
+  if (imgPath.startsWith('/media/')) {
+    const config = useRuntimeConfig();
+    const apiBase = config.public?.apiBase || 'http://127.0.0.1:8000';
+    return apiBase + imgPath;
+  }
+  
+  // If it's just a filename or relative path without /media/
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase || 'http://127.0.0.1:8000';
+  return `${apiBase}/media/${imgPath}`;
+}
+
+function handleEventImageChange(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    eventImageFile.value = null;
+    eventImagePreview.value = null;
+    return;
+  }
+  
+  // Client-seitige Validierung
+  if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
+    alert('Bitte nur JPG/PNG Bilder hochladen.');
+    event.target.value = '';
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Bild zu groß. Maximum: 5MB');
+    event.target.value = '';
+    return;
+  }
+  
+  eventImageFile.value = file;
+  
+  // Preview erstellen
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    eventImagePreview.value = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleEditEventImageChange(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    editEventImageFile.value = null;
+    editEventImagePreview.value = null;
+    return;
+  }
+  
+  // Client-seitige Validierung
+  if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
+    alert('Bitte nur JPG/PNG Bilder hochladen.');
+    event.target.value = '';
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Bild zu groß. Maximum: 5MB');
+    event.target.value = '';
+    return;
+  }
+  
+  editEventImageFile.value = file;
+  
+  // Preview erstellen
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    editEventImagePreview.value = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 async function openCreateModal() {
   showCreateModal.value = true;
   await nextTick();
@@ -729,28 +848,32 @@ async function handleCreateEvent() {
   const apiBase = config.public?.apiBase;
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
-  const eventData = {
-    name: newEvent.value.name,
-    topic: newEvent.value.topic,
-    location: newEvent.value.location,
-    duration: newEvent.value.duration,
-    // convert local datetime-local value to ISO before sending to backend
-    date: newEvent.value.date ? new Date(newEvent.value.date).toISOString() : null,
-    link: newEvent.value.link || '',
-    description: newEvent.value.description,
-    img: newEvent.value.img || 'https://picsum.photos/seed/event/900/480',
-    host: newEvent.value.host || user.value.username
-  };
-
   if (apiBase && token) {
     try {
+      // FormData für File Upload verwenden
+      const formData = new FormData();
+      
+      formData.append('name', newEvent.value.name);
+      formData.append('topic', newEvent.value.topic);
+      formData.append('location', newEvent.value.location);
+      formData.append('duration', newEvent.value.duration);
+      formData.append('date', newEvent.value.date ? new Date(newEvent.value.date).toISOString() : '');
+      formData.append('link', newEvent.value.link || '');
+      formData.append('description', newEvent.value.description);
+      formData.append('host', newEvent.value.host || user.value.username);
+      
+      // Bild hinzufügen (nur wenn ausgewählt)
+      if (eventImageFile.value) {
+        formData.append('img', eventImageFile.value);
+      }
+      
       const res = await fetch(`${apiBase}/events/`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
+          // KEIN Content-Type - Browser setzt automatisch mit boundary
         },
-        body: JSON.stringify(eventData)
+        body: formData
       });
       
       if (res.ok) {
@@ -760,8 +883,10 @@ async function handleCreateEvent() {
         showCreateEventModal.value = false;
         // Reset form
         newEvent.value = {
-          id: null, name: '', duration: null, location: '', topic: '', date: '', host: '', link: '', description: '', img: ''
+          id: null, name: '', duration: null, location: '', topic: '', date: '', host: '', link: '', description: '', img: null
         };
+        eventImageFile.value = null;
+        eventImagePreview.value = null;
       } else {
         const errorData = await res.json();
         console.error('Fehler beim Erstellen:', errorData);
@@ -772,14 +897,26 @@ async function handleCreateEvent() {
       alert('Netzwerkfehler beim Erstellen des Events.');
     }
   } else {
-    // Fallback: localStorage
-    const eventToAdd = { ...eventData, id: Date.now() };
+    // Fallback: localStorage (kann keine Files speichern)
+    const eventToAdd = { 
+      name: newEvent.value.name,
+      topic: newEvent.value.topic,
+      location: newEvent.value.location,
+      duration: newEvent.value.duration,
+      date: newEvent.value.date ? new Date(newEvent.value.date).toISOString() : null,
+      link: newEvent.value.link || '',
+      description: newEvent.value.description,
+      host: newEvent.value.host || user.value.username,
+      id: Date.now() 
+    };
     myEvents.value.unshift(eventToAdd);
     saveEventsToLocalStorage();
     showCreateEventModal.value = false;
     newEvent.value = {
-      id: null, name: '', duration: null, location: '', topic: '', date: '', host: '', link: '', description: '', img: ''
+      id: null, name: '', duration: null, location: '', topic: '', date: '', host: '', link: '', description: '', img: null
     };
+    eventImageFile.value = null;
+    eventImagePreview.value = null;
   }
 }
 
@@ -787,6 +924,8 @@ async function handleCreateEvent() {
 function openEditEventModal(event) {
   // copy event and normalize date for datetime-local input
   editingEvent.value = { ...event, date: isoToDatetimeLocal(event.date) };
+  editEventImageFile.value = null;
+  editEventImagePreview.value = null;
   showEditEventModal.value = true;
 }
 
@@ -797,17 +936,30 @@ async function handleUpdateEvent() {
 
   if (apiBase && token) {
     try {
+      // FormData für File Upload verwenden
+      const formData = new FormData();
+      
+      formData.append('name', editingEvent.value.name);
+      formData.append('topic', editingEvent.value.topic);
+      formData.append('location', editingEvent.value.location);
+      formData.append('duration', editingEvent.value.duration);
+      formData.append('date', editingEvent.value.date ? new Date(editingEvent.value.date).toISOString() : '');
+      formData.append('link', editingEvent.value.link || '');
+      formData.append('description', editingEvent.value.description);
+      formData.append('host', editingEvent.value.host || '');
+      
+      // Bild hinzufügen (nur wenn neues Bild ausgewählt)
+      if (editEventImageFile.value) {
+        formData.append('img', editEventImageFile.value);
+      }
+      
       const res = await fetch(`${apiBase}/events/${editingEvent.value.id}/`, {
         method: 'PATCH',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
+          // KEIN Content-Type - Browser setzt automatisch mit boundary
         },
-        // ensure date is sent as ISO string (backend expects timezone-aware datetime)
-        body: JSON.stringify({
-          ...editingEvent.value,
-          date: editingEvent.value.date ? new Date(editingEvent.value.date).toISOString() : null
-        })
+        body: formData
       });
       
       if (res.ok) {
@@ -816,6 +968,8 @@ async function handleUpdateEvent() {
         if (idx !== -1) myEvents.value[idx] = updated;
         console.log('Event erfolgreich aktualisiert');
         showEditEventModal.value = false;
+        editEventImageFile.value = null;
+        editEventImagePreview.value = null;
       } else {
         const errorData = await res.json();
         console.error('Fehler beim Aktualisieren:', errorData);

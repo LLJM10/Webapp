@@ -7,7 +7,7 @@
       </div>
       <div class="tags"><div class="tag">{{ pitch.goal }} Ziel</div></div>
     </div>
-    <img :src="pitch.img" :alt="pitch.title">
+    <img :src="getImageUrl(pitch.img)" :alt="pitch.title">
     
     <!-- Investment Details Grid -->
     <div class="investment-details">
@@ -87,6 +87,7 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '~/stores/auth';
+import { useRuntimeConfig } from '#app';
 // Wir importieren nur die dummyApi, da die Pitch-Daten über Props kommen
 import { dummyApi } from '~/composables/useDemoData'; 
 
@@ -101,6 +102,29 @@ const props = defineProps({
 // Router-Instanz für die Navigation
 const router = useRouter();
 const auth = useAuthStore();
+const config = useRuntimeConfig();
+
+// Helper function to get the correct image URL
+function getImageUrl(imgPath) {
+  if (!imgPath) {
+    return 'https://placehold.co/600x400/22c55e/ffffff?text=' + encodeURIComponent(props.pitch.title || 'Pitch');
+  }
+  
+  // If it's already a full URL (http/https), return as is
+  if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) {
+    return imgPath;
+  }
+  
+  // If it's a relative path from backend (e.g., /media/pitch_images/...)
+  if (imgPath.startsWith('/media/')) {
+    const apiBase = config.public?.apiBase || 'http://127.0.0.1:8000';
+    return apiBase + imgPath;
+  }
+  
+  // If it's just a filename or relative path without /media/
+  const apiBase = config.public?.apiBase || 'http://127.0.0.1:8000';
+  return `${apiBase}/media/${imgPath}`;
+}
 
 // Prüfen, ob der aktuelle User der Owner des Pitches ist
 const isOwner = computed(() => {

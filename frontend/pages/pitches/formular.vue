@@ -68,6 +68,26 @@
           </div>
         </div>
 
+        <!-- Image Upload -->
+        <div class="input-group">
+          <label for="pitch_image">🖼️ Pitch Bild (JPG/PNG, optional, max. 5MB)</label>
+          <input 
+            id="pitch_image" 
+            type="file" 
+            accept="image/jpeg,image/png,image/jpg" 
+            @change="handleImageChange($event)"
+          >
+          <small v-if="imageFile" class="muted" style="display:block;margin-top:4px">
+            Ausgewählt: {{ imageFile.name }}
+          </small>
+          <small v-if="existingImage" class="muted" style="display:block;margin-top:4px">
+            Aktuell: <a :href="existingImage" target="_blank" style="color:var(--accent)">Vorhandenes Bild anzeigen</a>
+          </small>
+          <div v-if="imagePreview" style="margin-top: 12px;">
+            <img :src="imagePreview" alt="Preview" style="max-width: 300px; max-height: 200px; border-radius: 8px; border: 2px solid var(--accent);">
+          </div>
+        </div>
+
         <!-- PDF Upload Felder -->
         <div class="input-group">
           <label for="pitch_deck">📄 Pitch Deck (PDF, optional, max. 10MB)</label>
@@ -148,8 +168,12 @@ const newPitch = ref({
   goal: '',
   equity: null,
   desc: '',
-  img: 'https://placehold.co/600x400/22c55e/ffffff?text=Neu'
+  img: null
 });
+
+const imageFile = ref(null);
+const imagePreview = ref(null);
+const existingImage = ref(null);
 
 const pdfFiles = ref({
   pitch_deck: null,
@@ -162,6 +186,36 @@ const existingFiles = ref({
   business_plan: null,
   financial_report: null
 });
+
+function handleImageChange(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    imageFile.value = null;
+    imagePreview.value = null;
+    return;
+  }
+  
+  // Client-seitige Validierung
+  if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
+    alert('Bitte nur JPG/PNG Bilder hochladen.');
+    event.target.value = '';
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Bild zu groß. Maximum: 5MB');
+    event.target.value = '';
+    return;
+  }
+  
+  imageFile.value = file;
+  
+  // Preview erstellen
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    imagePreview.value = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 
 function handleFileChange(event, fieldName) {
   const file = event.target.files[0];
@@ -214,10 +268,11 @@ onMounted(async () => {
           const data = await res.json();
           Object.assign(newPitch.value, data);
           
-          // Existierende PDFs laden
+          // Existierende PDFs und Bild laden
           existingFiles.value.pitch_deck = data.pitch_deck || null;
           existingFiles.value.business_plan = data.business_plan || null;
           existingFiles.value.financial_report = data.financial_report || null;
+          existingImage.value = data.img || null;
           return;
         }
       } catch (e) {
@@ -258,9 +313,13 @@ async function handleCreatePitch() {
   formData.append('goal', newPitch.value.goal);
   formData.append('equity', newPitch.value.equity);
   formData.append('desc', newPitch.value.desc || '');
-  formData.append('img', newPitch.value.img || '');
   formData.append('valuation', calculatedValuation.value || '');
   formData.append('is_public', 'true');
+  
+  // Bild hinzufügen (nur wenn ausgewählt)
+  if (imageFile.value) {
+    formData.append('img', imageFile.value);
+  }
   
   // PDF-Dateien hinzufügen (nur wenn ausgewählt)
   if (pdfFiles.value.pitch_deck) {

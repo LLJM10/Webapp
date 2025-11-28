@@ -16,6 +16,7 @@ class PitchSerializer(serializers.ModelSerializer):
     owner = serializers.CharField(source='owner.username', read_only=True)
     
     # FileFields explizit deklarieren für bessere Kontrolle
+    img = serializers.ImageField(required=False, allow_null=True)
     pitch_deck = serializers.FileField(required=False, allow_null=True)
     business_plan = serializers.FileField(required=False, allow_null=True)
     financial_report = serializers.FileField(required=False, allow_null=True)
@@ -29,6 +30,13 @@ class PitchSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'owner', 'created_at', 'updated_at']
+    
+    def validate_img(self, value):
+        """Validate pitch image file"""
+        if value and hasattr(value, 'size'):
+            if value.size > 5242880:  # 5MB
+                raise serializers.ValidationError("Bild zu groß. Maximum: 5MB")
+        return value
     
     def validate_pitch_deck(self, value):
         """Validate pitch deck PDF file"""
@@ -62,6 +70,7 @@ class EventSerializer(serializers.ModelSerializer):
     Includes validation for required fields.
     """
     owner = serializers.CharField(source='owner.username', read_only=True)
+    img = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Event
@@ -93,9 +102,10 @@ class EventSerializer(serializers.ModelSerializer):
         return value
 
     def validate_img(self, value):
-        """Check if URL is valid (optional)"""
-        if value and not (value.startswith('http://') or value.startswith('https://')):
-            raise serializers.ValidationError("Bild-URL muss mit http:// oder https:// beginnen.")
+        """Validate event image file"""
+        if value and hasattr(value, 'size'):
+            if value.size > 5242880:  # 5MB
+                raise serializers.ValidationError("Bild zu groß. Maximum: 5MB")
         return value
 
     def validate(self, data):

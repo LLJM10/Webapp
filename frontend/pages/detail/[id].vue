@@ -13,7 +13,7 @@
 
       <!-- Hero Section -->
       <div class="hero-section">
-        <img :src="pitch.img || 'https://placehold.co/1200x400/3b82f6/ffffff?text=Pitch'" :alt="pitch.title" class="hero-image" />
+        <img :src="getImageUrl(pitch.img, pitch.title)" :alt="pitch.title" class="hero-image" />
         <div class="hero-overlay">
           <div class="hero-content">
             <h1 class="hero-title">{{ pitch.title }}</h1>
@@ -198,6 +198,30 @@ import PaymentButton from '~/components/PaymentButton.vue';
 const route = useRoute();
 const pitch = ref(null);
 const paymentAmount = ref('10.00');
+
+// Helper function to get the correct image URL
+function getImageUrl(imgPath, fallbackText = 'Pitch') {
+  if (!imgPath) {
+    return 'https://placehold.co/1200x400/3b82f6/ffffff?text=' + encodeURIComponent(fallbackText);
+  }
+  
+  // If it's already a full URL (http/https), return as is
+  if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) {
+    return imgPath;
+  }
+  
+  // If it's a relative path from backend (e.g., /media/pitch_images/...)
+  if (imgPath.startsWith('/media/')) {
+    const config = useRuntimeConfig();
+    const apiBase = config.public?.apiBase || 'http://127.0.0.1:8000';
+    return apiBase + imgPath;
+  }
+  
+  // If it's just a filename or relative path without /media/
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase || 'http://127.0.0.1:8000';
+  return `${apiBase}/media/${imgPath}`;
+}
 
 onMounted(async () => {
   const config = useRuntimeConfig();

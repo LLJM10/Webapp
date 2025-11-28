@@ -37,7 +37,7 @@ class Pitch(models.Model):
     goal = models.CharField(max_length=64, blank=True, help_text='Funding goal (e.g., 500.000€)')
     equity = models.IntegerField(null=True, blank=True, help_text='Equity percentage offered')
     desc = models.TextField(blank=True, help_text='Pitch description')
-    img = models.URLField(blank=True, help_text='Image URL for pitch card')
+    img = models.ImageField(upload_to='pitch_images/', blank=True, null=True, help_text='Pitch card image')
     valuation = models.CharField(max_length=64, blank=True, help_text='Calculated valuation')
     
     # PDF file uploads
@@ -91,7 +91,7 @@ class Event(models.Model):
     date = models.DateTimeField(help_text='Event date and time')
     link = models.URLField(blank=True, help_text='Meeting link or registration URL')
     description = models.TextField(help_text='Detailed event description')
-    img = models.URLField(blank=True, help_text='Event cover image URL')
+    img = models.ImageField(upload_to='event_images/', blank=True, null=True, help_text='Event cover image')
     host = models.CharField(max_length=200, blank=True, help_text='Host name or organization')
     is_public = models.BooleanField(default=True, help_text='Whether event is visible on marketplace')
     created_at = models.DateTimeField(auto_now_add=True)
