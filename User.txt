@@ -1,0 +1,21 @@
+Benutzername:admin_test
+Mail:admin@test.de
+Passwort:admin12
+Rolle: startup
+
+Benutzername:admin_investor
+Mail:admin@test.de
+Passwort:admin12
+Rolle: investor
+
+superuser
+admin_lljm
+lukasniessen05@gmail.com
+julian1900
+
+Benutzername:email_test
+Mail: lukas@test.de
+Passwort:test123
+Rolle: startup
+
+Investify2025**
