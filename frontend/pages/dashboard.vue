@@ -232,7 +232,7 @@
             </div>
             <div class="kpi-content">
               <div class="kpi-label">Watchlist</div>
-              <div class="kpi-value">{{ investorKPIs.watchlistCount }}</div>
+              <div class="kpi-value">{{ savedPitches.length }}</div>
               <div class="kpi-trend neutral">{{ investorKPIs.newThisWeek }} neu diese Woche</div>
             </div>
           </div>
@@ -395,6 +395,49 @@
             </div>
             <div class="activity-amount" v-if="activity.amount">{{ activity.amount }}</div>
           </div>
+        </div>
+      </div>
+
+      <!-- Gespeicherte Pitches -->
+      <div class="saved-pitches-section">
+        <h3 class="section-title">Meine gespeicherten Pitches</h3>
+        <div v-if="savedPitches.length > 0" class="saved-pitches-grid">
+          <div v-for="saved in savedPitches" :key="saved.id" class="saved-pitch-card">
+            <NuxtLink :to="`/detail/${saved.pitch.id}`" class="saved-pitch-link">
+              <img :src="getImageUrl(saved.pitch.img, saved.pitch.title)" :alt="saved.pitch.title" class="saved-pitch-image">
+              <div class="saved-pitch-content">
+                <h4 class="saved-pitch-title">{{ saved.pitch.title }}</h4>
+                <div class="saved-pitch-meta">
+                  <span class="meta-badge">{{ saved.pitch.sector }}</span>
+                  <span class="meta-badge">{{ saved.pitch.stage }}</span>
+                </div>
+                <p class="saved-pitch-desc">{{ truncateText(saved.pitch.desc, 80) }}</p>
+                <div class="saved-pitch-stats">
+                  <div class="stat-small">
+                    <span class="stat-small-label">Ziel</span>
+                    <span class="stat-small-value">{{ saved.pitch.goal }}€</span>
+                  </div>
+                  <div class="stat-small">
+                    <span class="stat-small-label">Equity</span>
+                    <span class="stat-small-value">{{ saved.pitch.equity }}%</span>
+                  </div>
+                </div>
+              </div>
+            </NuxtLink>
+            <button class="btn-remove-saved" @click.prevent="removeSavedPitch(saved.pitch.id)" title="Entfernen">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div v-else class="empty-saved-state">
+          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+          </svg>
+          <p class="empty-text">Noch keine Pitches gespeichert</p>
+          <NuxtLink to="/market" class="btn primary">Zum Marktplatz</NuxtLink>
         </div>
       </div>
 
@@ -623,6 +666,7 @@ const phases = ref(['Pre-Seed', 'Seed', 'Series A', 'Wachstum', 'Reife']);
 const user = ref({ username: 'Startup-User', email: 'demo@startup.com', role: 'startup' }); // Default-Werte für Demo
 const myPitches = ref([]); // Startet mit einer leeren Liste
 const myEvents = ref([]); // NEU: Liste für Events
+const savedPitches = ref([]); // NEU: Gespeicherte Pitches für Investoren
 const showCreateModal = ref(false);
 const showCreateEventModal = ref(false); // NEU: State für Event-Modal
 const showAiModal = ref(false);
@@ -864,6 +908,11 @@ onMounted(async () => {
   } else {
     loadEventsFromLocalStorage();
   }
+  
+  // NEU: Load saved pitches for investors
+  if (user.value.role === 'investor') {
+    await loadSavedPitches();
+  }
 });
 
 function loadPitchesFromLocalStorage() {
@@ -968,6 +1017,66 @@ function formatCurrency(amount) {
 function navigateToDetail(pitchId) {
   const router = useRouter();
   router.push(`/detail/${pitchId}`);
+}
+
+// Load saved pitches for investors
+async function loadSavedPitches() {
+  if (user.value.role !== 'investor') return;
+  
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  if (!apiBase || !token) return;
+  
+  try {
+    const res = await fetch(`${apiBase}/saved-pitches/`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (res.ok) {
+      savedPitches.value = await res.json();
+      console.debug('Loaded saved pitches:', savedPitches.value.length);
+    } else {
+      console.warn('Failed to load saved pitches:', res.status);
+    }
+  } catch (e) {
+    console.error('Error loading saved pitches:', e);
+  }
+}
+
+// Remove a saved pitch
+async function removeSavedPitch(pitchId) {
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  if (!apiBase || !token) return;
+  
+  if (!confirm('Möchten Sie diesen Pitch wirklich aus der Watchlist entfernen?')) return;
+  
+  try {
+    const res = await fetch(`${apiBase}/saved-pitches/unsave_pitch/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ pitch_id: pitchId })
+    });
+    
+    if (res.ok) {
+      // Remove from local list
+      savedPitches.value = savedPitches.value.filter(saved => saved.pitch.id !== pitchId);
+      console.debug('Removed saved pitch:', pitchId);
+    } else {
+      console.warn('Failed to remove saved pitch:', res.status);
+      alert('Fehler beim Entfernen des Pitches.');
+    }
+  } catch (e) {
+    console.error('Error removing saved pitch:', e);
+    alert('Fehler beim Entfernen des Pitches.');
+  }
 }
 
 function handleEventImageChange(event) {
@@ -2412,6 +2521,162 @@ textarea.error {
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--accent);
+}
+
+/* Saved Pitches Section */
+.saved-pitches-section {
+  animation: fadeInUp 0.75s ease-out;
+}
+
+.saved-pitches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.saved-pitch-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.saved-pitch-card:hover {
+  border-color: rgba(94, 234, 212, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.saved-pitch-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.saved-pitch-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.saved-pitch-card:hover .saved-pitch-image {
+  transform: scale(1.05);
+}
+
+.saved-pitch-content {
+  padding: 20px;
+}
+
+.saved-pitch-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.saved-pitch-meta {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.meta-badge {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  background: rgba(94, 234, 212, 0.1);
+  color: var(--accent);
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.saved-pitch-desc {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.saved-pitch-stats {
+  display: flex;
+  gap: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stat-small {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-small-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.stat-small-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.btn-remove-saved {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  background: rgba(239, 68, 68, 0.9);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.saved-pitch-card:hover .btn-remove-saved {
+  opacity: 1;
+}
+
+.btn-remove-saved svg {
+  width: 16px;
+  height: 16px;
+  color: white;
+}
+
+.btn-remove-saved:hover {
+  background: rgba(220, 38, 38, 1);
+  transform: scale(1.1);
+}
+
+.empty-saved-state {
+  text-align: center;
+  padding: 48px 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+
+.empty-saved-state .empty-icon {
+  width: 64px;
+  height: 64px;
+  color: var(--muted);
+  margin: 0 auto 16px;
+}
+
+.empty-saved-state .empty-text {
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin-bottom: 20px;
 }
 
 /* Animations */

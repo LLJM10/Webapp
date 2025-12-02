@@ -1,12 +1,12 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, BasePermission, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.conf import settings
 
-from .models import Todo, Pitch, Event
-from .serializers import TodoSerializer, PitchSerializer, EventSerializer
+from .models import Todo, Pitch, Event, SavedPitch
+from .serializers import TodoSerializer, PitchSerializer, EventSerializer, SavedPitchSerializer
 
 
 @api_view(["GET"])
@@ -204,3 +204,107 @@ Antworte NUR mit der Beschreibung, ohne zusätzliche Kommentare."""
             {"error": f"AI generation failed: {str(e)}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+class SavedPitchViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for SavedPitch model.
+    - Only authenticated users can save/unsave pitches.
+    - Users can only see their own saved pitches.
+    - Custom actions: save_pitch, unsave_pitch, check_saved
+    """
+    serializer_class = SavedPitchSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Return only saved pitches of the current user."""
+        return SavedPitch.objects.filter(user=self.request.user).select_related('pitch', 'pitch__owner')
+
+    @action(detail=False, methods=['post'])
+    def save_pitch(self, request):
+        """
+        Save a pitch for the current user.
+        Expects: { "pitch_id": 123 }
+        Returns: SavedPitchSerializer data or error
+        """
+        pitch_id = request.data.get('pitch_id')
+        
+        if not pitch_id:
+            return Response(
+                {"error": "pitch_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            pitch = Pitch.objects.get(id=pitch_id)
+        except Pitch.DoesNotExist:
+            return Response(
+                {"error": "Pitch not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Create or get existing saved pitch
+        saved_pitch, created = SavedPitch.objects.get_or_create(
+            user=request.user,
+            pitch=pitch
+        )
+        
+        serializer = self.get_serializer(saved_pitch)
+        
+        if created:
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'])
+    def unsave_pitch(self, request):
+        """
+        Remove a saved pitch for the current user.
+        Expects: { "pitch_id": 123 }
+        Returns: success message or error
+        """
+        pitch_id = request.data.get('pitch_id')
+        
+        if not pitch_id:
+            return Response(
+                {"error": "pitch_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            saved_pitch = SavedPitch.objects.get(
+                user=request.user,
+                pitch_id=pitch_id
+            )
+            saved_pitch.delete()
+            return Response(
+                {"message": "Pitch removed from saved list"},
+                status=status.HTTP_200_OK
+            )
+        except SavedPitch.DoesNotExist:
+            return Response(
+                {"error": "Saved pitch not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    @action(detail=False, methods=['get'])
+    def check_saved(self, request):
+        """
+        Check if a pitch is saved by the current user.
+        Query param: ?pitch_id=123
+        Returns: { "saved": true/false }
+        """
+        pitch_id = request.query_params.get('pitch_id')
+        
+        if not pitch_id:
+            return Response(
+                {"error": "pitch_id query parameter is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        is_saved = SavedPitch.objects.filter(
+            user=request.user,
+            pitch_id=pitch_id
+        ).exists()
+        
+        return Response({"saved": is_saved})

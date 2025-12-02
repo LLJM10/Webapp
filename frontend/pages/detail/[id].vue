@@ -131,11 +131,18 @@
               Investiere in dieses vielversprechende Startup und werde Teil der Erfolgsgeschichte.
             </p>
             <PaymentButton v-if="pitch && isInvestor" :amount="paymentAmount" label="Jetzt investieren" style="width: 100%; margin-bottom: 12px" />
-            <button v-if="isInvestor" class="btn ghost" style="width: 100%; margin-bottom: 12px" @click="dummyApi('/api/favorite?pitch=' + pitch.id)">
+            <button 
+              v-if="isInvestor" 
+              class="btn ghost" 
+              style="width: 100%; margin-bottom: 12px" 
+              @click="toggleSavePitch"
+              :disabled="isLoading"
+            >
               <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 8px">
-                <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+                <path v-if="isSaved" d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2z"/>
+                <path v-else d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
               </svg>
-              Pitch merken
+              {{ isSaved ? '★ Gemerkt' : '☆ Pitch merken' }}
             </button>
             <button @click="openMail" class="btn ghost" style="width: 100%">
               Kontakt aufnehmen
@@ -196,6 +203,8 @@ const route = useRoute();
 const pitch = ref(null);
 const paymentAmount = ref('10.00');
 const user = ref({ username: '', email: '', role: 'startup' }); // Default user object
+const isSaved = ref(false); // Track if pitch is saved
+const isLoading = ref(false); // Track button loading state
 
 // Computed property to check if user is an investor
 const isInvestor = computed(() => user.value.role === 'investor');
@@ -227,6 +236,72 @@ function getImageUrl(imgPath, fallbackText = 'Pitch') {
   const config = useRuntimeConfig();
   const apiBase = config.public?.apiBase || 'http://127.0.0.1:8000';
   return `${apiBase}/media/${imgPath}`;
+}
+
+// Toggle save/unsave pitch
+async function toggleSavePitch() {
+  if (!pitch.value || !user.value || user.value.role !== 'investor') return;
+  
+  isLoading.value = true;
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  if (!token) {
+    alert('Bitte melde dich an, um Pitches zu speichern.');
+    isLoading.value = false;
+    return;
+  }
+  
+  try {
+    const endpoint = isSaved.value ? 'unsave_pitch' : 'save_pitch';
+    const res = await fetch(`${apiBase}/saved-pitches/${endpoint}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ pitch_id: pitch.value.id })
+    });
+    
+    if (res.ok) {
+      isSaved.value = !isSaved.value;
+      console.log(isSaved.value ? 'Pitch saved' : 'Pitch unsaved');
+    } else {
+      const errorData = await res.json();
+      console.error('Error toggling saved pitch:', errorData);
+      alert('Fehler beim Speichern des Pitches.');
+    }
+  } catch (e) {
+    console.error('Error saving pitch:', e);
+    alert('Fehler beim Speichern des Pitches.');
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+// Check if pitch is already saved
+async function checkIfSaved() {
+  if (!pitch.value || !user.value || user.value.role !== 'investor') return;
+  
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  if (!token) return;
+  
+  try {
+    const res = await fetch(`${apiBase}/saved-pitches/check_saved/?pitch_id=${pitch.value.id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      isSaved.value = data.saved;
+    }
+  } catch (e) {
+    console.error('Error checking saved status:', e);
+  }
 }
 
 onMounted(async () => {
@@ -277,6 +352,11 @@ onMounted(async () => {
     } catch (e) {
       console.error('Error loading pitch:', e);
     }
+  }
+  
+  // Check if pitch is saved after loading
+  if (pitch.value && user.value.role === 'investor') {
+    await checkIfSaved();
   }
 });
 </script>

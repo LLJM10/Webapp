@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import hello, PitchViewSet, EventViewSet, generate_ai_description
+from .views import hello, PitchViewSet, EventViewSet, SavedPitchViewSet, generate_ai_description
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -11,6 +11,7 @@ from rest_framework_simplejwt.views import (
 router = DefaultRouter()
 router.register(r'pitches', PitchViewSet, basename='pitch')
 router.register(r'events', EventViewSet, basename='event')
+router.register(r'saved-pitches', SavedPitchViewSet, basename='saved-pitch')
 
 urlpatterns = [
     path('hello/', hello),

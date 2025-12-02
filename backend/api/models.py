@@ -104,3 +104,32 @@ class Event(models.Model):
 
     def __str__(self):
         return f'{self.name} ({self.owner.username})'
+
+
+class SavedPitch(models.Model):
+    """
+    Model to store saved/bookmarked pitches by investors.
+    Many-to-Many relationship between users and pitches.
+    """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='saved_pitches',
+        help_text='User who saved this pitch'
+    )
+    pitch = models.ForeignKey(
+        Pitch,
+        on_delete=models.CASCADE,
+        related_name='saved_by',
+        help_text='The saved pitch'
+    )
+    saved_at = models.DateTimeField(auto_now_add=True, help_text='When the pitch was saved')
+
+    class Meta:
+        unique_together = ('user', 'pitch')  # Prevent duplicate saves
+        ordering = ['-saved_at']
+        verbose_name = 'Saved Pitch'
+        verbose_name_plural = 'Saved Pitches'
+
+    def __str__(self):
+        return f'{self.user.username} saved {self.pitch.title}'

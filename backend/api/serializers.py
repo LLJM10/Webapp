@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
-from .models import Todo, Pitch, Event   # dein Model
+from .models import Todo, Pitch, Event, SavedPitch   # dein Model
 
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -114,3 +114,17 @@ class EventSerializer(serializers.ModelSerializer):
         if data.get('is_public', True) and not data.get('host'):
             data['host'] = self.context['request'].user.username
         return data
+
+
+class SavedPitchSerializer(serializers.ModelSerializer):
+    """
+    Serializer for SavedPitch model.
+    Returns the full pitch data along with save timestamp.
+    """
+    pitch = PitchSerializer(read_only=True)
+    user = serializers.CharField(source='user.username', read_only=True)
+
+    class Meta:
+        model = SavedPitch
+        fields = ['id', 'user', 'pitch', 'saved_at']
+        read_only_fields = ['id', 'user', 'saved_at']
