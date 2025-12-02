@@ -130,8 +130,8 @@
             <p class="muted" style="margin-bottom: 20px; font-size: 0.95rem">
               Investiere in dieses vielversprechende Startup und werde Teil der Erfolgsgeschichte.
             </p>
-            <PaymentButton v-if="pitch" :amount="paymentAmount" label="Jetzt investieren" style="width: 100%; margin-bottom: 12px" />
-            <button class="btn ghost" style="width: 100%; margin-bottom: 12px" @click="dummyApi('/api/favorite?pitch=' + pitch.id)">
+            <PaymentButton v-if="pitch && isInvestor" :amount="paymentAmount" label="Jetzt investieren" style="width: 100%; margin-bottom: 12px" />
+            <button v-if="isInvestor" class="btn ghost" style="width: 100%; margin-bottom: 12px" @click="dummyApi('/api/favorite?pitch=' + pitch.id)">
               <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 8px">
                 <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
               </svg>
@@ -186,7 +186,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useRuntimeConfig } from '#app';
 import { dummyApi } from '~/composables/useDemoData';
@@ -195,6 +195,10 @@ import PaymentButton from '~/components/PaymentButton.vue';
 const route = useRoute();
 const pitch = ref(null);
 const paymentAmount = ref('10.00');
+const user = ref({ username: '', email: '', role: 'startup' }); // Default user object
+
+// Computed property to check if user is an investor
+const isInvestor = computed(() => user.value.role === 'investor');
 
 
 function openMail() {
@@ -231,6 +235,28 @@ onMounted(async () => {
   const pitchId = route.params.id;
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
+  // Load user data from backend
+  if (token) {
+    try {
+      const userRes = await fetch('http://127.0.0.1:8000/api/users/me/', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (userRes.ok) {
+        const userData = await userRes.json();
+        user.value.username = userData.username || '';
+        user.value.email = userData.email || '';
+        user.value.role = userData.profile?.role || userData.role || 'startup';
+        console.log('User loaded:', user.value);
+      } else {
+        console.warn('Failed to load user data:', userRes.status);
+      }
+    } catch (e) {
+      console.error('Error loading user:', e);
+    }
+  }
+
+  // Load pitch data
   if (apiBase && pitchId) {
     try {
       const res = await fetch(`${apiBase}/pitches/${pitchId}/`, {
