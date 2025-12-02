@@ -15,6 +15,35 @@ class UserViewSet(viewsets.ModelViewSet):
         user = request.user
         serializer = self.get_serializer(user)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['patch'], permission_classes=[IsAuthenticated])
+    def update_email(self, request):
+        """Update user's email address"""
+        user = request.user
+        new_email = request.data.get('email')
+        
+        if not new_email:
+            return Response(
+                {'error': 'E-Mail Adresse erforderlich'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check if email already exists
+        if User.objects.filter(email=new_email).exclude(id=user.id).exists():
+            return Response(
+                {'error': 'Diese E-Mail Adresse wird bereits verwendet'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Update email
+        user.email = new_email
+        user.save()
+        
+        return Response(
+            {'message': 'E-Mail Adresse erfolgreich aktualisiert', 'email': new_email}, 
+            status=status.HTTP_200_OK
+        )
+    
     queryset = User.objects.all()
     serializer_class = UserSerializer
 

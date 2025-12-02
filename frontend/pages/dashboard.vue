@@ -10,7 +10,7 @@
     <!-- Dashboard Header -->
     <div class="dashboard-header">
       <div>
-        <h2 style="margin-bottom: 8px">Dashboard</h2>
+        <h2 class="mb-8">Dashboard</h2>
         <p class="muted">Willkommen zurück, {{ user.username }}</p>
       </div>
     </div>
@@ -78,9 +78,9 @@
 
                 <!-- Delete Confirmation (inline) -->
                 <div v-if="pitchToDelete?.id === pitch.id" class="delete-confirmation">
-                  <strong style="color:#ef4444">Wirklich löschen?</strong>
-                  <p style="margin-top:8px;color:#cbd5e1;font-size:0.9rem">Dieser Pitch wird dauerhaft gelöscht.</p>
-                  <div style="display:flex;gap:8px;margin-top:12px">
+                  <strong class="text-danger">Wirklich löschen?</strong>
+                  <p class="mt-8 text-muted">Dieser Pitch wird dauerhaft gelöscht.</p>
+                  <div class="flex gap-8 mt-12">
                     <button class="btn danger small" @click="deletePitch">Ja, löschen</button>
                     <button class="btn ghost small" @click="cancelDeletePitch">Abbrechen</button>
                   </div>
@@ -130,9 +130,9 @@
 
                 <!-- Delete Confirmation (inline) -->
                 <div v-if="eventToDelete?.id === event.id" class="delete-confirmation">
-                  <strong style="color:#ef4444">Wirklich löschen?</strong>
-                  <p style="margin-top:8px;color:#cbd5e1;font-size:0.9rem">Dieses Event wird dauerhaft gelöscht.</p>
-                  <div style="display:flex;gap:8px;margin-top:12px">
+                  <strong class="text-danger">Wirklich löschen?</strong>
+                  <p class="mt-8 text-muted">Dieses Event wird dauerhaft gelöscht.</p>
+                  <div class="flex gap-8 mt-12">
                     <button class="btn danger small" @click="deleteEvent">Ja, löschen</button>
                     <button class="btn ghost small" @click="cancelDeleteEvent">Abbrechen</button>
                   </div>
@@ -476,7 +476,7 @@
             >
             <span v-if="validationErrors.name" class="error-text">{{ validationErrors.name }}</span>
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="grid-2 gap-12">
               <div class="input-group">
                 <label for="eventDuration">Dauer (Minuten) *</label>
                 <input 
@@ -548,13 +548,13 @@
               accept="image/jpeg,image/png,image/jpg" 
               @change="handleEventImageChange($event)"
             >
-            <small v-if="eventImageFile" class="muted" style="display:block;margin-top:4px">
+            <small v-if="eventImageFile" class="muted block mt-4">
               Ausgewählt: {{ eventImageFile.name }}
             </small>
-            <small v-if="existingEventImage" class="muted" style="display:block;margin-top:4px">
-              Aktuell: <a :href="existingEventImage" target="_blank" style="color:var(--accent)">Vorhandenes Bild anzeigen</a>
+            <small v-if="existingEventImage" class="muted block mt-4">
+              Aktuell: <a :href="existingEventImage" target="_blank" class="text-accent">Vorhandenes Bild anzeigen</a>
             </small>
-            <div v-if="eventImagePreview" style="margin-top: 12px;">
+            <div v-if="eventImagePreview" class="mt-12">
               <img :src="eventImagePreview" alt="Preview" style="max-width: 300px; max-height: 200px; border-radius: 8px; border: 2px solid var(--accent);">
             </div>
           </div>
@@ -597,7 +597,7 @@
             <label>Name des Events *</label>
             <input v-model="editingEvent.name" type="text" required>
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="grid-2 gap-12">
               <div class="input-group">
                 <label>Dauer (Minuten) *</label>
                 <input v-model.number="editingEvent.duration" type="number" min="1" max="480" required>
@@ -631,13 +631,13 @@
               accept="image/jpeg,image/png,image/jpg" 
               @change="handleEditEventImageChange($event)"
             >
-            <small v-if="editEventImageFile" class="muted" style="display:block;margin-top:4px">
+            <small v-if="editEventImageFile" class="muted block mt-4">
               Ausgewählt: {{ editEventImageFile.name }}
             </small>
-            <small v-if="editingEvent.img && !editEventImageFile" class="muted" style="display:block;margin-top:4px">
-              Aktuell: <a :href="getImageUrl(editingEvent.img, editingEvent.name)" target="_blank" style="color:var(--accent)">Vorhandenes Bild anzeigen</a>
+            <small v-if="editingEvent.img && !editEventImageFile" class="muted block mt-4">
+              Aktuell: <a :href="getImageUrl(editingEvent.img, editingEvent.name)" target="_blank" class="text-accent">Vorhandenes Bild anzeigen</a>
             </small>
-            <div v-if="editEventImagePreview" style="margin-top: 12px;">
+            <div v-if="editEventImagePreview" class="mt-12">
               <img :src="editEventImagePreview" alt="Preview" style="max-width: 300px; max-height: 200px; border-radius: 8px; border: 2px solid var(--accent);">
             </div>
           </div>
@@ -2678,6 +2678,12 @@ textarea.error {
   color: var(--muted);
   margin-bottom: 20px;
 }
+
+/* Utility Helper Classes */
+.block { display: block; }
+.text-danger { color: #ef4444; }
+.text-muted { color: #cbd5e1; font-size: 0.9rem; }
+.text-accent { color: var(--accent); }
 
 /* Animations */
 @keyframes fadeInUp {

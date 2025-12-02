@@ -1,159 +1,151 @@
 <template>
   <section id="page-profile" class="profile-page">
-    <div class="profile-header-bar">
-      <h2 class="page-title">Profil bearbeiten</h2>
-      <div class="role-badge" :class="user.role">{{ capitalizedRole }}</div>
-    </div>
-
-    <div class="profile-grid">
-      <!-- Hauptinformationen -->
-      <div class="left-column">
-        <!-- Profilbild/Logo Upload Section -->
-        <div class="card profile-image-section">
-          <div class="image-upload-area">
-            <img :src="profileImage" :alt="profileName" class="profile-image" />
-            <button class="btn ghost upload-btn">
-              <span class="icon">📷</span> Bild ändern
-            </button>
-          </div>
-        </div>
-
-        <!-- Hauptinformationen -->
-        <div class="card main-info">
-          <div class="section-title">
-            <h3>{{ isStartup ? 'Unternehmensinformationen' : 'Investorenprofil' }}</h3>
-            <button class="btn primary save-btn" @click="saveProfile">Speichern</button>
-          </div>
-
-          <!-- Gemeinsame Felder -->
-          <div class="input-group">
-            <label>{{ isStartup ? 'Unternehmensname' : 'Name/Organisation' }}</label>
-            <input v-model="profile.name" type="text" :placeholder="isStartup ? 'Ihre Firma GmbH' : 'Name oder Organisationsname'" />
-          </div>
-
-          <!-- Startup-spezifische Felder -->
-          <template v-if="isStartup">
-            <div class="input-grid">
-              <div class="input-group">
-                <label>Branche</label>
-                <select v-model="profile.industry">
-                  <option value="">Bitte wählen</option>
-                  <option v-for="industry in industries" :key="industry" :value="industry">{{ industry }}</option>
-                </select>
-              </div>
-              <div class="input-group">
-                <label>Phase</label>
-                <select v-model="profile.stage">
-                  <option value="">Bitte wählen</option>
-                  <option v-for="stage in stages" :key="stage" :value="stage">{{ stage }}</option>
-                </select>
-              </div>
-            </div>
-            <div class="input-grid">
-              <div class="input-group">
-                <label>Mitarbeiterzahl</label>
-                <input v-model="profile.employeeCount" type="number" min="1" />
-              </div>
-              <div class="input-group">
-                <label>Gründungsjahr</label>
-                <input v-model="profile.foundingYear" type="number" :max="currentYear" />
-              </div>
-            </div>
-          </template>
-
-          <!-- Investor-spezifische Felder -->
-          <template v-else>
-            <div class="input-grid">
-              <div class="input-group">
-                <label>Investmentfokus</label>
-                <select v-model="profile.investmentFocus" multiple>
-                  <option v-for="focus in investmentFoci" :key="focus" :value="focus">{{ focus }}</option>
-                </select>
-              </div>
-              <div class="input-group">
-                <label>Ticketgröße</label>
-                <select v-model="profile.ticketSize">
-                  <option value="">Bitte wählen</option>
-                  <option v-for="size in ticketSizes" :key="size" :value="size">{{ size }}</option>
-                </select>
-              </div>
-            </div>
-          </template>
-
-          <!-- Gemeinsame Felder -->
-          <div class="input-group">
-            <label>Kurzbeschreibung</label>
-            <textarea 
-              v-model="profile.description" 
-              :placeholder="isStartup ? 'Beschreiben Sie Ihr Unternehmen kurz...' : 'Beschreiben Sie Ihre Investmentstrategie...'"
-              rows="3">
-            </textarea>
-          </div>
-        </div>
-
-        <!-- Dokumente Section -->
-        <div class="card documents-section">
-          <h3>Dokumente</h3>
-          <div class="documents-grid">
-            <!-- Startup-spezifische Dokumente -->
-            <template v-if="isStartup">
-              <div class="document-upload" v-for="doc in startupDocs" :key="doc.type">
-                <div class="doc-info">
-                  <span class="icon">📄</span>
-                  <div>
-                    <div class="doc-title">{{ doc.title }}</div>
-                    <div class="doc-status" :class="{ 'uploaded': doc.uploaded }">
-                      {{ doc.uploaded ? 'Hochgeladen' : 'Noch nicht hochgeladen' }}
-                    </div>
-                  </div>
-                </div>
-                <button class="btn ghost">{{ doc.uploaded ? 'Aktualisieren' : 'Hochladen' }}</button>
-              </div>
-            </template>
-            <!-- Investor-spezifische Dokumente -->
-            <template v-else>
-              <div class="document-upload" v-for="doc in investorDocs" :key="doc.type">
-                <div class="doc-info">
-                  <span class="icon">📄</span>
-                  <div>
-                    <div class="doc-title">{{ doc.title }}</div>
-                    <div class="doc-status" :class="{ 'uploaded': doc.uploaded }">
-                      {{ doc.uploaded ? 'Hochgeladen' : 'Noch nicht hochgeladen' }}
-                    </div>
-                  </div>
-                </div>
-                <button class="btn ghost">{{ doc.uploaded ? 'Aktualisieren' : 'Hochladen' }}</button>
-              </div>
-            </template>
-          </div>
+    <!-- Header -->
+    <div class="profile-header">
+      <div class="header-content">
+        <h1 class="page-title">Mein Profil</h1>
+        <div class="role-badge" :class="user.role">
+          {{ user.role === 'startup' ? 'Startup' : 'Investor' }}
         </div>
       </div>
+    </div>
 
-      <!-- Sidebar -->
-      <aside class="aside-column">
-        <!-- Kontaktinformationen -->
-        <div class="card contact-info">
-          <h3>Kontaktinformationen</h3>
-          <div class="input-group">
-            <label>E-Mail</label>
-            <div class="muted email-display">{{ user.email }}</div>
+    <!-- Success/Error Messages -->
+    <div v-if="successMessage" class="alert alert-success">
+      <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+      {{ successMessage }}
+    </div>
+    <div v-if="errorMessage" class="alert alert-error">
+      <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="15" y1="9" x2="9" y2="15"/>
+        <line x1="9" y1="9" x2="15" y2="15"/>
+      </svg>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Profile Content -->
+    <div class="profile-content">
+      <!-- Profile Card -->
+      <div class="card-base profile-card">
+        <div class="profile-avatar-section">
+          <div class="avatar-wrapper">
+            <img :src="avatarUrl" :alt="user.username" class="avatar" />
+            <div class="avatar-badge" :class="user.role">
+              {{ user.role === 'startup' ? '🚀' : '💼' }}
+            </div>
           </div>
-          <div class="input-group">
-            <label>Telefon</label>
-            <input v-model="profile.phone" type="tel" placeholder="+49" />
-          </div>
-          <div class="input-group">
-            <label>Website</label>
-            <input v-model="profile.website" type="url" placeholder="https://" />
+          <div class="profile-info">
+            <h2 class="profile-name">{{ user.username }}</h2>
+            <p class="profile-role">{{ user.role === 'startup' ? 'Startup Gründer' : 'Investor' }}</p>
           </div>
         </div>
 
-        <!-- Account Actions -->
-        <div class="card account-actions">
-          <h3>Account</h3>
-          <button class="btn danger" @click="handleLogout">Abmelden</button>
+        <!-- Account Details -->
+        <div class="info-section">
+          <h3 class="section-heading">Account Details</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Benutzername</span>
+              <span class="info-value">{{ user.username }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Rolle</span>
+              <span class="info-value">{{ user.role === 'startup' ? 'Startup' : 'Investor' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Mitglied seit</span>
+              <span class="info-value">{{ formattedJoinDate }}</span>
+            </div>
+          </div>
         </div>
-      </aside>
+
+        <!-- Email Edit Section -->
+        <div class="info-section">
+          <div class="section-header">
+            <h3 class="section-heading">E-Mail Adresse</h3>
+            <button v-if="!isEditingEmail" @click="startEditEmail" class="btn-edit">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              Bearbeiten
+            </button>
+          </div>
+          
+          <div v-if="!isEditingEmail" class="email-display">
+            <svg class="email-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            <span>{{ user.email }}</span>
+          </div>
+
+          <div v-else class="email-edit-form">
+            <div class="input-group">
+              <label for="email">Neue E-Mail Adresse</label>
+              <input 
+                id="email"
+                v-model="newEmail" 
+                type="email" 
+                placeholder="neue@email.com"
+                @keyup.enter="saveEmail"
+              />
+            </div>
+            <div class="form-actions">
+              <button @click="saveEmail" class="btn primary" :disabled="isSaving">
+                <span v-if="!isSaving">Speichern</span>
+                <span v-else>Speichert...</span>
+              </button>
+              <button @click="cancelEditEmail" class="btn ghost">Abbrechen</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Profile Info -->
+        <div class="info-section" v-if="user.role === 'startup'">
+          <h3 class="section-heading">Startup Informationen</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Pitches erstellt</span>
+              <span class="info-value highlight">{{ stats.pitchCount }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Events organisiert</span>
+              <span class="info-value highlight">{{ stats.eventCount }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-section" v-else>
+          <h3 class="section-heading">Investor Aktivität</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Gespeicherte Pitches</span>
+              <span class="info-value highlight">{{ stats.savedPitches }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Events besucht</span>
+              <span class="info-value highlight">{{ stats.eventsAttended }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="profile-actions">
+          <button @click="handleLogout" class="btn danger-outline">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Abmelden
+          </button>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -162,345 +154,515 @@
 import { ref, onMounted, computed } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 
-const user = ref({ username: '', email: '', role: '' });
-const profile = ref({
-  name: '',
-  industry: '',
-  stage: '',
-  employeeCount: null,
-  foundingYear: null,
-  investmentFocus: [],
-  ticketSize: '',
-  description: '',
-  phone: '',
-  website: '',
+const user = ref({ 
+  username: '', 
+  email: '', 
+  role: '',
+  date_joined: ''
 });
 
-// Computed Properties
-const isStartup = computed(() => user.value.role === 'startup');
-const capitalizedRole = computed(() => user.value.role.charAt(0).toUpperCase() + user.value.role.slice(1));
-const currentYear = new Date().getFullYear();
+const stats = ref({
+  pitchCount: 0,
+  eventCount: 0,
+  savedPitches: 0,
+  eventsAttended: 0
+});
 
-// Konstanten für Auswahlfelder
-const industries = [
-  'FinTech',
-  'HealthTech',
-  'CleanTech',
-  'AI/ML',
-  'SaaS',
-  'E-Commerce',
-  'IoT',
-  'Biotech',
-  'Mobility',
-  'EdTech'
-];
+const isEditingEmail = ref(false);
+const newEmail = ref('');
+const isSaving = ref(false);
+const successMessage = ref('');
+const errorMessage = ref('');
 
-const stages = [
-  'Pre-Seed',
-  'Seed',
-  'Series A',
-  'Series B',
-  'Series C',
-  'Growth'
-];
+// Avatar URL basierend auf Username
+const avatarUrl = computed(() => {
+  const seed = user.value.username || 'user';
+  return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
+});
 
-const investmentFoci = [
-  'B2B SaaS',
-  'DeepTech',
-  'FinTech',
-  'HealthTech',
-  'CleanTech',
-  'Consumer',
-  'Hardware',
-  'Marketplace'
-];
+// Formatiertes Beitrittsdatum
+const formattedJoinDate = computed(() => {
+  if (!user.value.date_joined) return 'Unbekannt';
+  const date = new Date(user.value.date_joined);
+  return date.toLocaleDateString('de-DE', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+});
 
-const ticketSizes = [
-  '< 100k €',
-  '100k € - 500k €',
-  '500k € - 1M €',
-  '1M € - 3M €',
-  '> 3M €'
-];
+// Email bearbeiten
+const startEditEmail = () => {
+  newEmail.value = user.value.email;
+  isEditingEmail.value = true;
+  errorMessage.value = '';
+  successMessage.value = '';
+};
 
-const startupDocs = [
-  { type: 'pitch_deck', title: 'Pitch Deck', uploaded: false },
-  { type: 'financials', title: 'Financial Report', uploaded: false },
-  { type: 'cap_table', title: 'Cap Table', uploaded: false },
-  { type: 'business_plan', title: 'Business Plan', uploaded: false }
-];
+const cancelEditEmail = () => {
+  isEditingEmail.value = false;
+  newEmail.value = '';
+  errorMessage.value = '';
+};
 
-const investorDocs = [
-  { type: 'credentials', title: 'Investorencredentials', uploaded: false },
-  { type: 'portfolio', title: 'Portfolioübersicht', uploaded: false }
-];
+const saveEmail = async () => {
+  if (!newEmail.value || !newEmail.value.includes('@')) {
+    errorMessage.value = 'Bitte geben Sie eine gültige E-Mail Adresse ein.';
+    return;
+  }
 
-// Profilbild
-const profileImage = ref('https://picsum.photos/seed/profile/200/200');
+  if (newEmail.value === user.value.email) {
+    errorMessage.value = 'Die neue E-Mail ist identisch mit der aktuellen.';
+    return;
+  }
 
-// Methods
-const saveProfile = async () => {
+  isSaving.value = true;
+  errorMessage.value = '';
+  successMessage.value = '';
+
   try {
     const token = localStorage.getItem('access_token');
-    const response = await fetch('http://127.0.0.1:8000/users/profile/', {
-      method: 'PUT',
+    const response = await fetch('http://127.0.0.1:8000/api/users/update-email/', {
+      method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(profile.value)
+      body: JSON.stringify({ email: newEmail.value })
     });
+
     if (response.ok) {
-      // TODO: Erfolgsmeldung anzeigen
+      const data = await response.json();
+      user.value.email = newEmail.value;
+      isEditingEmail.value = false;
+      successMessage.value = 'E-Mail Adresse erfolgreich aktualisiert!';
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => {
+        successMessage.value = '';
+      }, 5000);
+    } else {
+      const errorData = await response.json();
+      errorMessage.value = errorData.error || 'Fehler beim Aktualisieren der E-Mail Adresse.';
     }
   } catch (error) {
-    console.error('Fehler beim Speichern des Profils:', error);
+    console.error('Fehler beim Speichern der E-Mail:', error);
+    errorMessage.value = 'Netzwerkfehler. Bitte versuchen Sie es später erneut.';
+  } finally {
+    isSaving.value = false;
   }
 };
 
-// Logout Handler
+// Logout
 const auth = useAuthStore();
 const handleLogout = () => {
-  auth.logout();
-  navigateTo('/login');
+  if (confirm('Möchten Sie sich wirklich abmelden?')) {
+    auth.logout();
+    navigateTo('/login');
+  }
 };
 
-// Initial Data Loading
+// Statistiken laden
+const loadStats = async () => {
+  const token = localStorage.getItem('access_token');
+  if (!token) return;
+
+  try {
+    const apiBase = 'http://127.0.0.1:8000/api';
+    
+    if (user.value.role === 'startup') {
+      // Lade Pitches
+      const pitchRes = await fetch(`${apiBase}/pitches/?mine=true`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (pitchRes.ok) {
+        const pitches = await pitchRes.json();
+        stats.value.pitchCount = pitches.length;
+      }
+
+      // Lade Events
+      const eventRes = await fetch(`${apiBase}/events/?mine=true`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (eventRes.ok) {
+        const events = await eventRes.json();
+        stats.value.eventCount = events.length;
+      }
+    } else {
+      // Lade gespeicherte Pitches für Investoren
+      const savedRes = await fetch(`${apiBase}/saved-pitches/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (savedRes.ok) {
+        const saved = await savedRes.json();
+        stats.value.savedPitches = saved.length;
+      }
+
+      // Events Attended (Placeholder - würde eine Backend-Erweiterung benötigen)
+      stats.value.eventsAttended = 0;
+    }
+  } catch (err) {
+    console.error('Fehler beim Laden der Statistiken:', err);
+  }
+};
+
+// Initial laden
 onMounted(async () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  if (!token) return;
+  if (!token) {
+    navigateTo('/login');
+    return;
+  }
   
   try {
-    const response = await fetch('http://127.0.0.1:8000/users/me/', {
+    const response = await fetch('http://127.0.0.1:8000/api/users/me/', {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    if (!response.ok) return;
+    
+    if (!response.ok) {
+      navigateTo('/login');
+      return;
+    }
     
     const data = await response.json();
     user.value = {
       username: data.username ?? '',
       email: data.email ?? '',
-      role: data.profile?.role ?? data.role ?? ''
+      role: data.profile?.role ?? data.role ?? '',
+      date_joined: data.date_joined ?? ''
     };
 
-    // Lade Profildaten
-    if (data.profile) {
-      profile.value = {
-        ...profile.value,
-        ...data.profile
-      };
-    }
+    // Lade Statistiken
+    await loadStats();
   } catch (err) {
     console.error('Fehler beim Laden der Profildaten:', err);
+    navigateTo('/login');
   }
 });
 </script>
 
 <style scoped>
 .profile-page {
-  padding: 2rem;
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
+  padding: 2rem 1rem;
 }
 
-.profile-header-bar {
+/* Header */
+.profile-header {
+  margin-bottom: 2rem;
+}
+
+.header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .page-title {
   font-size: 2rem;
+  font-weight: 800;
   margin: 0;
+  color: #fff;
 }
 
 .role-badge {
   padding: 0.5rem 1rem;
-  border-radius: var(--radius);
+  border-radius: 20px;
   font-weight: 600;
   font-size: 0.9rem;
+  text-transform: capitalize;
 }
 
 .role-badge.startup {
-  background: var(--accent);
-  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #021;
 }
 
 .role-badge.investor {
-  background: #4CAF50;
+  background: linear-gradient(135deg, #10b981, #059669);
   color: #fff;
 }
 
-.profile-grid {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 2rem;
-  align-items: start;
+/* Alerts */
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  animation: slideIn 0.3s ease;
 }
 
-.profile-image-section {
-  text-align: center;
+.alert-success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+}
+
+.alert-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.alert-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Profile Card */
+.profile-card {
   padding: 2rem;
 }
 
-.image-upload-area {
+.profile-avatar-section {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 2rem;
 }
 
-.profile-image {
-  width: 180px;
-  height: 180px;
+.avatar-wrapper {
+  position: relative;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
+  border: 3px solid rgba(94, 234, 212, 0.3);
   object-fit: cover;
-  border: 3px solid var(--accent);
 }
 
-.upload-btn {
+.avatar-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  font-size: 1.2rem;
+  border: 2px solid var(--bg);
 }
 
-.section-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
+.avatar-badge.startup {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
 }
 
-.section-title h3 {
+.avatar-badge.investor {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+  color: #fff;
+}
+
+.profile-role {
+  font-size: 1rem;
+  color: var(--muted);
   margin: 0;
 }
 
-.input-group {
-  margin-bottom: 1.5rem;
+/* Info Sections */
+.info-section {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.input-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: var(--muted);
+.info-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
-.input-group input,
-.input-group select,
-.input-group textarea {
-  width: 100%;
-  padding: 0.8rem;
-  border-radius: var(--radius);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.03);
-  color: #fff;
-  font-size: 1rem;
-}
-
-.input-group textarea {
-  resize: vertical;
-  min-height: 100px;
-}
-
-.input-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.documents-section {
-  margin-top: 2rem;
-}
-
-.documents-grid {
-  display: grid;
-  gap: 1rem;
-}
-
-.document-upload {
+.section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: var(--radius);
-}
-
-.doc-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.doc-title {
-  font-weight: 600;
-}
-
-.doc-status {
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-
-.doc-status.uploaded {
-  color: #4CAF50;
-}
-
-.contact-info,
-.account-actions {
   margin-bottom: 1rem;
 }
 
+.section-heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  color: #fff;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.info-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 1.1rem;
+  color: #fff;
+  font-weight: 600;
+}
+
+.info-value.highlight {
+  color: var(--accent);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Email Section */
 .email-display {
-  padding: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem;
   background: rgba(255, 255, 255, 0.03);
-  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: #fff;
 }
 
-.danger {
-  background: #f44336;
-  color: white;
+.email-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+  flex-shrink: 0;
 }
 
-.danger:hover {
-  background: #d32f2f;
+.btn-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.icon {
-  font-size: 1.2rem;
+.btn-edit:hover {
+  background: rgba(94, 234, 212, 0.1);
+  border-color: rgba(94, 234, 212, 0.3);
 }
 
-/* Responsive Styles */
-@media (max-width: 1024px) {
-  .profile-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .input-grid {
-    grid-template-columns: 1fr;
-  }
+.btn-icon {
+  width: 16px;
+  height: 16px;
 }
 
+.email-edit-form {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 1rem;
+}
+
+/* Actions */
+.profile-actions {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.danger-outline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #ef4444;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.danger-outline:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+}
+
+/* Responsive */
 @media (max-width: 640px) {
-  .profile-header-bar {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-  
   .profile-page {
-    padding: 1rem;
+    padding: 1rem 0.5rem;
   }
-  
-  .section-title {
+
+  .profile-card {
+    padding: 1.5rem;
+  }
+
+  .profile-avatar-section {
     flex-direction: column;
-    gap: 1rem;
     text-align: center;
   }
-  
-  .save-btn {
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .btn {
     width: 100%;
   }
 }

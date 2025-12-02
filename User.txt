@@ -18,4 +18,7 @@ Mail: lukas@test.de
 Passwort:test123
 Rolle: startup
 
+Benutzername: lukas
+Passwort: lukas2005
+
 Investify2025**
