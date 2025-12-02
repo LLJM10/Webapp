@@ -184,11 +184,13 @@ PAYPAL_WEBHOOK_ID = os.environ.get("PAYPAL_WEBHOOK_ID", "")
 # Production: SMTP Backend (echte E-Mails versenden)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True  # WICHTIG: Bei Port 465 muss SSL auf True sein
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')  # Ihre Gmail-Adresse
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')  # App-Passwort
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@investify.com')
+DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER', 'noreply@investify.com')  # Muss gleiche Adresse sein wie EMAIL_HOST_USER
+EMAIL_TIMEOUT = 30  # Timeout in Sekunden
 
 # Groq AI API Key
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
