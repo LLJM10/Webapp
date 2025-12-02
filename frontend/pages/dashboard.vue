@@ -186,45 +186,231 @@
     </div>
     <!-- ENDE: Nur für Startup-Rolle -->
 
-    <!-- Fallback für andere Rollen wie Investor -->
-    <div v-else class="dashboard-layout">
-      <div class="dashboard-main">
-        <div class="dashboard-section">
-          <div class="section-header">
-            <h3>Investor Dashboard</h3>
-            <p class="muted">Portfolio-Übersicht & Investment Opportunities</p>
+    <!-- Investor Dashboard - Nur für Investor-Rolle -->
+    <div v-else-if="user.role === 'investor'" class="investor-dashboard">
+      
+      <!-- KPI Overview Grid -->
+      <div class="kpi-section">
+        <h3 class="section-title">Portfolio Übersicht</h3>
+        <div class="kpi-grid">
+          <!-- Investiertes Kapital -->
+          <div class="kpi-card glow-card">
+            <div class="kpi-icon-wrapper primary-glow">
+              <svg class="kpi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </div>
+            <div class="kpi-content">
+              <div class="kpi-label">Investiertes Kapital</div>
+              <div class="kpi-value">{{ formatCurrency(investorKPIs.totalInvested) }}</div>
+              <div class="kpi-trend positive">+12.5% YoY</div>
+            </div>
           </div>
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-icon">💼</div>
-              <div>
-                <div class="stat-label">Portfolio</div>
-                <div class="stat-value">1.2M€</div>
+
+          <!-- Anzahl Startups -->
+          <div class="kpi-card glow-card">
+            <div class="kpi-icon-wrapper accent-glow">
+              <svg class="kpi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div class="kpi-content">
+              <div class="kpi-label">Portfolio Startups</div>
+              <div class="kpi-value">{{ investorKPIs.startupCount }}</div>
+              <div class="kpi-trend neutral">{{ investorKPIs.activeStartups }} aktiv</div>
+            </div>
+          </div>
+
+          <!-- Watchlist -->
+          <div class="kpi-card glow-card">
+            <div class="kpi-icon-wrapper warning-glow">
+              <svg class="kpi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <div class="kpi-content">
+              <div class="kpi-label">Watchlist</div>
+              <div class="kpi-value">{{ investorKPIs.watchlistCount }}</div>
+              <div class="kpi-trend neutral">{{ investorKPIs.newThisWeek }} neu diese Woche</div>
+            </div>
+          </div>
+
+          <!-- Durchschnitt pro Startup -->
+          <div class="kpi-card glow-card">
+            <div class="kpi-icon-wrapper success-glow">
+              <svg class="kpi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="8.5" cy="7" r="4"/>
+                <line x1="20" y1="8" x2="20" y2="14"/>
+                <line x1="23" y1="11" x2="17" y2="11"/>
+              </svg>
+            </div>
+            <div class="kpi-content">
+              <div class="kpi-label">Ø Investment</div>
+              <div class="kpi-value">{{ formatCurrency(investorKPIs.avgInvestment) }}</div>
+              <div class="kpi-trend positive">+8.2% MoM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance Metrics -->
+      <div class="performance-section">
+        <h3 class="section-title">Performance Metriken</h3>
+        <div class="performance-grid">
+          <!-- Portfolio Wachstum -->
+          <div class="metric-card">
+            <div class="metric-header">
+              <div class="metric-title">
+                <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                  <polyline points="17 6 23 6 23 12"/>
+                </svg>
+                Portfolio-Wachstum
+              </div>
+              <div class="metric-change positive">+{{ investorKPIs.portfolioGrowth }}%</div>
+            </div>
+            <div class="metric-chart">
+              <div class="mini-bar" style="height: 40%"></div>
+              <div class="mini-bar" style="height: 55%"></div>
+              <div class="mini-bar" style="height: 45%"></div>
+              <div class="mini-bar" style="height: 70%"></div>
+              <div class="mini-bar" style="height: 85%"></div>
+              <div class="mini-bar" style="height: 100%"></div>
+            </div>
+            <div class="metric-footer">Letzte 6 Monate</div>
+          </div>
+
+          <!-- Rendite Forecast -->
+          <div class="metric-card">
+            <div class="metric-header">
+              <div class="metric-title">
+                <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Rendite-Forecast
+              </div>
+              <div class="metric-change positive">+{{ investorKPIs.roiForecast }}%</div>
+            </div>
+            <div class="metric-value-large">{{ formatCurrency(investorKPIs.projectedReturn) }}</div>
+            <div class="metric-footer">Prognostiziert bis Ende {{ new Date().getFullYear() + 1 }}</div>
+          </div>
+
+          <!-- Success Rate -->
+          <div class="metric-card">
+            <div class="metric-header">
+              <div class="metric-title">
+                <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                Success Rate
+              </div>
+              <div class="metric-change positive">{{ investorKPIs.successRate }}%</div>
+            </div>
+            <div class="success-ring">
+              <svg viewBox="0 0 36 36">
+                <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                <path class="ring-progress" :stroke-dasharray="investorKPIs.successRate + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              </svg>
+              <div class="ring-text">{{ investorKPIs.successRate }}%</div>
+            </div>
+            <div class="metric-footer">{{ investorKPIs.successfulExits }} erfolgreiche Exits</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Matching Vorschläge -->
+      <div class="matching-section">
+        <div class="section-header-inline">
+          <h3 class="section-title">Empfohlene Investments</h3>
+          <NuxtLink to="/market" class="link-with-icon">
+            Alle ansehen
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </NuxtLink>
+        </div>
+        <div class="matching-grid">
+          <div v-for="match in investorKPIs.matchingSuggestions" :key="match.id" class="matching-card" @click="navigateToDetail(match.id)">
+            <div class="matching-header">
+              <img :src="getImageUrl(match.img, match.title)" :alt="match.title" class="matching-image">
+              <div class="matching-score">
+                <svg class="score-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                {{ match.matchScore }}%
               </div>
             </div>
-            <div class="stat-card">
-              <div class="stat-icon">⭐</div>
-              <div>
-                <div class="stat-label">Watchlist</div>
-                <div class="stat-value">3 Startups</div>
+            <div class="matching-content">
+              <h4 class="matching-title">{{ match.title }}</h4>
+              <div class="matching-meta">
+                <span class="meta-tag">{{ match.sector }}</span>
+                <span class="meta-tag">{{ match.stage }}</span>
+              </div>
+              <p class="matching-desc">{{ match.desc }}</p>
+              <div class="matching-stats">
+                <div class="stat-mini">
+                  <span class="stat-mini-label">Ziel</span>
+                  <span class="stat-mini-value">{{ match.goal }}€</span>
+                </div>
+                <div class="stat-mini">
+                  <span class="stat-mini-label">Equity</span>
+                  <span class="stat-mini-value">{{ match.equity }}%</span>
+                </div>
+              </div>
+              <div class="matching-reason">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                {{ match.matchReason }}
               </div>
             </div>
           </div>
         </div>
       </div>
-      
-      <aside class="dashboard-sidebar">
-        <div class="sidebar-card">
-          <h3>Matching Vorschläge</h3>
-          <div class="match-item">
-            <div class="match-avatar">GC</div>
-            <div>
-              <div class="match-name">GreenCharge</div>
-              <div class="muted" style="font-size: 0.875rem">Match: 87%</div>
+
+      <!-- Recent Activity -->
+      <div class="activity-section">
+        <h3 class="section-title">Letzte Aktivitäten</h3>
+        <div class="activity-list">
+          <div v-for="activity in investorKPIs.recentActivity" :key="activity.id" class="activity-item">
+            <div class="activity-icon" :class="activity.type">
+              <svg v-if="activity.type === 'investment'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              </svg>
+              <svg v-else-if="activity.type === 'watchlist'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+              </svg>
+              <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
             </div>
+            <div class="activity-content">
+              <div class="activity-title">{{ activity.title }}</div>
+              <div class="activity-meta">{{ activity.startup }} • {{ activity.time }}</div>
+            </div>
+            <div class="activity-amount" v-if="activity.amount">{{ activity.amount }}</div>
           </div>
         </div>
-      </aside>
+      </div>
+
+    </div>
+    <!-- ENDE: Investor Dashboard -->
+
+    <!-- Fallback für andere Rollen -->
+    <div v-else class="dashboard-layout">
+      <div class="dashboard-main">
+        <div class="dashboard-section">
+          <div class="section-header">
+            <h3>Dashboard</h3>
+            <p class="muted">Willkommen im Dashboard</p>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Pitch-Erstellung wurde in eine eigene Seite verschoben: /pitches/formular -->
@@ -429,7 +615,9 @@
 
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const phases = ref(['Pre-Seed', 'Seed', 'Series A', 'Wachstum', 'Reife']);
 
 const user = ref({ username: 'Startup-User', email: 'demo@startup.com', role: 'startup' }); // Default-Werte für Demo
@@ -478,6 +666,93 @@ const existingEventImage = ref(null);
 
 const editEventImageFile = ref(null);
 const editEventImagePreview = ref(null);
+
+// NEU: Investor KPI Data
+const investorKPIs = ref({
+  totalInvested: 1200000,
+  startupCount: 7,
+  activeStartups: 7,
+  watchlistCount: 3,
+  newThisWeek: 2,
+  avgInvestment: 171428,
+  portfolioGrowth: 24.5,
+  roiForecast: 35,
+  projectedReturn: 420000,
+  successRate: 71,
+  successfulExits: 5,
+  matchingSuggestions: [
+    {
+      id: 's1',
+      title: 'SmartHome Energy',
+      sector: 'Energy',
+      stage: 'Seed',
+      desc: 'Dezentrale Energieoptimierung für Privathaushalte mittels Edge-AI und Lastverschiebung.',
+      img: 'https://picsum.photos/seed/s1/900/480',
+      goal: '400k',
+      equity: 8,
+      matchScore: 94,
+      matchReason: 'Passt zu deinem Energy-Portfolio'
+    },
+    {
+      id: 's2',
+      title: 'GreenCharge',
+      sector: 'Mobility',
+      stage: 'Series A',
+      desc: 'Batterie-Management für EV-Flotten mit optimierter Ladeplanung und Flotten-Analytics.',
+      img: 'https://picsum.photos/seed/s2/900/480',
+      goal: '2.5M',
+      equity: 12,
+      matchScore: 87,
+      matchReason: 'Hohe Wachstumsrate im Mobility-Sektor'
+    },
+    {
+      id: 's3',
+      title: 'HealthTech AI',
+      sector: 'Health',
+      stage: 'Seed',
+      desc: 'KI-gestützte Diagnose-Software für Radiologie mit FDA-Zulassung in Vorbereitung.',
+      img: 'https://picsum.photos/seed/s3/900/480',
+      goal: '750k',
+      equity: 10,
+      matchScore: 82,
+      matchReason: 'HealthTech-Sektor zeigt starke Performance'
+    }
+  ],
+  recentActivity: [
+    {
+      id: 1,
+      type: 'investment',
+      title: 'Investment getätigt',
+      startup: 'GreenCharge',
+      time: 'vor 2 Tagen',
+      amount: '150.000€'
+    },
+    {
+      id: 2,
+      type: 'watchlist',
+      title: 'Zu Watchlist hinzugefügt',
+      startup: 'SmartHome Energy',
+      time: 'vor 1 Woche',
+      amount: null
+    },
+    {
+      id: 3,
+      type: 'message',
+      title: 'Nachricht erhalten',
+      startup: 'Medico',
+      time: 'vor 1 Woche',
+      amount: null
+    },
+    {
+      id: 4,
+      type: 'investment',
+      title: 'Investment getätigt',
+      startup: 'HealthTech AI',
+      time: 'vor 2 Wochen',
+      amount: '100.000€'
+    }
+  ]
+});
 
 // LocalStorage helpers: load/save lists so created items survive page reloads (Option A)
 function savePitchesToLocalStorage() {
@@ -677,6 +952,22 @@ function getImageUrl(imgPath, fallbackText = 'Image') {
   const config = useRuntimeConfig();
   const apiBase = config.public?.apiBase || 'http://127.0.0.1:8000';
   return `${apiBase}/media/${imgPath}`;
+}
+
+// Format currency for investor dashboard
+function formatCurrency(amount) {
+  if (amount >= 1000000) {
+    return (amount / 1000000).toFixed(1) + 'M€';
+  } else if (amount >= 1000) {
+    return (amount / 1000).toFixed(0) + 'k€';
+  }
+  return amount.toLocaleString('de-DE') + '€';
+}
+
+// Navigate to pitch detail page
+function navigateToDetail(pitchId) {
+  const router = useRouter();
+  router.push(`/detail/${pitchId}`);
 }
 
 function handleEventImageChange(event) {
@@ -1590,6 +1881,585 @@ textarea.error {
   .modal-content {
     max-width: 100%;
     max-height: 95vh;
+  }
+}
+
+/* ============================================
+   INVESTOR DASHBOARD STYLES
+   ============================================ */
+
+.investor-dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Section Titles */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 20px;
+}
+
+.section-header-inline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.link-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.link-with-icon svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s;
+}
+
+.link-with-icon:hover {
+  color: var(--accent-2);
+}
+
+.link-with-icon:hover svg {
+  transform: translateX(4px);
+}
+
+/* KPI Section */
+.kpi-section {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.kpi-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(94, 234, 212, 0.05), rgba(59, 130, 246, 0.05));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.kpi-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(94, 234, 212, 0.3);
+  box-shadow: 0 8px 32px rgba(94, 234, 212, 0.15);
+}
+
+.kpi-card:hover::before {
+  opacity: 1;
+}
+
+.kpi-icon-wrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.primary-glow {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2));
+  box-shadow: 0 4px 24px rgba(59, 130, 246, 0.4);
+}
+
+.accent-glow {
+  background: linear-gradient(135deg, rgba(94, 234, 212, 0.2), rgba(20, 184, 166, 0.2));
+  box-shadow: 0 4px 24px rgba(94, 234, 212, 0.4);
+}
+
+.warning-glow {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
+  box-shadow: 0 4px 24px rgba(251, 191, 36, 0.4);
+}
+
+.success-glow {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.2));
+  box-shadow: 0 4px 24px rgba(34, 197, 94, 0.4);
+}
+
+.kpi-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--accent);
+}
+
+.kpi-content {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.kpi-label {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.kpi-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.kpi-trend {
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.kpi-trend.positive {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.kpi-trend.neutral {
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Performance Section */
+.performance-section {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.performance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.metric-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s;
+}
+
+.metric-card:hover {
+  border-color: rgba(94, 234, 212, 0.2);
+  transform: translateY(-2px);
+}
+
+.metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.metric-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.metric-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+}
+
+.metric-change {
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.metric-change.positive {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.metric-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 80px;
+  margin-bottom: 16px;
+}
+
+.mini-bar {
+  flex: 1;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  border-radius: 4px 4px 0 0;
+  transition: all 0.3s;
+  opacity: 0.7;
+}
+
+.metric-card:hover .mini-bar {
+  opacity: 1;
+}
+
+.metric-value-large {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.metric-footer {
+  font-size: 0.875rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Success Ring */
+.success-ring {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 20px auto;
+}
+
+.success-ring svg {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+
+.ring-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 3.8;
+}
+
+.ring-progress {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3.8;
+  stroke-linecap: round;
+  transition: stroke-dasharray 1s ease-out;
+}
+
+.ring-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* Matching Section */
+.matching-section {
+  animation: fadeInUp 0.7s ease-out;
+}
+
+.matching-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+.matching-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.matching-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(94, 234, 212, 0.3);
+  box-shadow: 0 12px 40px rgba(94, 234, 212, 0.2);
+}
+
+.matching-header {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.matching-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.matching-card:hover .matching-image {
+  transform: scale(1.05);
+}
+
+.matching-score {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 8px 12px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.score-icon {
+  width: 16px;
+  height: 16px;
+  color: #fbbf24;
+}
+
+.matching-content {
+  padding: 20px;
+}
+
+.matching-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.matching-meta {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.meta-tag {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  background: rgba(94, 234, 212, 0.1);
+  color: var(--accent);
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.matching-desc {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.matching-stats {
+  display: flex;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 12px;
+}
+
+.stat-mini {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-mini-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.stat-mini-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.matching-reason {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--accent-2);
+  font-weight: 500;
+}
+
+.matching-reason svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Activity Section */
+.activity-section {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.activity-list {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.activity-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateX(4px);
+}
+
+.activity-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.activity-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.activity-icon.investment {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.activity-icon.watchlist {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+
+.activity-icon.message {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.activity-meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.activity-amount {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .performance-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .matching-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .investor-dashboard {
+    padding: 16px;
+  }
+  
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .kpi-card {
+    padding: 20px;
+  }
+  
+  .kpi-value {
+    font-size: 1.75rem;
+  }
+  
+  .section-title {
+    font-size: 1.25rem;
   }
 }
 </style>
