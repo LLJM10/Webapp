@@ -335,7 +335,7 @@ async function handleCreatePitch() {
   // PATCH (Bearbeiten)
   if (isEditMode.value && apiBase && newPitch.value.id) {
     try {
-      const res = await fetch(`${apiBase}/pitches/${newPitch.value.id}/`, {
+      let res = await fetch(`${apiBase}/pitches/${newPitch.value.id}/`, {
         method: 'PATCH',
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -343,6 +343,36 @@ async function handleCreatePitch() {
         },
         body: formData
       });
+      
+      // Token expired? Try refresh
+      if (res.status === 401) {
+        const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
+        if (refreshToken) {
+          const refreshResponse = await fetch(`${apiBase}/token/refresh/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh: refreshToken })
+          });
+          
+          if (refreshResponse.ok) {
+            const refreshData = await refreshResponse.json();
+            const newToken = refreshData.access;
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('access_token', newToken);
+            }
+            
+            // Retry original request with new token
+            res = await fetch(`${apiBase}/pitches/${newPitch.value.id}/`, {
+              method: 'PATCH',
+              headers: {
+                Authorization: `Bearer ${newToken}`
+              },
+              body: formData
+            });
+          }
+        }
+      }
+      
       if (res.ok) { 
         router.push('/dashboard'); 
         return; 
@@ -360,13 +390,42 @@ async function handleCreatePitch() {
   // POST (Neu erstellen)
   if (!isEditMode.value && apiBase) {
     try {
-      const res = await fetch(`${apiBase}/pitches/`, {
+      let res = await fetch(`${apiBase}/pitches/`, {
         method: 'POST',
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {})
         },
         body: formData
       });
+      
+      // Token expired? Try refresh
+      if (res.status === 401) {
+        const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
+        if (refreshToken) {
+          const refreshResponse = await fetch(`${apiBase}/token/refresh/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh: refreshToken })
+          });
+          
+          if (refreshResponse.ok) {
+            const refreshData = await refreshResponse.json();
+            const newToken = refreshData.access;
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('access_token', newToken);
+            }
+            
+            // Retry original request with new token
+            res = await fetch(`${apiBase}/pitches/`, {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${newToken}`
+              },
+              body: formData
+            });
+          }
+        }
+      }
       
       if (res.ok) { 
         const createdPitch = await res.json();
