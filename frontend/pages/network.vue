@@ -117,14 +117,25 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 
 // Demo-Daten sind direkt im Code, um Fehler zu vermeiden
 const alert = (msg) => window.alert(msg);
 
-// Aktueller User (simuliert)
-const currentUserAvatar = ref('https://api.dicebear.com/7.x/avataaars/svg?seed=currentuser');
-const currentUserName = ref('Du');
+// Aktueller User (wird vom Backend geladen)
+const currentUser = ref({ 
+  username: '', 
+  email: '', 
+  role: ''
+});
+
+// Avatar URL basierend auf Username (wie auf Profil-Seite)
+const currentUserAvatar = computed(() => {
+  const seed = currentUser.value.username || 'user';
+  return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
+});
+
+const currentUserName = computed(() => currentUser.value.username || 'Du');
 
 // Neuer Post Content
 const newPostContent = ref('');
@@ -161,6 +172,26 @@ const getProfileByAuthor = (authorName) => {
 function filterProfiles() {
   console.log('Profilsuche ausgeführt für:', searchQuery.value);
 }
+
+// User-Daten beim Laden der Seite holen
+onMounted(async () => {
+  const token = localStorage.getItem('access_token');
+  if (token) {
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/users/me/', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        currentUser.value.username = data.username || '';
+        currentUser.value.email = data.email || '';
+        currentUser.value.role = data.profile?.role || '';
+      }
+    } catch (e) {
+      console.warn('Failed to load user data', e);
+    }
+  }
+});
 
 // Simuliert das Posten einer Nachricht
 function simulatePost() {
