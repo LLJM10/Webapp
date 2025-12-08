@@ -5,7 +5,7 @@
         <strong>{{ pitch.title }}</strong>
         <div class="muted">{{ pitch.sector }} · {{ pitch.stage }}</div>
       </div>
-      <div class="tags"><div class="tag">{{ pitch.goal }} Ziel</div></div>
+      <div class="tags"><div class="tag">{{ pitch.goal }}€ Ziel</div></div>
     </div>
     <img :src="getImageUrl(pitch.img)" :alt="pitch.title">
     

@@ -30,19 +30,19 @@
           <p class="post-content">{{ post.content }}</p>
           <img v-if="post.image" :src="post.image" class="post-image">
           <div class="post-actions">
-            <a class="action-item" @click="alert('Gefällt mir (Demo)')">
+            <a class="action-item" @click="alert('Gefällt mir ')">
               <span>👍</span>
-              <span>Gefällt mir (Demo)</span>
+              <span>Gefällt mir </span>
             </a>
 
-            <a class="action-item" @click="alert('Kommentar (Demo)')">
+            <a class="action-item" @click="alert('Kommentar ')">
               <span>💬</span>
-              <span>Kommentar (Demo)</span>
+              <span>Kommentar </span>
             </a>
 
-            <a class="action-item" @click="alert('Teilen (Demo)')">
+            <a class="action-item" @click="alert('Teilen ')">
               <span>🔗</span>
-              <span>Teilen (Demo)</span>
+              <span>Teilen </span>
             </a>
           </div>
         </div>
@@ -70,7 +70,7 @@
               </div>
               
               <div class="button-wrapper">
-                <button class="btn ghost" @click="alert('Kontaktanfrage (Demo)')">Kontakt</button>
+                <button class="btn ghost" @click="alert('Kontaktanfrage ')">Kontakt</button>
               </div>
 
             </div>

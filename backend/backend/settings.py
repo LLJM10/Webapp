@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -167,6 +168,41 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+}
+
+
+# JWT Token Settings (Django Simple JWT)
+SIMPLE_JWT = {
+    # Token Lifetimes
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),        # Access Token gültig für 1 Stunde (statt 5 Min Standard)
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),        # Refresh Token gültig für 7 Tage (statt 1 Tag Standard)
+    
+    # Token Rotation & Blacklisting
+    'ROTATE_REFRESH_TOKENS': False,                     # Bei Token-Refresh wird KEIN neuer Refresh Token erstellt
+    'BLACKLIST_AFTER_ROTATION': True,                   # Alte Tokens werden nach Rotation auf Blacklist gesetzt
+    'UPDATE_LAST_LOGIN': True,                          # Aktualisiert last_login bei jedem Token-Refresh
+    
+    # Algorithm & Security
+    'ALGORITHM': 'HS256',                               # Hash-Algorithmus für Token-Signatur
+    'SIGNING_KEY': SECRET_KEY,                          # Verwendet Django SECRET_KEY zum Signieren
+    'VERIFYING_KEY': None,                              # Für asymmetrische Algorithmen (RS256, etc.)
+    
+    # Token Headers
+    'AUTH_HEADER_TYPES': ('Bearer',),                   # Authorization Header Format: "Bearer <token>"
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',           # Header-Name für Authorization
+    
+    # User Identification
+    'USER_ID_FIELD': 'id',                              # User Model Field für user_id Claim
+    'USER_ID_CLAIM': 'user_id',                         # JWT Claim Name für User ID
+    
+    # Token Types
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',                   # JWT Claim für Token Type
+    
+    # Sliding Tokens (optional - derzeit nicht verwendet)
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
 
