@@ -203,7 +203,6 @@
             <div class="kpi-content">
               <div class="kpi-label">Investiertes Kapital</div>
               <div class="kpi-value">{{ formatCurrency(investorKPIs.totalInvested) }}</div>
-              <div class="kpi-trend positive">+12.5% YoY</div>
             </div>
           </div>
 
@@ -232,7 +231,7 @@
             </div>
             <div class="kpi-content">
               <div class="kpi-label">Watchlist</div>
-              <div class="kpi-value">{{ savedPitches.length }}</div>
+              <div class="kpi-value">{{ investorKPIs.watchlistCount }}</div>
               <div class="kpi-trend neutral">{{ investorKPIs.newThisWeek }} neu diese Woche</div>
             </div>
           </div>
@@ -250,7 +249,6 @@
             <div class="kpi-content">
               <div class="kpi-label">Ø Investment</div>
               <div class="kpi-value">{{ formatCurrency(investorKPIs.avgInvestment) }}</div>
-              <div class="kpi-trend positive">+8.2% MoM</div>
             </div>
           </div>
         </div>
@@ -260,29 +258,6 @@
       <div class="performance-section">
         <h3 class="section-title">Performance Metriken</h3>
         <div class="performance-grid">
-          <!-- Portfolio Wachstum -->
-          <div class="metric-card">
-            <div class="metric-header">
-              <div class="metric-title">
-                <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-                  <polyline points="17 6 23 6 23 12"/>
-                </svg>
-                Portfolio-Wachstum
-              </div>
-              <div class="metric-change positive">+{{ investorKPIs.portfolioGrowth }}%</div>
-            </div>
-            <div class="metric-chart">
-              <div class="mini-bar" style="height: 40%"></div>
-              <div class="mini-bar" style="height: 55%"></div>
-              <div class="mini-bar" style="height: 45%"></div>
-              <div class="mini-bar" style="height: 70%"></div>
-              <div class="mini-bar" style="height: 85%"></div>
-              <div class="mini-bar" style="height: 100%"></div>
-            </div>
-            <div class="metric-footer">Letzte 6 Monate</div>
-          </div>
-
           <!-- Rendite Forecast -->
           <div class="metric-card">
             <div class="metric-header">
@@ -293,32 +268,68 @@
                 </svg>
                 Rendite-Forecast
               </div>
-              <div class="metric-change positive">+{{ investorKPIs.roiForecast }}%</div>
             </div>
             <div class="metric-value-large">{{ formatCurrency(investorKPIs.projectedReturn) }}</div>
             <div class="metric-footer">Prognostiziert bis Ende {{ new Date().getFullYear() + 1 }}</div>
           </div>
+        </div>
+      </div>
 
-          <!-- Success Rate -->
+      <!-- Risk Metrics Section (NEW) -->
+      <div v-if="investorKPIs.valueAtRisk" class="performance-section">
+        <h3 class="section-title">Risiko-Analyse</h3>
+        <div class="performance-grid">
+          <!-- Value at Risk 95% -->
           <div class="metric-card">
             <div class="metric-header">
               <div class="metric-title">
                 <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                  <polyline points="22 4 12 14.01 9 11.01"/>
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
                 </svg>
-                Success Rate
+                Value at Risk (95%)
               </div>
-              <div class="metric-change positive">{{ investorKPIs.successRate }}%</div>
+              <div class="metric-change" :class="investorKPIs.valueAtRisk.riskLevel === 'Niedrig' ? 'positive' : (investorKPIs.valueAtRisk.riskLevel === 'Mittel' ? 'neutral' : 'negative')">
+                {{ investorKPIs.valueAtRisk.riskLevel }}
+              </div>
             </div>
-            <div class="success-ring">
-              <svg viewBox="0 0 36 36">
-                <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                <path class="ring-progress" :stroke-dasharray="investorKPIs.successRate + ', 100'" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-              </svg>
-              <div class="ring-text">{{ investorKPIs.successRate }}%</div>
+            <div class="metric-value-large">{{ formatCurrency(investorKPIs.valueAtRisk.var_95) }}</div>
+            <div class="metric-footer">Maximal zu erwartender Verlust (95% Konfidenz)</div>
+          </div>
+
+          <!-- Expected Loss -->
+          <div class="metric-card">
+            <div class="metric-header">
+              <div class="metric-title">
+                <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <polyline points="19 12 12 19 5 12"/>
+                </svg>
+                Expected Loss
+              </div>
+              <div class="metric-change neutral">VaR × 1.3</div>
             </div>
-            <div class="metric-footer">{{ investorKPIs.successfulExits }} erfolgreiche Exits</div>
+            <div class="metric-value-large">{{ formatCurrency(investorKPIs.valueAtRisk.expectedLoss) }}</div>
+            <div class="metric-footer">Durchschnittlicher Verlust bei Risikoeintritt</div>
+          </div>
+
+          <!-- Portfolio Concentration -->
+          <div class="metric-card">
+            <div class="metric-header">
+              <div class="metric-title">
+                <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+                Konzentrationsrisiko
+              </div>
+              <div class="metric-change" :class="investorKPIs.concentrationRisk === 'Niedrig' ? 'positive' : (investorKPIs.concentrationRisk === 'Mittel' ? 'neutral' : 'negative')">
+                {{ investorKPIs.concentrationRisk }}
+              </div>
+            </div>
+            <div class="metric-value-large">{{ investorKPIs.herfindahlIndex?.toFixed(3) || '0.000' }}</div>
+            <div class="metric-footer">Herfindahl-Hirschman Index (HHI)</div>
           </div>
         </div>
       </div>
@@ -438,6 +449,49 @@
           </svg>
           <p class="empty-text">Noch keine Pitches gespeichert</p>
           <NuxtLink to="/market" class="btn primary">Zum Marktplatz</NuxtLink>
+        </div>
+      </div>
+
+      <!-- Meine Investments (für Testing) -->
+      <div class="investments-section" v-if="myInvestments.length > 0">
+        <div class="section-header-inline">
+          <h3 class="section-title">Meine Investments</h3>
+          <span class="badge-count">{{ myInvestments.length }}</span>
+        </div>
+        <div class="investments-grid">
+          <div v-for="investment in myInvestments" :key="investment.id" class="investment-card">
+            <div class="investment-header">
+              <h4>{{ investment.pitch.title }}</h4>
+              <span class="investment-status" :class="investment.status">{{ investment.status }}</span>
+            </div>
+            <div class="investment-details">
+              <div class="detail-row">
+                <span class="detail-label">Betrag:</span>
+                <span class="detail-value">{{ formatCurrency(investment.amount) }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Equity:</span>
+                <span class="detail-value">{{ investment.equity_percentage }}%</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Datum:</span>
+                <span class="detail-value">{{ new Date(investment.investment_date).toLocaleDateString('de-DE') }}</span>
+              </div>
+              <div v-if="investment.roi" class="detail-row">
+                <span class="detail-label">ROI:</span>
+                <span class="detail-value" :class="investment.roi > 0 ? 'positive' : 'negative'">
+                  {{ investment.roi > 0 ? '+' : '' }}{{ investment.roi }}%
+                </span>
+              </div>
+            </div>
+            <button class="btn-remove-investment" @click="removeInvestment(investment.id)" title="Investment löschen (Test)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              Löschen (Test)
+            </button>
+          </div>
         </div>
       </div>
 
@@ -667,6 +721,7 @@ const user = ref({ username: 'Startup-User', email: 'demo@startup.com', role: 's
 const myPitches = ref([]); // Startet mit einer leeren Liste
 const myEvents = ref([]); // NEU: Liste für Events
 const savedPitches = ref([]); // NEU: Gespeicherte Pitches für Investoren
+const myInvestments = ref([]); // Liste der Investments (für Testing)
 const showCreateModal = ref(false);
 const showCreateEventModal = ref(false); // NEU: State für Event-Modal
 const showAiModal = ref(false);
@@ -675,7 +730,6 @@ const eventToDelete = ref(null); // Event das gelöscht werden soll
 const editingEvent = ref(null); // Event das bearbeitet wird
 const validationErrors = ref({}); // Validierungsfehler
 
-// NEU: Pitch Delete State
 const pitchToDelete = ref(null);
 
 // Datenmodell für einen neuen Pitch
@@ -690,7 +744,7 @@ const newPitch = ref({
   img: 'https://placehold.co/600x400/22c55e/ffffff?text=Neu'
 });
 
-// NEU: Datenmodell für ein neues Event
+// Event form model
 const newEvent = ref({
   id: null,
   name: '',
@@ -711,91 +765,21 @@ const existingEventImage = ref(null);
 const editEventImageFile = ref(null);
 const editEventImagePreview = ref(null);
 
-// NEU: Investor KPI Data
+// Investor KPI data - loaded dynamically from API
 const investorKPIs = ref({
-  totalInvested: 1200000,
-  startupCount: 7,
-  activeStartups: 7,
-  watchlistCount: 3,
-  newThisWeek: 2,
-  avgInvestment: 171428,
-  portfolioGrowth: 24.5,
-  roiForecast: 35,
-  projectedReturn: 420000,
-  successRate: 71,
-  successfulExits: 5,
-  matchingSuggestions: [
-    {
-      id: 's1',
-      title: 'SmartHome Energy',
-      sector: 'Energy',
-      stage: 'Seed',
-      desc: 'Dezentrale Energieoptimierung für Privathaushalte mittels Edge-AI und Lastverschiebung.',
-      img: 'https://picsum.photos/seed/s1/900/480',
-      goal: '400k',
-      equity: 8,
-      matchScore: 94,
-      matchReason: 'Passt zu deinem Energy-Portfolio'
-    },
-    {
-      id: 's2',
-      title: 'GreenCharge',
-      sector: 'Mobility',
-      stage: 'Series A',
-      desc: 'Batterie-Management für EV-Flotten mit optimierter Ladeplanung und Flotten-Analytics.',
-      img: 'https://picsum.photos/seed/s2/900/480',
-      goal: '2.5M',
-      equity: 12,
-      matchScore: 87,
-      matchReason: 'Hohe Wachstumsrate im Mobility-Sektor'
-    },
-    {
-      id: 's3',
-      title: 'HealthTech AI',
-      sector: 'Health',
-      stage: 'Seed',
-      desc: 'KI-gestützte Diagnose-Software für Radiologie mit FDA-Zulassung in Vorbereitung.',
-      img: 'https://picsum.photos/seed/s3/900/480',
-      goal: '750k',
-      equity: 10,
-      matchScore: 82,
-      matchReason: 'HealthTech-Sektor zeigt starke Performance'
-    }
-  ],
-  recentActivity: [
-    {
-      id: 1,
-      type: 'investment',
-      title: 'Investment getätigt',
-      startup: 'GreenCharge',
-      time: 'vor 2 Tagen',
-      amount: '150.000€'
-    },
-    {
-      id: 2,
-      type: 'watchlist',
-      title: 'Zu Watchlist hinzugefügt',
-      startup: 'SmartHome Energy',
-      time: 'vor 1 Woche',
-      amount: null
-    },
-    {
-      id: 3,
-      type: 'message',
-      title: 'Nachricht erhalten',
-      startup: 'Medico',
-      time: 'vor 1 Woche',
-      amount: null
-    },
-    {
-      id: 4,
-      type: 'investment',
-      title: 'Investment getätigt',
-      startup: 'HealthTech AI',
-      time: 'vor 2 Wochen',
-      amount: '100.000€'
-    }
-  ]
+  totalInvested: 0,
+  startupCount: 0,
+  activeStartups: 0,
+  watchlistCount: 0,
+  newThisWeek: 0,
+  avgInvestment: 0,
+  portfolioGrowth: 0,
+  roiForecast: 0,
+  projectedReturn: 0,
+  successRate: 0,
+  successfulExits: 0,
+  matchingSuggestions: [],
+  recentActivity: []
 });
 
 // LocalStorage helpers: load/save lists so created items survive page reloads (Option A)
@@ -833,22 +817,18 @@ const calculatedValuation = computed(() => {
 
 onMounted(async () => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  console.log('Token found:', token ? 'Yes' : 'No');
   
   if (token) {
     try {
       const res = await fetch('http://127.0.0.1:8000/api/users/me/', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      console.log('API Response status:', res.status);
       
       if (res.ok) {
         const data = await res.json();
-        console.log('API Response data:', data);
         user.value.username = data.username || '';
         user.value.email = data.email || '';
         user.value.role = data.profile?.role || data.role || 'startup';
-        console.log('User data updated to:', user.value);
       } else {
         console.error('Failed to load user data:', res.status);
         const errorText = await res.text();
@@ -861,7 +841,7 @@ onMounted(async () => {
     console.warn('No access token found - user may not be logged in');
   }
 
-  // NEW: Load Pitches from backend API first
+  // Load pitches from backend
   const config = useRuntimeConfig();
   const apiBase = config.public?.apiBase;
   if (apiBase && token) {
@@ -872,10 +852,8 @@ onMounted(async () => {
       if (res.ok) {
         const backendPitches = await res.json();
         myPitches.value = backendPitches;
-        console.debug('Loaded pitches from backend:', backendPitches.length);
       } else {
         console.warn('Backend pitches request failed with status', res.status);
-        // Fallback to localStorage
         loadPitchesFromLocalStorage();
       }
     } catch (e) {
@@ -883,11 +861,10 @@ onMounted(async () => {
       loadPitchesFromLocalStorage();
     }
   } else {
-    // No apiBase or no token: fallback to localStorage
     loadPitchesFromLocalStorage();
   }
 
-  // Load saved Events from localStorage if available, otherwise use demo data
+  // Load events from backend
   if (apiBase && token) {
     try {
       const res = await fetch(`${apiBase}/events/?mine=true`, {
@@ -896,7 +873,6 @@ onMounted(async () => {
       if (res.ok) {
         const backendEvents = await res.json();
         myEvents.value = backendEvents;
-        console.debug('Loaded events from backend:', backendEvents.length);
       } else {
         console.warn('Backend events request failed with status', res.status);
         loadEventsFromLocalStorage();
@@ -909,9 +885,11 @@ onMounted(async () => {
     loadEventsFromLocalStorage();
   }
   
-  // NEU: Load saved pitches for investors
+  // Load investor-specific data
   if (user.value.role === 'investor') {
     await loadSavedPitches();
+    await loadInvestorKPIs();
+    await loadInvestments();
   }
 });
 
@@ -921,21 +899,15 @@ function loadPitchesFromLocalStorage() {
       const savedPitches = localStorage.getItem('myPitches');
       if (savedPitches) {
         myPitches.value = JSON.parse(savedPitches);
-      } else if (user.value.role === 'startup') {
-        myPitches.value = [
-          { id: 1, title: 'EcoSolutions', sector: 'Nachhaltigkeit', stage: 'Seed', goal: '250.000€', equity: 15, desc: 'Eine Plattform zur Reduzierung von Plastikmüll in Unternehmen.', img: 'https://placehold.co/600x400/3b82f6/ffffff?text=Eco', valuation: '1.666.667 €' },
-        ];
+      } else {
+        myPitches.value = [];
       }
     } else {
-      // Server-side / non-browser: set demo data
-      if (user.value.role === 'startup') {
-        myPitches.value = [
-          { id: 1, title: 'EcoSolutions', sector: 'Nachhaltigkeit', stage: 'Seed', goal: '250.000€', equity: 15, desc: 'Eine Plattform zur Reduzierung von Plastikmüll in Unternehmen.', img: 'https://placehold.co/600x400/3b82f6/ffffff?text=Eco', valuation: '1.666.667 €' },
-        ];
-      }
+      myPitches.value = [];
     }
   } catch (e) {
     console.warn('Error loading saved data from localStorage', e);
+    myPitches.value = [];
   }
 }
 
@@ -946,17 +918,14 @@ function loadEventsFromLocalStorage() {
       if (savedEvents) {
         myEvents.value = JSON.parse(savedEvents);
       } else {
-        myEvents.value = [
-          { id: 1, name: 'Tech Meetup Berlin', duration: 180, location: 'MS Teams', topic: 'AI & Web3', date: '2025-11-15T14:00', host: 'TechHub', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.', img: 'https://picsum.photos/seed/e1/900/480' }
-        ];
+        myEvents.value = [];
       }
     } else {
-      myEvents.value = [
-        { id: 1, name: 'Tech Meetup Berlin', duration: 180, location: 'MS Teams', topic: 'AI & Web3', date: '2025-11-15T14:00', host: 'TechHub', link: 'https://teams.microsoft.com/...', description: 'Ein Networking-Event für Entwickler und Gründer.', img: 'https://picsum.photos/seed/e1/900/480' }
-      ];
+      myEvents.value = [];
     }
   } catch (e) {
     console.warn('Error loading events from localStorage', e);
+    myEvents.value = [];
   }
 }
 
@@ -1036,12 +1005,37 @@ async function loadSavedPitches() {
     
     if (res.ok) {
       savedPitches.value = await res.json();
-      console.debug('Loaded saved pitches:', savedPitches.value.length);
     } else {
       console.warn('Failed to load saved pitches:', res.status);
     }
   } catch (e) {
     console.error('Error loading saved pitches:', e);
+  }
+}
+
+// Load investor KPIs dynamically from API
+async function loadInvestorKPIs() {
+  if (user.value.role !== 'investor') return;
+  
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  if (!apiBase || !token) return;
+  
+  try {
+    const res = await fetch(`${apiBase}/investor/kpis/`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      investorKPIs.value = data;
+    } else {
+      console.warn('Failed to load investor KPIs:', res.status);
+    }
+  } catch (e) {
+    console.error('Error loading investor KPIs:', e);
   }
 }
 
@@ -1075,6 +1069,63 @@ async function removeSavedPitch(pitchId) {
     }
   } catch (e) {
     console.error('Error removing saved pitch:', e);
+    alert('Fehler beim Entfernen des Pitches.');
+  }
+}
+
+// Load investor investments
+async function loadInvestments() {
+  if (user.value.role !== 'investor') return;
+  
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  if (!apiBase || !token) return;
+  
+  try {
+    const res = await fetch(`${apiBase}/investments/`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (res.ok) {
+      myInvestments.value = await res.json();
+    } else {
+      console.warn('Failed to load investments:', res.status);
+    }
+  } catch (e) {
+    console.error('Error loading investments:', e);
+  }
+}
+
+// Remove investment (for testing)
+async function removeInvestment(investmentId) {
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  if (!apiBase || !token) return;
+  
+  if (!confirm('Investment wirklich löschen? (Nur für Testing)')) return;
+  
+  try {
+    const res = await fetch(`${apiBase}/investments/${investmentId}/`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (res.ok) {
+      // Remove from local list
+      myInvestments.value = myInvestments.value.filter(inv => inv.id !== investmentId);
+      // Reload KPIs to update dashboard
+      await loadInvestorKPIs();
+      alert('Investment erfolgreich gelöscht!');
+    } else {
+      console.warn('Failed to delete investment:', res.status);
+      alert('Fehler beim Löschen des Investments.');
+    }
+  } catch (e) {
+    console.error('Error deleting investment:', e);
     alert('Fehler beim Entfernen des Pitches.');
   }
 }
@@ -2238,6 +2289,17 @@ textarea.error {
   margin-bottom: 16px;
 }
 
+.empty-chart-message {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
 .mini-bar {
   flex: 1;
   background: linear-gradient(180deg, var(--accent), var(--accent-2));
@@ -2656,6 +2718,139 @@ textarea.error {
 .btn-remove-saved:hover {
   background: rgba(220, 38, 38, 1);
   transform: scale(1.1);
+}
+
+/* Investments Section (Testing) */
+.investments-section {
+  animation: fadeInUp 0.6s ease-out 0.5s backwards;
+}
+
+.investments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.investment-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s;
+}
+
+.investment-card:hover {
+  border-color: rgba(94, 234, 212, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(94, 234, 212, 0.1);
+}
+
+.investment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.investment-header h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+}
+
+.investment-status {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.investment-status.active {
+  background: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+}
+
+.investment-status.exited {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+
+.investment-status.failed {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.investment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.detail-label {
+  color: var(--muted);
+}
+
+.detail-value {
+  font-weight: 600;
+  color: white;
+}
+
+.detail-value.positive {
+  color: #86efac;
+}
+
+.detail-value.negative {
+  color: #fca5a5;
+}
+
+.btn-remove-investment {
+  width: 100%;
+  padding: 10px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #fca5a5;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-remove-investment svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-remove-investment:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: translateY(-1px);
+}
+
+.badge-count {
+  background: rgba(94, 234, 212, 0.2);
+  color: var(--accent);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 .empty-saved-state {

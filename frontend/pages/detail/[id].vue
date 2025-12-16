@@ -1,5 +1,37 @@
 <template>
   <section id="page-detail">
+    <!-- Investment Modal -->
+    <div v-if="showInvestmentModal" class="modal-overlay" @click.self="showInvestmentModal = false">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Investment Details</h3>
+          <button @click="showInvestmentModal = false" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="muted mb-16">Investiere in <strong>{{ pitch?.title }}</strong></p>
+          <div class="info-display">
+            <div class="info-row">
+              <span class="info-label">Investitionsbetrag:</span>
+              <span class="info-value">{{ formatCurrency(investmentForm.amount) }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Equity Anteil:</span>
+              <span class="info-value">{{ investmentForm.equity_percentage }}%</span>
+            </div>
+          </div>
+          <div v-if="investmentError" class="alert alert-error mb-16">
+            {{ investmentError }}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button @click="showInvestmentModal = false" class="btn ghost">Abbrechen</button>
+          <button @click="submitInvestment" class="btn primary" :disabled="investmentLoading">
+            {{ investmentLoading ? 'Wird verarbeitet...' : 'Investieren' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    
     <div v-if="pitch">
       <!-- Back Button -->
       <div style="margin-bottom: 24px">
@@ -130,7 +162,17 @@
             <p class="muted" style="margin-bottom: 20px; font-size: 0.95rem">
               Investiere in dieses vielversprechende Startup und werde Teil der Erfolgsgeschichte.
             </p>
-            <PaymentButton v-if="pitch && isInvestor" :amount="paymentAmount" label="Jetzt investieren" style="width: 100%; margin-bottom: 12px" />
+            <button 
+              v-if="isInvestor" 
+              @click="openInvestmentModal" 
+              class="btn primary" 
+              style="width: 100%; margin-bottom: 12px"
+            >
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 8px">
+                <path d="M4 10.781c.148 1.667 1.513 2.85 3.591 3.003V15h1.043v-1.216c2.27-.179 3.678-1.438 3.678-3.3 0-1.59-.947-2.51-2.956-3.028l-.722-.187V3.467c1.122.11 1.879.714 2.07 1.616h1.47c-.166-1.6-1.54-2.748-3.54-2.875V1H7.591v1.233c-1.939.23-3.27 1.472-3.27 3.156 0 1.454.966 2.483 2.661 2.917l.61.162v4.031c-1.149-.17-1.94-.8-2.131-1.718H4zm3.391-3.836c-1.043-.263-1.6-.825-1.6-1.616 0-.944.704-1.641 1.8-1.828v3.495l-.2-.05zm1.591 1.872c1.287.323 1.852.859 1.852 1.769 0 1.097-.826 1.828-2.2 1.939V8.73l.348.086z"/>
+              </svg>
+              Investieren
+            </button>
             <button 
               v-if="isInvestor" 
               class="btn ghost" 
@@ -194,21 +236,52 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useRuntimeConfig } from '#app';
 import { dummyApi } from '~/composables/useDemoData';
-import PaymentButton from '~/components/PaymentButton.vue';
+import { usePayPal } from '~/composables/usePayPal';
 
 const route = useRoute();
+const router = useRouter();
 const pitch = ref(null);
-const paymentAmount = ref('10.00');
 const user = ref({ username: '', email: '', role: 'startup' }); // Default user object
 const isSaved = ref(false); // Track if pitch is saved
 const isLoading = ref(false); // Track button loading state
 
+// Investment modal state
+const showInvestmentModal = ref(false);
+const investmentLoading = ref(false);
+const investmentError = ref('');
+const investmentForm = ref({
+  amount: 50000,
+  equity_percentage: 5.0
+});
+
 // Computed property to check if user is an investor
 const isInvestor = computed(() => user.value.role === 'investor');
 
+// Open investment modal and initialize values from pitch
+function openInvestmentModal() {
+  if (!pitch.value) return;
+  
+  // Initialize investment form with pitch values
+  investmentForm.value.amount = parseFloat(pitch.value.goal) || 50000;
+  investmentForm.value.equity_percentage = parseFloat(pitch.value.equity) || 5.0;
+  
+  // Reset error and open modal
+  investmentError.value = '';
+  showInvestmentModal.value = true;
+}
+
+// Format currency helper
+function formatCurrency(value) {
+  return new Intl.NumberFormat('de-DE', { 
+    style: 'currency', 
+    currency: 'EUR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(value);
+}
 
 function openMail() {
   window.location.href = 'mailto:startup@test.de'
@@ -304,6 +377,99 @@ async function checkIfSaved() {
   }
 }
 
+// Submit investment
+async function submitInvestment() {
+  if (!pitch.value) return;
+  
+  investmentError.value = '';
+  investmentLoading.value = true;
+  
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  if (!token) {
+    investmentError.value = 'Bitte melde dich an, um zu investieren.';
+    investmentLoading.value = false;
+    return;
+  }
+  
+  // Validation
+  if (!investmentForm.value.amount || investmentForm.value.amount <= 0) {
+    investmentError.value = 'Bitte gib einen gültigen Betrag ein.';
+    investmentLoading.value = false;
+    return;
+  }
+  
+  if (!investmentForm.value.equity_percentage || investmentForm.value.equity_percentage <= 0 || investmentForm.value.equity_percentage > 100) {
+    investmentError.value = 'Bitte gib einen gültigen Equity-Anteil ein (0-100%).';
+    investmentLoading.value = false;
+    return;
+  }
+  
+  try {
+    // Step 1: Create investment in database immediately
+    const res = await fetch(`${apiBase}/investments/invest/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        pitch_id: pitch.value.id,
+        amount: investmentForm.value.amount,
+        equity_percentage: investmentForm.value.equity_percentage
+      })
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      
+      // Close modal and show success
+      showInvestmentModal.value = false;
+      alert(`Investment erfolgreich gespeichert! (ID: ${data.id})`);
+      
+      // Step 2: Open PayPal in new tab (non-blocking)
+      try {
+        const { createOrder } = usePayPal();
+        const returnUrl = `${window.location.origin}/dashboard?investment_success=${data.id}`;
+        const cancelUrl = `${window.location.origin}/dashboard?investment_id=${data.id}`;
+        
+        const paypalResp = await createOrder({ 
+          amount: investmentForm.value.amount, 
+          currency: 'EUR',
+          returnUrl,
+          cancelUrl
+        });
+        
+        const approval = paypalResp.approval_url || paypalResp.approvalUrl || paypalResp.data?.approval_url;
+        if (approval) {
+          // Open PayPal in new tab
+          window.open(approval, '_blank');
+        } else {
+          console.error('No approval URL from PayPal', paypalResp);
+        }
+      } catch (paypalError) {
+        console.error('PayPal error:', paypalError);
+        // Investment is already saved, so this is non-critical
+      }
+      
+      // Redirect to dashboard after short delay
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 2000);
+    } else {
+      const errorData = await res.json();
+      investmentError.value = errorData.error || errorData.detail || 'Fehler beim Investieren.';
+    }
+  } catch (e) {
+    console.error('Error submitting investment:', e);
+    investmentError.value = 'Netzwerkfehler. Bitte versuche es erneut.';
+  } finally {
+    investmentLoading.value = false;
+  }
+}
+
 onMounted(async () => {
   const config = useRuntimeConfig();
   const apiBase = config.public?.apiBase;
@@ -341,11 +507,6 @@ onMounted(async () => {
       if (res.ok) {
         pitch.value = await res.json();
         console.log('Pitch loaded:', pitch.value);
-        
-        // Parse funding goal for payment amount
-        const numeric = pitch.value?.goal?.toString().replace(/[€ ,]/g, '') || '';
-        const parsed = parseFloat(numeric) || 10.00;
-        paymentAmount.value = parsed.toFixed(2);
       } else {
         console.error('Failed to load pitch:', res.status);
       }
@@ -580,6 +741,204 @@ onMounted(async () => {
 .cta-card {
   background: linear-gradient(135deg, rgba(94, 234, 212, 0.1) 0%, rgba(96, 165, 250, 0.1) 100%);
   border: 1px solid rgba(94, 234, 212, 0.2);
+}
+
+/* Investment Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.modal-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  padding: 24px 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.modal-body {
+  padding: 32px;
+}
+
+.info-display {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 24px;
+  padding: 24px;
+  background: rgba(94, 234, 212, 0.08);
+  border: 1px solid rgba(94, 234, 212, 0.2);
+  border-radius: 12px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-label {
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.info-value {
+  color: #5EEACC;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.modal-footer {
+  padding: 24px 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn.ghost {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, #5EEACC 0%, #60A5FA 100%);
+  color: #0F172A;
+  font-weight: 700;
+}
+
+.btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(94, 234, 212, 0.3);
+}
+
+.btn.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.alert-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
 }
 
 /* Responsive */

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
-from .models import Todo, Pitch, Event, SavedPitch   # dein Model
+from .models import Todo, Pitch, Event, SavedPitch, Investment   # dein Model
 
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -128,3 +128,38 @@ class SavedPitchSerializer(serializers.ModelSerializer):
         model = SavedPitch
         fields = ['id', 'user', 'pitch', 'saved_at']
         read_only_fields = ['id', 'user', 'saved_at']
+
+
+class InvestmentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Investment model.
+    Includes pitch details and calculated fields.
+    """
+    investor = serializers.CharField(source='investor.username', read_only=True)
+    pitch = PitchSerializer(read_only=True)
+    pitch_id = serializers.IntegerField(write_only=True, required=False)
+    roi = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
+    current_value = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+
+    class Meta:
+        model = Investment
+        fields = [
+            'id', 'investor', 'pitch', 'pitch_id',
+            'amount', 'equity_percentage', 'investment_date', 'status',
+            'exit_date', 'exit_amount', 'notes', 'roi', 'current_value',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'investor', 'investment_date', 'created_at', 'updated_at']
+
+    def validate_amount(self, value):
+        """Investment amount must be positive"""
+        if value <= 0:
+            raise serializers.ValidationError("Investment-Betrag muss größer als 0 sein.")
+        return value
+
+    def validate_equity_percentage(self, value):
+        """Equity percentage must be between 0 and 100"""
+        if value is not None and (value < 0 or value > 100):
+            raise serializers.ValidationError("Equity-Anteil muss zwischen 0 und 100% liegen.")
+        return value
+
