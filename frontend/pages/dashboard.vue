@@ -1526,6 +1526,8 @@ function handleAiGenerated(description) {
 </script>
 
 <style scoped>
+/* Dashboard-spezifische Styles - Globale Styles sind in main.css */
+
 /* Dashboard Layout */
 .dashboard-header {
   margin-bottom: 32px;
@@ -1611,16 +1613,6 @@ function handleAiGenerated(description) {
   flex-wrap: wrap;
 }
 
-.badge-pill {
-  padding: 4px 12px;
-  background: rgba(94, 234, 212, 0.1);
-  border: 1px solid rgba(94, 234, 212, 0.2);
-  border-radius: 20px;
-  font-size: 0.8rem;
-  color: var(--accent);
-  font-weight: 600;
-}
-
 .pitch-desc {
   font-size: 0.9rem;
   line-height: 1.5;
@@ -1642,17 +1634,6 @@ function handleAiGenerated(description) {
   display: flex;
   flex-direction: column;
   gap: 4px;
-}
-
-.stat-label {
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
-.stat-value {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--accent);
 }
 
 .pitch-documents {
@@ -1760,46 +1741,10 @@ function handleAiGenerated(description) {
   gap: 20px;
 }
 
-.sidebar-card {
-  background: var(--card);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 12px;
-  padding: 20px;
-}
-
-.sidebar-card h3 {
-  font-size: 1.1rem;
-  margin: 0 0 16px 0;
-}
-
 .user-info {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.info-row:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.info-label {
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-
-.info-value {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: white;
 }
 
 .match-item {
@@ -1840,145 +1785,6 @@ function handleAiGenerated(description) {
   gap: 16px;
 }
 
-.stat-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
-  background: var(--card);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 12px;
-  transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-  border-color: rgba(94, 234, 212, 0.2);
-  transform: translateY(-2px);
-}
-
-.stat-icon {
-  font-size: 2rem;
-}
-
-/* Button Styles */
-.btn-small {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 0;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-small.ghost {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
-.btn-small.ghost:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.btn-small.danger-outline {
-  background: transparent;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #ef4444;
-}
-
-.btn-small.danger-outline:hover {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.5);
-}
-
-/* Empty State */
-.empty-state {
-  padding: 48px 24px;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px dashed rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-
-.empty-icon {
-  font-size: 3.5rem;
-  opacity: 0.5;
-}
-
-.empty-text {
-  color: var(--muted);
-  margin: 0;
-  font-size: 1rem;
-}
-
-.empty-cta {
-  margin-top: 8px;
-}
-
-/* Responsive */
-@media (max-width: 1200px) {
-  .dashboard-layout {
-    grid-template-columns: 1fr;
-  }
-  
-  .dashboard-sidebar {
-    position: static;
-  }
-}
-
-@media (max-width: 968px) {
-  .dashboard-main {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 640px) {
-  .section-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .pitch-stats {
-    grid-template-columns: 1fr;
-  }
-  
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-input.error,
-textarea.error {
-  border-color: #ef4444;
-}
-
-.error-text {
-  color: #ef4444;
-  font-size: 0.875rem;
-  margin-top: 4px;
-  display: block;
-}
-
-.btn.danger {
-  background: #ef4444;
-  color: white;
-}
-
-.btn.danger:hover {
-  background: #dc2626;
-}
-
-.btn.small {
-  padding: 4px 12px;
-  font-size: 0.875rem;
-}
-
 /* Delete Confirmation Styling */
 .delete-confirmation {
   margin-top: 12px;
@@ -2013,19 +1819,8 @@ textarea.error {
   box-shadow: 0 4px 12px rgba(94, 234, 212, 0.4);
 }
 
-/* Modal Styles */
+/* Modal Overlay Override for Dashboard */
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  padding: 20px;
   overflow-y: auto;
 }
 
@@ -2037,17 +1832,7 @@ textarea.error {
   margin: auto;
 }
 
-@media (max-width: 768px) {
-  .modal-content {
-    max-width: 100%;
-    max-height: 95vh;
-  }
-}
-
-/* ============================================
-   INVESTOR DASHBOARD STYLES
-   ============================================ */
-
+/* Investor Dashboard */
 .investor-dashboard {
   max-width: 1400px;
   margin: 0 auto;
@@ -2057,7 +1842,6 @@ textarea.error {
   gap: 32px;
 }
 
-/* Section Titles */
 .section-title {
   font-size: 1.5rem;
   font-weight: 700;
