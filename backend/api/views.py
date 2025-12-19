@@ -593,3 +593,46 @@ def format_time_ago(dt):
         return f'vor {diff.seconds // 60} Minute{"n" if diff.seconds // 60 > 1 else ""}'
     else:
         return 'Gerade eben'
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def generate_certificate_pdf(request, investment_id):
+    """
+    Generate and download shareholder certificate PDF for an investment.
+    GET /api/investments/<id>/certificate/
+    """
+    from django.http import FileResponse
+    from .pdf_generator import generate_investment_certificate
+    
+    try:
+        # Get investment and verify ownership
+        investment = Investment.objects.select_related('investor', 'pitch').get(id=investment_id)
+        
+        # Check if user owns this investment
+        if investment.investor != request.user:
+            return Response(
+                {"error": "Sie sind nicht berechtigt, dieses Zertifikat herunterzuladen."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Generate PDF
+        pdf_buffer = generate_investment_certificate(investment)
+        
+        # Return as file response
+        filename = f"Investify_Zertifikat_{investment.pitch.title}_{investment_id}.pdf"
+        response = FileResponse(pdf_buffer, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        
+        return response
+        
+    except Investment.DoesNotExist:
+        return Response(
+            {"error": "Investment nicht gefunden."},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        return Response(
+            {"error": f"Fehler bei der PDF-Generierung: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

@@ -495,6 +495,68 @@
         </div>
       </div>
 
+      <!-- NEU: Dokumente / Zertifikate Sektion -->
+      <div class="documents-section" v-if="myInvestments.length > 0">
+        <div class="section-header-inline">
+          <h3 class="section-title">Meine Dokumente & Zertifikate</h3>
+          <span class="badge-count">{{ myInvestments.length }}</span>
+        </div>
+        <p class="section-description">
+          Für jedes Investment steht Ihnen ein offizielles Shareholder-Zertifikat zum Download bereit.
+        </p>
+        
+        <div class="documents-grid">
+          <div v-for="investment in myInvestments" :key="`doc-${investment.id}`" class="document-card">
+            <div class="document-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="12" y1="18" x2="12" y2="12"/>
+                <line x1="9" y1="15" x2="15" y2="15"/>
+              </svg>
+            </div>
+            <div class="document-content">
+              <h4 class="document-title">Zeichnungsschein</h4>
+              <p class="document-startup">{{ investment.pitch.title }}</p>
+              <div class="document-meta">
+                <span class="meta-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  {{ new Date(investment.investment_date).toLocaleDateString('de-DE') }}
+                </span>
+                <span class="meta-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="1" x2="12" y2="23"/>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                  </svg>
+                  {{ formatCurrency(investment.amount) }}
+                </span>
+              </div>
+            </div>
+            <button 
+              class="btn-download-certificate" 
+              @click="downloadCertificate(investment.id)" 
+              :disabled="downloadingCertificates[investment.id]"
+              title="Zertifikat herunterladen"
+            >
+              <svg v-if="!downloadingCertificates[investment.id]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <svg v-else class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+              </svg>
+              {{ downloadingCertificates[investment.id] ? 'Lädt...' : 'PDF' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
     <!-- ENDE: Investor Dashboard -->
 
@@ -722,6 +784,7 @@ const myPitches = ref([]); // Startet mit einer leeren Liste
 const myEvents = ref([]); // NEU: Liste für Events
 const savedPitches = ref([]); // NEU: Gespeicherte Pitches für Investoren
 const myInvestments = ref([]); // Liste der Investments (für Testing)
+const downloadingCertificates = ref({}); // Tracking für Download-Status
 const showCreateModal = ref(false);
 const showCreateEventModal = ref(false); // NEU: State für Event-Modal
 const showAiModal = ref(false);
@@ -1127,6 +1190,71 @@ async function removeInvestment(investmentId) {
   } catch (e) {
     console.error('Error deleting investment:', e);
     alert('Fehler beim Entfernen des Pitches.');
+  }
+}
+
+// Download certificate PDF for investment
+async function downloadCertificate(investmentId) {
+  const config = useRuntimeConfig();
+  const apiBase = config.public?.apiBase;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  
+  if (!apiBase || !token) {
+    alert('Nicht eingeloggt oder keine API-Konfiguration.');
+    return;
+  }
+  
+  // Set loading state
+  downloadingCertificates.value = { ...downloadingCertificates.value, [investmentId]: true };
+  
+  try {
+    const res = await fetch(`${apiBase}/investments/${investmentId}/certificate/`, {
+      method: 'GET',
+      headers: { 
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (res.ok) {
+      // Get the PDF blob
+      const blob = await res.blob();
+      
+      // Get filename from content-disposition header or create default
+      const contentDisposition = res.headers.get('content-disposition');
+      let filename = 'Investify_Zertifikat.pdf';
+      
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      }, 100);
+      
+    } else {
+      const errorData = await res.json().catch(() => ({ error: 'Unbekannter Fehler' }));
+      console.error('Failed to download certificate:', res.status, errorData);
+      alert(`Fehler beim Download: ${errorData.error || 'Bitte versuchen Sie es später erneut.'}`);
+    }
+  } catch (e) {
+    console.error('Error downloading certificate:', e);
+    alert('Fehler beim Herunterladen des Zertifikats. Bitte versuchen Sie es später erneut.');
+  } finally {
+    // Remove loading state
+    downloadingCertificates.value = { ...downloadingCertificates.value, [investmentId]: false };
   }
 }
 
@@ -2635,6 +2763,167 @@ function handleAiGenerated(description) {
   border-radius: 12px;
   font-size: 0.875rem;
   font-weight: 600;
+}
+
+/* Documents Section (NEW) */
+.documents-section {
+  animation: fadeInUp 0.6s ease-out 0.6s backwards;
+}
+
+.section-description {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-top: 8px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.document-card {
+  background: linear-gradient(135deg, rgba(30, 58, 95, 0.12) 0%, rgba(16, 185, 129, 0.08) 100%);
+  border: 1px solid rgba(94, 234, 212, 0.15);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.document-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--accent) 0%, rgba(94, 234, 212, 0.3) 100%);
+}
+
+.document-card:hover {
+  border-color: rgba(94, 234, 212, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(94, 234, 212, 0.15);
+  background: linear-gradient(135deg, rgba(30, 58, 95, 0.18) 0%, rgba(16, 185, 129, 0.12) 100%);
+}
+
+.document-icon {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, rgba(94, 234, 212, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+}
+
+.document-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.document-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.document-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 4px 0;
+  letter-spacing: 0.3px;
+}
+
+.document-startup {
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin: 0 0 12px 0;
+  font-weight: 500;
+}
+
+.document-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta-item svg {
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+}
+
+.btn-download-certificate {
+  flex-shrink: 0;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--accent) 0%, rgba(16, 185, 129, 0.8) 100%);
+  border: none;
+  border-radius: 8px;
+  color: var(--bg);
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 90px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(94, 234, 212, 0.2);
+}
+
+.btn-download-certificate svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-download-certificate:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(94, 234, 212, 1) 0%, var(--accent) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(94, 234, 212, 0.35);
+}
+
+.btn-download-certificate:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-download-certificate:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-download-certificate .spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .empty-saved-state {
