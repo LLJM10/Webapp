@@ -5,7 +5,7 @@ Rolle: startup
 
 Benutzername:admin_investor
 Mail:admin@test.de
-Passwort:admin12
+Passwort: 
 Rolle: investor
 
 superuser
