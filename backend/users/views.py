@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.conf import settings
 import secrets
+import os
 from .models import UserProfile
 from .serializers import UserSerializer, UserProfileSerializer
 
@@ -106,6 +107,65 @@ def verify_email(request):
     
     except UserProfile.DoesNotExist:
         return Response({'error': 'Ungültiger Token'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def verify_identity(request):
+    """Handle identity verification with uploaded image"""
+    try:
+        user = request.user
+        profile = UserProfile.objects.get(user=user)
+        
+        if 'verification_image' not in request.FILES:
+            return Response(
+                {'error': 'Bitte laden Sie ein Bild hoch'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        verification_image = request.FILES['verification_image']
+        
+        # Validierung: Dateityp prüfen
+        allowed_types = ['image/jpeg', 'image/jpg', 'image/png']
+        if verification_image.content_type not in allowed_types:
+            return Response(
+                {'error': 'Nur JPEG und PNG Bilder sind erlaubt'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validierung: Dateigröße prüfen (max 5MB)
+        max_size = 5 * 1024 * 1024  # 5MB
+        if verification_image.size > max_size:
+            return Response(
+                {'error': 'Bild darf maximal 5MB groß sein'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Lösche altes Verifizierungsbild falls vorhanden
+        if profile.verification_image:
+            # Lösche physische Datei
+            if os.path.isfile(profile.verification_image.path):
+                os.remove(profile.verification_image.path)
+        
+        # Speichere neues Verifizierungsbild
+        # Der Dateiname wird automatisch durch user_verification_image_path generiert
+        profile.verification_image = verification_image
+        profile.save()
+        
+        return Response(
+            {'message': 'Verifizierungsbild erfolgreich hochgeladen. Unser Team wird es überprüfen.'},
+            status=status.HTTP_200_OK
+        )
+    
+    except UserProfile.DoesNotExist:
+        return Response(
+            {'error': 'Benutzerprofil nicht gefunden'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        return Response(
+            {'error': f'Fehler beim Hochladen: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()

@@ -139,7 +139,21 @@
           <h3 class="section-heading">Verifizierung</h3>
           <p class="verification-description">Verifizieren Sie Ihre Identität durch eine Videoaufnahme mit Ihrer Kamera.</p>
           
-          <div v-if="!showVerificationCamera" class="verification-button-container">
+          <!-- Erfolgsmeldung -->
+          <div v-if="verificationSuccess" class="verification-success-box">
+            <div class="success-icon-large">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <h4 class="success-title">Erfolgreich hochgeladen!</h4>
+            <p class="success-message">{{ verificationMessage }}</p>
+            <button @click="resetVerification" class="btn ghost">Schließen</button>
+          </div>
+          
+          <!-- Button zum Öffnen der Kamera -->
+          <div v-else-if="!showVerificationCamera" class="verification-button-container">
             <button @click="startVerification" class="btn primary verification-btn">
               <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M23 7l-7 5 7 5V7z"/>
@@ -149,6 +163,7 @@
             </button>
           </div>
 
+          <!-- Kamera-Ansicht -->
           <div v-else class="verification-camera-section">
             <div class="camera-container">
               <video ref="videoElement" class="camera-video" autoplay playsinline></video>
@@ -184,7 +199,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, nextTick } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 
 const user = ref({ 
@@ -207,9 +222,11 @@ const isSaving = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
 const showVerificationCamera = ref(false);
+const verificationSuccess = ref(false);
+const verificationMessage = ref('');
 const isCapturing = ref(false);
-const videoElement = ref(null);
-const canvasElement = ref(null);
+const videoElement = ref<HTMLVideoElement | null>(null);
+const canvasElement = ref<HTMLCanvasElement | null>(null);
 
 // Avatar URL basierend auf Username
 const avatarUrl = computed(() => {
@@ -303,14 +320,39 @@ const handleLogout = () => {
 const startVerification = async () => {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'user' },
+      video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
       audio: false
     });
     
+    // UI zuerst anzeigen
+    showVerificationCamera.value = true;
+    errorMessage.value = '';
+    
+    // Warte auf nächsten Vue-Render-Zyklus damit das Video-Element im DOM ist
+    await nextTick();
+    
     if (videoElement.value) {
+      // Event-Handler registrieren
+      videoElement.value.addEventListener('loadedmetadata', () => {
+        if (videoElement.value) {
+          videoElement.value.play().catch((err: Error) => {
+            console.error('Fehler beim Abspielen:', err);
+            errorMessage.value = 'Fehler beim Starten der Kamera.';
+          });
+        }
+      }, { once: true });
+      
+      // Stream setzen
       videoElement.value.srcObject = stream;
-      showVerificationCamera.value = true;
-      errorMessage.value = '';
+      
+      // Fallback: Versuche direkt play() nach kurzer Verzögerung
+      setTimeout(() => {
+        if (videoElement.value && videoElement.value.readyState >= 2) {
+          videoElement.value.play().catch((err: Error) => {
+            console.error('Fallback play() fehlgeschlagen:', err);
+          });
+        }
+      }, 200);
     }
   } catch (error) {
     console.error('Fehler beim Zugriff auf die Kamera:', error);
@@ -331,7 +373,7 @@ const captureFrame = async () => {
       context.drawImage(videoElement.value, 0, 0);
       
       // Convert canvas to blob and upload
-      canvasElement.value.toBlob(async (blob) => {
+      canvasElement.value.toBlob(async (blob: Blob | null) => {
         if (blob) {
           await uploadVerificationImage(blob);
         }
@@ -347,7 +389,10 @@ const captureFrame = async () => {
 
 const uploadVerificationImage = async (blob: Blob) => {
   const token = localStorage.getItem('access_token');
-  if (!token) return;
+  if (!token) {
+    errorMessage.value = 'Keine Authentifizierung gefunden. Bitte melden Sie sich erneut an.';
+    return;
+  }
 
   const formData = new FormData();
   formData.append('verification_image', blob, 'verification.jpg');
@@ -361,16 +406,17 @@ const uploadVerificationImage = async (blob: Blob) => {
       body: formData
     });
 
+    const data = await response.json();
+
     if (response.ok) {
-      successMessage.value = 'Verifizierung erfolgreich eingereicht! Unser Team wird Ihre Anfrage bearbeiten.';
-      cancelVerification();
+      // Zeige lokale Erfolgsmeldung in der Verifizierungs-Section
+      verificationMessage.value = data.message || 'Verifizierung erfolgreich eingereicht!';
+      verificationSuccess.value = true;
       
-      setTimeout(() => {
-        successMessage.value = '';
-      }, 5000);
+      // Kamera schließen
+      cancelVerification();
     } else {
-      const errorData = await response.json();
-      errorMessage.value = errorData.error || 'Fehler beim Hochladen des Fotos.';
+      errorMessage.value = data.error || 'Fehler beim Hochladen des Fotos.';
     }
   } catch (error) {
     console.error('Fehler beim Upload:', error);
@@ -386,6 +432,11 @@ const cancelVerification = () => {
   
   showVerificationCamera.value = false;
   isCapturing.value = false;
+};
+
+const resetVerification = () => {
+  verificationSuccess.value = false;
+  verificationMessage.value = '';
 };
 
 // Statistiken laden
@@ -780,24 +831,86 @@ onMounted(async () => {
   padding: 0.75rem 1.5rem;
 }
 
+.verification-success-box {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2.5rem;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%);
+  border: 2px solid rgba(16, 185, 129, 0.3);
+  border-radius: 16px;
+  text-align: center;
+  animation: slideIn 0.4s ease-out;
+}
+
+.success-icon-large {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  background: rgba(16, 185, 129, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-icon-large svg {
+  width: 48px;
+  height: 48px;
+  color: #10b981;
+  stroke-width: 3;
+}
+
+.success-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #10b981;
+  margin: 0 0 0.75rem 0;
+}
+
+.success-message {
+  color: var(--text);
+  font-size: 1rem;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.6;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .verification-camera-section {
   animation: fadeIn 0.3s ease;
+  margin-top: 1.5rem;
 }
 
 .camera-container {
   width: 100%;
-  max-width: 400px;
+  max-width: 640px;
+  min-height: 480px;
   margin: 0 auto 1.5rem;
   border-radius: 12px;
   overflow: hidden;
   background: #000;
-  border: 2px solid rgba(94, 234, 212, 0.3);
+  border: 2px solid rgba(94, 234, 212, 0.5);
+  box-shadow: 0 4px 20px rgba(94, 234, 212, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .camera-video {
   width: 100%;
   height: auto;
+  min-height: 480px;
   display: block;
+  object-fit: cover;
 }
 
 .camera-canvas {
