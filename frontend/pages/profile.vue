@@ -134,6 +134,39 @@
           </div>
         </div>
 
+        <!-- Verification Section for Investors -->
+        <div class="info-section" v-if="user.role === 'investor'">
+          <h3 class="section-heading">Verifizierung</h3>
+          <p class="verification-description">Verifizieren Sie Ihre Identität durch eine Videoaufnahme mit Ihrer Kamera.</p>
+          
+          <div v-if="!showVerificationCamera" class="verification-button-container">
+            <button @click="startVerification" class="btn primary verification-btn">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 7l-7 5 7 5V7z"/>
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+              </svg>
+              Kamera öffnen
+            </button>
+          </div>
+
+          <div v-else class="verification-camera-section">
+            <div class="camera-container">
+              <video ref="videoElement" class="camera-video" autoplay playsinline></video>
+              <canvas ref="canvasElement" class="camera-canvas" style="display: none;"></canvas>
+            </div>
+            <div class="camera-actions">
+              <button @click="captureFrame" class="btn primary" :disabled="isCapturing">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="1"/>
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                </svg>
+                {{ isCapturing ? 'Wird verarbeitet...' : 'Foto aufnehmen' }}
+              </button>
+              <button @click="cancelVerification" class="btn ghost">Abbrechen</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Actions -->
         <div class="profile-actions">
           <button @click="handleLogout" class="btn danger-outline">
@@ -173,6 +206,10 @@ const newEmail = ref('');
 const isSaving = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
+const showVerificationCamera = ref(false);
+const isCapturing = ref(false);
+const videoElement = ref(null);
+const canvasElement = ref(null);
 
 // Avatar URL basierend auf Username
 const avatarUrl = computed(() => {
@@ -260,6 +297,95 @@ const handleLogout = () => {
     auth.logout();
     navigateTo('/login');
   }
+};
+
+// Verification Camera Functions
+const startVerification = async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user' },
+      audio: false
+    });
+    
+    if (videoElement.value) {
+      videoElement.value.srcObject = stream;
+      showVerificationCamera.value = true;
+      errorMessage.value = '';
+    }
+  } catch (error) {
+    console.error('Fehler beim Zugriff auf die Kamera:', error);
+    errorMessage.value = 'Konnte nicht auf die Kamera zugreifen. Bitte überprüfen Sie die Berechtigungen.';
+  }
+};
+
+const captureFrame = async () => {
+  if (!videoElement.value || !canvasElement.value) return;
+  
+  isCapturing.value = true;
+  try {
+    const context = canvasElement.value.getContext('2d');
+    canvasElement.value.width = videoElement.value.videoWidth;
+    canvasElement.value.height = videoElement.value.videoHeight;
+    
+    if (context) {
+      context.drawImage(videoElement.value, 0, 0);
+      
+      // Convert canvas to blob and upload
+      canvasElement.value.toBlob(async (blob) => {
+        if (blob) {
+          await uploadVerificationImage(blob);
+        }
+      }, 'image/jpeg', 0.9);
+    }
+  } catch (error) {
+    console.error('Fehler beim Aufnehmen des Fotos:', error);
+    errorMessage.value = 'Fehler beim Aufnehmen des Fotos. Bitte versuchen Sie es erneut.';
+  } finally {
+    isCapturing.value = false;
+  }
+};
+
+const uploadVerificationImage = async (blob: Blob) => {
+  const token = localStorage.getItem('access_token');
+  if (!token) return;
+
+  const formData = new FormData();
+  formData.append('verification_image', blob, 'verification.jpg');
+
+  try {
+    const response = await fetch('http://127.0.0.1:8000/api/users/verify-identity/', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+
+    if (response.ok) {
+      successMessage.value = 'Verifizierung erfolgreich eingereicht! Unser Team wird Ihre Anfrage bearbeiten.';
+      cancelVerification();
+      
+      setTimeout(() => {
+        successMessage.value = '';
+      }, 5000);
+    } else {
+      const errorData = await response.json();
+      errorMessage.value = errorData.error || 'Fehler beim Hochladen des Fotos.';
+    }
+  } catch (error) {
+    console.error('Fehler beim Upload:', error);
+    errorMessage.value = 'Netzwerkfehler. Bitte versuchen Sie es später erneut.';
+  }
+};
+
+const cancelVerification = () => {
+  if (videoElement.value && videoElement.value.srcObject) {
+    const tracks = (videoElement.value.srcObject as MediaStream).getTracks();
+    tracks.forEach(track => track.stop());
+  }
+  
+  showVerificationCamera.value = false;
+  isCapturing.value = false;
 };
 
 // Statistiken laden
@@ -633,6 +759,62 @@ onMounted(async () => {
 .danger-outline:hover {
   background: rgba(239, 68, 68, 0.1);
   border-color: #ef4444;
+}
+
+/* Verification Section */
+.verification-description {
+  color: var(--muted);
+  margin: 0 0 1.5rem 0;
+  font-size: 0.95rem;
+}
+
+.verification-button-container {
+  display: flex;
+  justify-content: center;
+}
+
+.verification-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.75rem 1.5rem;
+}
+
+.verification-camera-section {
+  animation: fadeIn 0.3s ease;
+}
+
+.camera-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  border: 2px solid rgba(94, 234, 212, 0.3);
+}
+
+.camera-video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.camera-canvas {
+  display: none;
+}
+
+.camera-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.camera-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Responsive */
