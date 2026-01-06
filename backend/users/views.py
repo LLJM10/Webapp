@@ -174,12 +174,11 @@ def verify_identity(request):
 def view_verification_image(request, user_id):
     """
     Zeigt verschlüsseltes Verifizierungsbild.
-    Nur der Bildbesitzer oder Admins dürfen zugreifen.
     """
     try:
         profile = UserProfile.objects.get(user_id=user_id)
         
-        # Sicherheit: Nur eigenes Bild oder Admin darf zugreifen
+        # Nur eigenes Bild oder Admin darf zugreifen
         if request.user.id != user_id and not request.user.is_staff:
             return HttpResponse('Keine Berechtigung', status=403)
         

@@ -1,18 +1,3 @@
-"""
-Verschlüsselungs-Utilities für Verifizierungsbilder
-
-WICHTIG: Dies ist eine Beispiel-Implementierung. Für Produktion sollten Sie:
-1. Kryptographische Schlüssel sicher verwalten (z.B. mit django-environ, AWS KMS, etc.)
-2. Die Schlüssel NIEMALS im Code oder Repository speichern
-3. Eine professionelle Key-Management-Lösung verwenden
-
-Installation erforderlich:
-    pip install cryptography
-
-Verwendung:
-    from .encryption import encrypt_image_file, decrypt_image_file
-"""
-
 from cryptography.fernet import Fernet
 from django.conf import settings
 import os
@@ -22,21 +7,7 @@ def get_encryption_key():
     """
     Hole den Verschlüsselungs-Key aus den Settings.
     
-    WICHTIG: In Produktion sollte der Key NICHT in settings.py stehen!
-    Verwenden Sie stattdessen:
-    - Umgebungsvariablen (z.B. über django-environ)
-    - AWS Secrets Manager
-    - HashiCorp Vault
-    - Azure Key Vault
     """
-    # Fallback: Generiere einen Key (NUR für Entwicklung!)
-    if not hasattr(settings, 'ENCRYPTION_KEY'):
-        key = Fernet.generate_key()
-        print("⚠️  WARNUNG: Kein ENCRYPTION_KEY in settings.py gefunden!")
-        print(f"⚠️  Generierter temporärer Key: {key.decode()}")
-        print("⚠️  Fügen Sie dies zu settings.py hinzu:")
-        print(f"⚠️  ENCRYPTION_KEY = '{key.decode()}'")
-        return key
     
     return settings.ENCRYPTION_KEY.encode() if isinstance(settings.ENCRYPTION_KEY, str) else settings.ENCRYPTION_KEY
 
@@ -110,49 +81,3 @@ def decrypt_image_file(file_path, output_path=None):
         return None
 
 
-def decrypt_image_to_response(file_path):
-    """
-    Entschlüsselt ein Bild und gibt es als HTTP-Response zurück.
-    
-    Verwendung in Views:
-        from django.http import HttpResponse
-        from .encryption import decrypt_image_to_response
-        
-        def serve_verification_image(request, user_id):
-            file_path = f'media/verification_images/user_{user_id}_verification.jpg'
-            return decrypt_image_to_response(file_path)
-    """
-    from django.http import HttpResponse
-    
-    decrypted_data = decrypt_image_file(file_path)
-    
-    if decrypted_data:
-        # Bestimme Content-Type basierend auf Dateiendung
-        if file_path.endswith('.jpg') or file_path.endswith('.jpeg'):
-            content_type = 'image/jpeg'
-        elif file_path.endswith('.png'):
-            content_type = 'image/png'
-        else:
-            content_type = 'application/octet-stream'
-        
-        return HttpResponse(decrypted_data, content_type=content_type)
-    
-    return HttpResponse('Image not found or decryption failed', status=404)
-
-
-# Alternative: Django Signal für automatische Verschlüsselung
-"""
-Um Bilder automatisch nach dem Upload zu verschlüsseln, 
-fügen Sie dies zu models.py hinzu:
-
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from .encryption import encrypt_image_file
-
-@receiver(post_save, sender=UserProfile)
-def encrypt_verification_image(sender, instance, created, **kwargs):
-    if instance.verification_image:
-        file_path = instance.verification_image.path
-        if os.path.exists(file_path):
-            encrypt_image_file(file_path)
-"""

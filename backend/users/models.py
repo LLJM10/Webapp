@@ -45,7 +45,7 @@ def encrypt_verification_image(sender, instance, created, **kwargs):
                     return  # Bereits verschlüsselt
             
             if encrypt_image_file(file_path):
-                print(f"✓ Verifizierungsbild für User {instance.user.id} verschlüsselt")
+                print(f"Verifizierungsbild für User {instance.user.id} verschlüsselt")
             else:
-                print(f"✗ Fehler beim Verschlüsseln des Bildes für User {instance.user.id}")
+                print(f"Fehler beim Verschlüsseln des Bildes für User {instance.user.id}")
 

@@ -1,18 +1,14 @@
-/* assets/main.css - KORRIGIERTE & RESPONSIVE VERSION (Mobile First) */
+
 
 :root{
-  /* FARBVARIABLEN */
   --bg:#061022; --card:#0b1320; --muted:#9fb0c8; --accent:#5eead4; --accent-2:#60a5fa;
   --glass: rgba(255,255,255,0.03); --radius:12px; --shadow: 0 10px 30px rgba(2,6,23,0.6);
   font-family:'Inter',ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
   
-  /* WICHTIG: Setzt die Basis für responsive rem-Berechnungen */
   font-size: 16px; 
 }
 
-/* -------------------------------------- */
-/* BASIS & TYPOGRAPHIE                    */
-/* -------------------------------------- */
+/* BASIS & TYPOGRAPHIE */
 
 *{box-sizing:border-box}
 
@@ -21,7 +17,7 @@ html,body{
   margin:0;
   background:linear-gradient(180deg,#020a14,#071126 65%);
   color:#eaf6fb;
-  overflow-x: hidden; /* Verhindert horizontales Scrollen */
+  overflow-x: hidden;
 }
 
 a{color:var(--accent);text-decoration:none}
@@ -29,39 +25,34 @@ h1,h2,h3{margin:0}
 .muted{color:var(--muted)}
 .lead{color:var(--muted);line-height:1.5}
 
-/* Container mit dynamischem Padding für Mobile */
 .container{
   width: 100%; 
   max-width: 1200px; 
-  margin: 1.75rem auto; /* 28px */
-  padding: 0 1.25rem; /* 20px */
+  margin: 1.75rem auto;
+  padding: 0 1.25rem;
 }
 
-/* H1 mit responsiver Skalierung */
 h1.large{
   font-size: clamp(1.8rem, 5vw, 2.5rem); 
   line-height: 1.1;
 }
 
-/* -------------------------------------- */
-/* HEADER & NAVIGATION (Mobile First)     */
-/* -------------------------------------- */
+/* HEADER & NAVIGATION */
 
 header{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding: 0.75rem 1.25rem; /* 12px 20px - Reduziert für Mobile */
+  padding: 0.75rem 1.25rem;
   background:rgba(2,6,12,0.45);
   backdrop-filter:blur(6px);
   position:sticky;top:0;z-index:60;
   border-bottom:1px solid rgba(255,255,255,0.02);
-  flex-wrap: wrap; /* Erlaubt Umbruch auf sehr kleinen Screens */
+  flex-wrap: wrap;
 }
 
 .brand{display:flex;align-items:center;gap:0.75rem}
 
-/* Logo auf Mobile kleiner */
 .logo{
   width:40px;height:40px;border-radius:8px;
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
@@ -69,9 +60,8 @@ header{
   font-weight:900;color:#021;font-size:1rem;
 }
 
-/* Navigation: Auf Mobile versteckt (oder nur bei Bedarf in einer Sidebar) */
 nav{
-  display:none; /* WICHTIG: Versteckt die Nav-Links auf Mobile */
+  display:none;
   gap: 0.75rem;
   align-items:center;
 }
@@ -94,26 +84,23 @@ nav a.nuxt-link-exact-active{color:#fff;background:rgba(255,255,255,0.03)}
 
 .profile-list {
   display: flex;
-  flex-direction: column; /* Ordnet die Elemente untereinander an */
-  gap: 24px;              /* Fügt den gewünschten großen Abstand hinzu */
-  max-width: 800px;       /* Sorgt für bessere Lesbarkeit auf breiten Bildschirmen */
-  margin: 24px auto 0;  /* Zentriert die Liste horizontal und gibt Abstand nach oben */
+  flex-direction: column; 
+  gap: 24px;              
+  max-width: 800px;       
+  margin: 24px auto 0;  
 }
 
-
-/* -------------------------------------- */
-/* GRIDS & LAYOUT (Mobile First Stacking) */
-/* -------------------------------------- */
+/* GRIDS & LAYOUT */
 
 .hero{
-  display:flex; /* Wechsel auf Flexbox für vertikales Stapeln */
+  display:flex;
   flex-direction: column; 
   gap: 1.5rem;
   margin-top:1.2rem;
 }
 
 .detail-grid{
-  display:flex; /* Wechsel auf Flexbox für vertikales Stapeln */
+  display:flex;
   flex-direction: column; 
   gap: 1rem;
   margin-top:1rem;
@@ -121,14 +108,14 @@ nav a.nuxt-link-exact-active{color:#fff;background:rgba(255,255,255,0.03)}
 
 .grid-3{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); /* Reduzierte Min-Breite für Mobile */
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
   gap: 1rem;
   margin-top:1.2rem;
 }
 
 .list{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); /* Reduzierte Min-Breite für Mobile */
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
   gap: 1rem;
   margin-top:1.2rem;
 }
@@ -136,10 +123,7 @@ nav a.nuxt-link-exact-active{color:#fff;background:rgba(255,255,255,0.03)}
 .profiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .events-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
 
-
-/* -------------------------------------- */
-/* CARDS, BUTTONS & INTERACTIONS          */
-/* -------------------------------------- */
+/* CARDS & BUTTONS */
 
 .hero-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:1.4rem;border-radius:14px}
 .card{background:var(--card);padding:1rem;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
@@ -164,11 +148,9 @@ nav a.nuxt-link-exact-active{color:#fff;background:rgba(255,255,255,0.03)}
 .tags{display:flex;gap:8px;flex-wrap:wrap}
 .tag{padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:999px;font-weight:700;font-size:13px;color:var(--muted)}
 
-/* Table (Asset Management Style) */
 table{width:100%;border-collapse:collapse}
 th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03);font-size:13px;color:#cfe3f5}
 
-/* Micro Interactions & Utilities */
 .pitch:hover{transform:translateY(-6px)}
 .btn:hover{transform:translateY(-3px)}
 .blur{filter:blur(6px);opacity:.6}
@@ -176,32 +158,24 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
 .v-enter-active, .v-leave-active { transition: opacity 0.3s ease; }
 .v-enter-from, .v-leave-to { opacity: 0; }
 
+/* MEDIA QUERIES */
 
-/* -------------------------------------- */
-/* MEDIA QUERIES (Desktop Overrides)     */
-/* -------------------------------------- */
-
-/* Tablet und größere Bildschirme */
 @media (min-width: 768px){
-  /* Header & Navigation wird wieder zu einer Zeile */
   header {
-    padding: 1rem 1.5rem; /* 16px 24px */
+    padding: 1rem 1.5rem;
     flex-wrap: nowrap;
   }
   .logo{width:46px;height:46px;border-radius:10px;font-size:1.2rem;} 
   
-  /* Navigation wieder sichtbar machen */
   nav{display:flex;} 
 
-  /* Hero ändert sich von Stack zu 2 Spalten (zurück zu Grid) */
   .hero{
     display:grid; 
     grid-template-columns:1fr 460px;
-    gap: 1.625rem; /* 26px */
-    margin-top: 1.75rem; /* 28px */
+    gap: 1.625rem;
+    margin-top: 1.75rem;
   }
 
-  /* Detailseite geht von Stack zu 2 Spalten (zurück zu Grid) */
   .detail-grid{
     display:grid;
     grid-template-columns:1fr 360px;
@@ -209,28 +183,24 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
     margin-top:1rem;
   }
   
-  /* Container Padding wieder auf Original Desktop Wert */
   .container{
     padding: 0 20px;
   }
 }
 
-/* Große Desktop-Bildschirme */
 @media (min-width: 1200px){
   h1.large{
-    font-size: 2.5rem; /* Max-Größe festlegen */
+    font-size: 2.5rem;
   }
 }
 
-/* Hauptlayout für den Feed und die Sidebar */
 .feed-container {
   display: grid;
-  grid-template-columns: 2fr 1fr; /* Linke Spalte ist doppelt so breit */
+  grid-template-columns: 2fr 1fr;
   gap: 24px;
-  align-items: start; /* Verhindert, dass die Sidebar nach unten gestreckt wird */
+  align-items: start;
 }
 
-/* Linke Spalte: Feed mit Beiträgen */
 .posts-feed {
   display: flex;
   flex-direction: column;
@@ -238,7 +208,7 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
 }
 
 .post {
-  padding: 16px; /* Spezifisches Padding für Posts */
+  padding: 16px;
 }
 
 .post-header {
@@ -281,65 +251,61 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
   color: var(--accent);
 }
 
-/* Rechte Spalte: Sidebar */
 .sidebar-profile {
   display: flex;
-  align-items: flex-start; /* Richtet Bild und Info-Block oben aus */
+  align-items: flex-start;
   gap: 16px;
-  padding: 16px; /* Gibt der Karte inneren Abstand */
+  padding: 16px;
 }
 
 .avatar-rounded {
   width: 56px;
   height: 56px;
-  border-radius: 10px; /* Abgerundete Ecken statt Kreis */
+  border-radius: 10px;
   object-fit: cover;
   flex-shrink: 0;
 }
 
 .profile-details {
   display: flex;
-  flex-direction: column; /* Ordnet die Elemente (Info, Tags, Button) untereinander an */
-  flex-grow: 1;          /* Nimmt den restlichen Platz ein */
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .post-actions {
   margin-top: 16px;
   display: flex;
-  align-items: center; /* Stellt sicher, dass Icons und Text auf einer Linie sind */
-  gap: 24px;         /* Abstand ZWISCHEN den einzelnen Aktionen */
+  align-items: center;
+  gap: 24px;
   font-size: 14px;
 }
 
-/* Style für jedes einzelne Icon-Text-Paar (z.B. "👍 Gefällt mir") */
 .action-item {
   display: flex;
   align-items: center;
-  gap: 8px;            /* Kleiner Abstand ZWISCHEN Icon und Text */
+  gap: 8px;
   color: var(--muted);
   cursor: pointer;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
-/* Hover-Effekt, damit die Leiste interaktiv wirkt */
 .action-item:hover {
-  color: var(--accent); /* Nutzt die Akzentfarbe aus deinem Design */
+  color: var(--accent);
 }
 
 .button-wrapper {
   margin-top: 12px;
   display: flex;
-  justify-content: flex-end; /* Richtet den Button am rechten Rand aus */
+  justify-content: flex-end;
 }
 
-/* --- NEU: Formular-Styling --- */
 .input-group {
     margin-bottom: 16px;
 }
 .input-group label {
     display: block;
-    margin-bottom: 8px; /* Etwas mehr Abstand */
+    margin-bottom: 8px;
     font-weight: 500;
     font-size: 14px;
     color: var(--muted);
@@ -347,9 +313,9 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
 .input-group input,
 .input-group textarea {
     width: 100%;
-    background-color: var(--bg); /* Passt zum Hintergrund */
+    background-color: var(--bg);
     border: 1px solid rgba(255,255,255,0.04);
-    border-radius: 10px; /* Abgerundete Ecken wie bei Buttons */
+    border-radius: 10px;
     padding: 12px 14px;
     color: #eaf6fb;
     font-size: 1rem;
@@ -358,31 +324,26 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
 .input-group input:focus,
 .input-group textarea:focus {
     outline: none;
-    border-color: var(--accent-2); /* Hebt das aktive Feld hervor */
-    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2); /* Weicher Fokus-Schatten */
+    border-color: var(--accent-2);
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
 }
 .input-group textarea {
-    resize: vertical; /* Erlaubt nur vertikales Ändern der Größe */
+    resize: vertical;
     min-height: 80px;
 }
 ::placeholder {
     color: var(--muted);
     opacity: 0.6;
 }
-/* --- ENDE: Formular-Styling --- */
 
-/* Responsive Anpassung: Auf kleineren Bildschirmen alles untereinander */
 @media (max-width: 960px) {
   .feed-container {
     grid-template-columns: 1fr;
   }
 }
 
-/* ========================================
-   UTILITY CLASSES (wiederverwendbar)
-   ======================================== */
+/* UTILITY CLASSES */
 
-/* Spacing - Margin Top */
 .mt-4 { margin-top: 4px; }
 .mt-8 { margin-top: 8px; }
 .mt-10 { margin-top: 10px; }
@@ -393,7 +354,6 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
 .mt-28 { margin-top: 28px; }
 .mt-32 { margin-top: 32px; }
 
-/* Spacing - Margin Bottom */
 .mb-4 { margin-bottom: 4px; }
 .mb-8 { margin-bottom: 8px; }
 .mb-12 { margin-bottom: 12px; }
@@ -402,7 +362,6 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
 .mb-24 { margin-bottom: 24px; }
 .mb-32 { margin-bottom: 32px; }
 
-/* Spacing - Padding */
 .p-8 { padding: 8px; }
 .p-12 { padding: 12px; }
 .p-16 { padding: 16px; }
@@ -410,7 +369,6 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
 .p-24 { padding: 24px; }
 .p-28 { padding: 28px; }
 
-/* Layout - Flexbox */
 .flex { display: flex; }
 .flex-col { display: flex; flex-direction: column; }
 .flex-between { display: flex; justify-content: space-between; align-items: center; }
@@ -419,7 +377,6 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
 .flex-justify-center { display: flex; justify-content: center; }
 .flex-wrap { flex-wrap: wrap; }
 
-/* Layout - Gap */
 .gap-4 { gap: 4px; }
 .gap-8 { gap: 8px; }
 .gap-10 { gap: 10px; }
@@ -428,18 +385,15 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
 .gap-20 { gap: 20px; }
 .gap-24 { gap: 24px; }
 
-/* Text Alignment */
 .text-center { text-align: center; }
 .text-right { text-align: right; }
 .text-left { text-align: left; }
 
-/* Font Weight */
 .font-medium { font-weight: 500; }
 .font-semibold { font-weight: 600; }
 .font-bold { font-weight: 700; }
 .font-extrabold { font-weight: 800; }
 
-/* Common Card Styles */
 .card-base {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -459,7 +413,6 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* Section Styles */
 .section-title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -496,7 +449,6 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
   gap: 16px; 
 }
 
-/* Begrenzt Grid auf maximal 3 Spalten bei großen Bildschirmen */
 @media (min-width: 1400px) {
   .grid-auto-fit-280 { 
     grid-template-columns: repeat(auto-fit, minmax(320px, 400px)); 
@@ -506,16 +458,13 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
   }
 }
 
-/* Stack auf Mobile */
 @media (max-width: 768px) {
   .grid-1fr-360 {
     grid-template-columns: 1fr;
   }
 }
 
-/* ========================================
-   MODAL STYLES (Global Reusable)
-   ======================================== */
+/* MODAL STYLES */
 
 .modal-overlay {
   position: fixed;
@@ -600,9 +549,7 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
   justify-content: flex-end;
 }
 
-/* ========================================
-   HERO SECTION (Global Reusable)
-   ======================================== */
+/* HERO SECTION */
 
 .hero-section {
   position: relative;
@@ -647,9 +594,7 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
   flex-wrap: wrap;
 }
 
-/* ========================================
-   STAT/METRIC CARDS (Global Reusable)
-   ======================================== */
+/* STAT/METRIC CARDS */
 
 .stat-card {
   display: flex;
@@ -716,9 +661,7 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
   font-weight: 700;
 }
 
-/* ========================================
-   INFO ROWS/LISTS (Global Reusable)
-   ======================================== */
+/* INFO ROWS/LISTS */
 
 .info-list {
   display: flex;
@@ -762,9 +705,7 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
   border-radius: 12px;
 }
 
-/* ========================================
-   BADGE/PILL STYLES (Global Reusable)
-   ======================================== */
+/* BADGE/PILL STYLES */
 
 .badge-pill {
   padding: 4px 12px;
@@ -776,9 +717,7 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
   font-weight: 600;
 }
 
-/* ========================================
-   BUTTON VARIATIONS (Global Reusable)
-   ======================================== */
+/* BUTTON VARIATIONS */
 
 .btn-small {
   padding: 8px 14px;
@@ -826,9 +765,7 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
   font-size: 0.875rem;
 }
 
-/* ========================================
-   EMPTY STATE (Global Reusable)
-   ======================================== */
+/* EMPTY STATE */
 
 .empty-state {
   padding: 48px 24px;
@@ -857,9 +794,7 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
   margin-top: 8px;
 }
 
-/* ========================================
-   ALERT STYLES (Global Reusable)
-   ======================================== */
+/* ALERT STYLES */
 
 .alert {
   padding: 12px 16px;
@@ -891,9 +826,7 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
   color: #93c5fd;
 }
 
-/* ========================================
-   FORM ERROR STYLES (Global Reusable)
-   ======================================== */
+/* FORM ERROR STYLES */
 
 input.error,
 textarea.error {
@@ -907,9 +840,7 @@ textarea.error {
   display: block;
 }
 
-/* ========================================
-   SIDEBAR STYLES (Global Reusable)
-   ======================================== */
+/* SIDEBAR STYLES */
 
 .sidebar-card {
   background: var(--card);
@@ -923,9 +854,7 @@ textarea.error {
   margin: 0 0 16px 0;
 }
 
-/* ========================================
-   DOCUMENT/FILE CARD (Global Reusable)
-   ======================================== */
+/* DOCUMENT/FILE CARD */
 
 .document-item {
   display: flex;
@@ -972,10 +901,6 @@ textarea.error {
 .document-item:hover svg {
   opacity: 1;
 }
-
-/* ========================================
-   RESPONSIVE HERO (Global)
-   ======================================== */
 
 @media (max-width: 1024px) {
   .hero-title {
