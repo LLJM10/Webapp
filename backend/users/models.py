@@ -6,12 +6,12 @@ import os
 
 def user_verification_image_path(instance, filename):
     """
-    Generate unique file path for each user's verification image.
+    Generiert eindeutigen Dateipfad für das Verifizierungsbild jedes Benutzers.
     Format: verification_images/user_{user_id}_verification.jpg
     """
-    # Get file extension
+    # Dateiendung ermitteln
     ext = filename.split('.')[-1]
-    # Create unique filename based on user ID
+    # Eindeutigen Dateinamen basierend auf User-ID erstellen
     filename = f'user_{instance.user.id}_verification.{ext}'
     return os.path.join('verification_images', filename)
 

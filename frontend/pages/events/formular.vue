@@ -204,7 +204,7 @@ function handleImageChange(event) {
   
   imageFile.value = file;
   
-  // Preview erstellen
+  // Vorschau erstellen
   const reader = new FileReader();
   reader.onload = (e) => {
     imagePreview.value = e.target.result;
@@ -212,7 +212,7 @@ function handleImageChange(event) {
   reader.readAsDataURL(file);
 }
 
-// Helper: convert an ISO datetime to datetime-local format
+// Hilfsfunktion: ISO-Datetime in datetime-local-Format konvertieren
 function isoToDatetimeLocal(iso) {
   if (!iso) return '';
   const d = new Date(iso);
@@ -233,7 +233,7 @@ onMounted(async () => {
 
   if (id) {
     isEditMode.value = true;
-    // Load event from backend
+    // Event vom Backend laden
     if (apiBase) {
       try {
         const res = await fetch(`${apiBase}/events/${id}/`, { 
@@ -253,7 +253,7 @@ onMounted(async () => {
       }
     }
 
-    // Fallback: try to load from localStorage
+    // Fallback: Versuche von localStorage zu laden
     try {
       const saved = typeof window !== 'undefined' ? localStorage.getItem('myEvents') : null;
       if (saved) {

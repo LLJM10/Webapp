@@ -209,7 +209,7 @@ function handleImageChange(event) {
   
   imageFile.value = file;
   
-  // Preview erstellen
+  // Vorschau erstellen
   const reader = new FileReader();
   reader.onload = (e) => {
     imagePreview.value = e.target.result;
@@ -260,7 +260,7 @@ onMounted(async () => {
 
   if (id) {
     isEditMode.value = true;
-    // Try backend GET /pitches/:id/ first
+    // Versuche zuerst Backend GET /pitches/:id/
     if (apiBase) {
       try {
         const res = await fetch(`${apiBase}/pitches/${id}/`, { headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) } });
@@ -280,7 +280,7 @@ onMounted(async () => {
       }
     }
 
-    // Fallback: try to load from localStorage
+    // Fallback: Versuche aus localStorage zu laden
     try {
       const saved = typeof window !== 'undefined' ? localStorage.getItem('myPitches') : null;
       if (saved) {
@@ -303,7 +303,7 @@ async function handleCreatePitch() {
     return;
   }
 
-  // FormData für File Upload verwenden
+  // FormData für Datei-Upload verwenden
   const formData = new FormData();
   
   // Text-Felder hinzufügen
@@ -361,7 +361,7 @@ async function handleCreatePitch() {
               localStorage.setItem('access_token', newToken);
             }
             
-            // Retry original request with new token
+            // Erneuter Versuch mit neuem Token
             res = await fetch(`${apiBase}/pitches/${newPitch.value.id}/`, {
               method: 'PATCH',
               headers: {
@@ -442,7 +442,7 @@ async function handleCreatePitch() {
     }
   }
 
-  // Fallback: localStorage (kann keine Files speichern)
+  // Fallback: localStorage (kann keine Dateien speichern)
   try {
     const pitchToAdd = { 
       ...newPitch.value,

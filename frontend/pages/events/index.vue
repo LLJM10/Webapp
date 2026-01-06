@@ -30,7 +30,7 @@ onMounted(async () => {
   const apiBase = config.public?.apiBase;
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
-  // Fetch all public events from backend
+  // Alle öffentlichen Events vom Backend abrufen
   if (apiBase) {
     try {
       const res = await fetch(`${apiBase}/events/`, {

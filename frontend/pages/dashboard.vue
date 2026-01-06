@@ -904,7 +904,7 @@ onMounted(async () => {
     console.warn('No access token found - user may not be logged in');
   }
 
-  // Load pitches from backend
+  // Lade Pitches vom Backend
   const config = useRuntimeConfig();
   const apiBase = config.public?.apiBase;
   if (apiBase && token) {
@@ -927,7 +927,7 @@ onMounted(async () => {
     loadPitchesFromLocalStorage();
   }
 
-  // Load events from backend
+  // Lade Events vom Backend
   if (apiBase && token) {
     try {
       const res = await fetch(`${apiBase}/events/?mine=true`, {
@@ -948,7 +948,7 @@ onMounted(async () => {
     loadEventsFromLocalStorage();
   }
   
-  // Load investor-specific data
+  // Lade Investor-spezifische Daten
   if (user.value.role === 'investor') {
     await loadSavedPitches();
     await loadInvestorKPIs();
@@ -1011,31 +1011,31 @@ function truncateText(text, maxLength) {
   return text.substring(0, maxLength) + '...';
 }
 
-// Helper function to get the correct image URL
+// Hilfsfunktion zum Abrufen der korrekten Bild-URL
 function getImageUrl(imgPath, fallbackText = 'Image') {
   if (!imgPath) {
     return 'https://placehold.co/600x400/3b82f6/ffffff?text=' + encodeURIComponent(fallbackText);
   }
   
-  // If it's already a full URL (http/https), return as is
+  // Wenn es bereits eine vollständige URL ist (http/https), direkt zurückgeben
   if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) {
     return imgPath;
   }
   
-  // If it's a relative path from backend (e.g., /media/pitch_images/...)
+  // Wenn es ein relativer Pfad vom Backend ist (z.B. /media/pitch_images/...)
   if (imgPath.startsWith('/media/')) {
     const config = useRuntimeConfig();
     const apiBase = config.public?.apiBase || 'http://127.0.0.1:8000';
     return apiBase + imgPath;
   }
   
-  // If it's just a filename or relative path without /media/
+  // Wenn es nur ein Dateiname oder relativer Pfad ohne /media/ ist
   const config = useRuntimeConfig();
   const apiBase = config.public?.apiBase || 'http://127.0.0.1:8000';
   return `${apiBase}/media/${imgPath}`;
 }
 
-// Format currency for investor dashboard
+// Währungsformatierung für Investor-Dashboard
 function formatCurrency(amount) {
   if (amount >= 1000000) {
     return (amount / 1000000).toFixed(1) + 'M€';
@@ -1045,13 +1045,13 @@ function formatCurrency(amount) {
   return amount.toLocaleString('de-DE') + '€';
 }
 
-// Navigate to pitch detail page
+// Navigiere zur Pitch-Detailseite
 function navigateToDetail(pitchId) {
   const router = useRouter();
   router.push(`/detail/${pitchId}`);
 }
 
-// Load saved pitches for investors
+// Lade gespeicherte Pitches für Investoren
 async function loadSavedPitches() {
   if (user.value.role !== 'investor') return;
   
@@ -1076,7 +1076,7 @@ async function loadSavedPitches() {
   }
 }
 
-// Load investor KPIs dynamically from API
+// Lade Investor-KPIs dynamisch von der API
 async function loadInvestorKPIs() {
   if (user.value.role !== 'investor') return;
   
@@ -1102,7 +1102,7 @@ async function loadInvestorKPIs() {
   }
 }
 
-// Remove a saved pitch
+// Entferne einen gespeicherten Pitch
 async function removeSavedPitch(pitchId) {
   const config = useRuntimeConfig();
   const apiBase = config.public?.apiBase;
@@ -1123,7 +1123,7 @@ async function removeSavedPitch(pitchId) {
     });
     
     if (res.ok) {
-      // Remove from local list
+      // Entferne aus lokaler Liste
       savedPitches.value = savedPitches.value.filter(saved => saved.pitch.id !== pitchId);
       console.debug('Removed saved pitch:', pitchId);
     } else {
@@ -1136,7 +1136,7 @@ async function removeSavedPitch(pitchId) {
   }
 }
 
-// Load investor investments
+// Lade Investor-Investitionen
 async function loadInvestments() {
   if (user.value.role !== 'investor') return;
   
@@ -1204,7 +1204,7 @@ async function downloadCertificate(investmentId) {
     return;
   }
   
-  // Set loading state
+  // Ladezustand setzen
   downloadingCertificates.value = { ...downloadingCertificates.value, [investmentId]: true };
   
   try {
@@ -1216,10 +1216,10 @@ async function downloadCertificate(investmentId) {
     });
     
     if (res.ok) {
-      // Get the PDF blob
+      // PDF-Blob abrufen
       const blob = await res.blob();
       
-      // Get filename from content-disposition header or create default
+      // Dateinamen aus Content-Disposition-Header ermitteln oder Standardnamen erstellen
       const contentDisposition = res.headers.get('content-disposition');
       let filename = 'Investify_Zertifikat.pdf';
       
@@ -1230,7 +1230,7 @@ async function downloadCertificate(investmentId) {
         }
       }
       
-      // Create download link
+      // Download-Link erstellen
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -1238,7 +1238,7 @@ async function downloadCertificate(investmentId) {
       document.body.appendChild(link);
       link.click();
       
-      // Cleanup
+      // Aufräumen
       setTimeout(() => {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(link);
@@ -1253,7 +1253,7 @@ async function downloadCertificate(investmentId) {
     console.error('Error downloading certificate:', e);
     alert('Fehler beim Herunterladen des Zertifikats. Bitte versuchen Sie es später erneut.');
   } finally {
-    // Remove loading state
+    // Entferne Ladezustand
     downloadingCertificates.value = { ...downloadingCertificates.value, [investmentId]: false };
   }
 }
@@ -1280,7 +1280,7 @@ function handleEventImageChange(event) {
   
   eventImageFile.value = file;
   
-  // Preview erstellen
+  // Vorschau erstellen
   const reader = new FileReader();
   reader.onload = (e) => {
     eventImagePreview.value = e.target.result;
@@ -1310,7 +1310,7 @@ function handleEditEventImageChange(event) {
   
   editEventImageFile.value = file;
   
-  // Preview erstellen
+  // Vorschau erstellen
   const reader = new FileReader();
   reader.onload = (e) => {
     editEventImagePreview.value = e.target.result;
@@ -1335,7 +1335,7 @@ function handleCreatePitch() {
   };
 
   myPitches.value.unshift(pitchToAdd);
-  // Persist immediately so the pitch remains after reload
+  // Speichere sofort, damit der Pitch nach Reload erhalten bleibt
   savePitchesToLocalStorage();
   console.log('Neuer Pitch erstellt:', pitchToAdd);
   showCreateModal.value = false;
@@ -1345,7 +1345,7 @@ function handleCreatePitch() {
   };
 }
 
-// NEU: Funktion zum Öffnen des Event-Modals
+// Funktion zum Öffnen des Event-Modals
 async function openCreateEventModal() {
   showCreateEventModal.value = true;
   validationErrors.value = {};
@@ -1356,8 +1356,8 @@ async function openCreateEventModal() {
   }
 }
 
-// Helper: convert an ISO datetime (possibly with timezone) to a string
-// accepted by <input type="datetime-local"> ("YYYY-MM-DDTHH:MM").
+// Hilfsfunktion: ISO-Datetime (möglicherweise mit Zeitzone) in String konvertieren
+// der von <input type="datetime-local"> akzeptiert wird ("YYYY-MM-DDTHH:MM")
 function isoToDatetimeLocal(iso) {
   if (!iso) return '';
   const d = new Date(iso);

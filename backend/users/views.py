@@ -20,7 +20,7 @@ class UserViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['patch'], permission_classes=[IsAuthenticated])
     def update_email(self, request):
-        """Update user's email address"""
+        """Aktualisiert die E-Mail-Adresse des Benutzers."""
         user = request.user
         new_email = request.data.get('email')
         
@@ -30,14 +30,14 @@ class UserViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Check if email already exists
+        # Prüfen ob E-Mail bereits existiert
         if User.objects.filter(email=new_email).exclude(id=user.id).exists():
             return Response(
                 {'error': 'Diese E-Mail Adresse wird bereits verwendet'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Update email
+        # E-Mail aktualisieren
         user.email = new_email
         user.save()
         
@@ -53,10 +53,10 @@ class UserViewSet(viewsets.ModelViewSet):
         user = serializer.save()
         role = self.request.data.get('role', 'startup')
         
-        # Generate verification token
+        # Verifizierungs-Token generieren
         verification_token = secrets.token_urlsafe(32)
         
-        # Create UserProfile with verification token
+        # UserProfile mit Verifizierungs-Token erstellen
         profile = UserProfile.objects.create(
             user=user, 
             role=role,
@@ -64,10 +64,10 @@ class UserViewSet(viewsets.ModelViewSet):
             is_email_verified=False
         )
         
-        # Send verification email
+        # Verifizierungs-E-Mail senden
         verification_url = f"http://localhost:3000/verify-email?token={verification_token}"
         
-        # Debug: Print email settings (remove in production!)
+        # Debug: E-Mail-Einstellungen ausgeben (in Produktion entfernen!)
         print(f"=== EMAIL DEBUG ===")
         print(f"EMAIL_HOST_USER: {settings.EMAIL_HOST_USER}")
         print(f"EMAIL_HOST_PASSWORD: {'*' * len(settings.EMAIL_HOST_PASSWORD) if settings.EMAIL_HOST_PASSWORD else 'NOT SET'}")
@@ -112,7 +112,7 @@ def verify_email(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def verify_identity(request):
-    """Handle identity verification with uploaded image"""
+    """Verarbeitet Identitätsverifizierung mit hochgeladenem Bild."""
     try:
         user = request.user
         profile = UserProfile.objects.get(user=user)

@@ -25,23 +25,23 @@ class TodoViewSet(viewsets.ModelViewSet):
 
 class IsOwnerOrReadOnly(BasePermission):
     """
-    Custom permission: only allow owner of an object to edit/delete it.
+    Benutzerdefinierte Berechtigung: Nur der Eigentümer darf ein Objekt bearbeiten/löschen.
     """
     def has_object_permission(self, request, view, obj):
-        # Read permissions are allowed to any request (GET, HEAD, OPTIONS)
+        # Lesezugriff ist für alle Anfragen erlaubt (GET, HEAD, OPTIONS)
         if request.method in ['GET', 'HEAD', 'OPTIONS']:
             return True
-        # Write permissions are only allowed to the owner
+        # Schreibzugriff nur für den Eigentümer
         return obj.owner == request.user
 
 
 class PitchViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for Pitch model.
-    - Anonymous users can list/read public pitches.
-    - Authenticated users can create pitches (owner set automatically).
-    - Only owner can update/delete their pitches.
-    - ?mine=true filter returns only pitches of the authenticated user.
+    ViewSet für Pitch-Modell.
+    - Anonyme Benutzer können öffentliche Pitches lesen.
+    - Authentifizierte Benutzer können Pitches erstellen (Eigentümer wird automatisch gesetzt).
+    - Nur der Eigentümer kann seine Pitches aktualisieren/löschen.
+    - ?mine=true Filter gibt nur Pitches des authentifizierten Benutzers zurück.
     """
     queryset = Pitch.objects.all()
     serializer_class = PitchSerializer
@@ -49,30 +49,28 @@ class PitchViewSet(viewsets.ModelViewSet):
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def perform_create(self, serializer):
-        """Set owner to the current user when creating a pitch."""
+        """Setzt den Eigentümer auf den aktuellen Benutzer beim Erstellen eines Pitches."""
         serializer.save(owner=self.request.user)
 
     def get_queryset(self):
         """
-        Optionally filter queryset:
-        - ?mine=true returns only user's own pitches (requires auth)
-        - Otherwise returns public pitches (is_public=True) or all if staff
+        Optionale Filterung des Querysets:
+        - ?mine=true gibt nur eigene Pitches zurück (erfordert Authentifizierung)
+        - Sonst öffentliche Pitches (is_public=True) oder alle für Staff
         """
         qs = super().get_queryset()
         
-        # If user requests their own pitches
+        # Wenn Benutzer seine eigenen Pitches anfordert
         if self.request.query_params.get('mine') in ['1', 'true', 'True']:
             if self.request.user.is_authenticated:
                 return qs.filter(owner=self.request.user)
             else:
-                return qs.none()  # Anonymous users have no pitches
+                return qs.none()
         
-        # For public listing (marketplace)
+        # Für öffentliche Auflistung (Marketplace)
         if self.request.user.is_authenticated and self.request.user.is_staff:
-            # Staff can see all pitches
             return qs
         else:
-            # Public users see only public pitches
             return qs.filter(is_public=True)
         
         return qs
@@ -80,11 +78,11 @@ class PitchViewSet(viewsets.ModelViewSet):
 
 class EventViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for Event model.
-    - Anonymous users can list/read public events.
-    - Authenticated users can create events (owner set automatically).
-    - Only owner can update/delete their events.
-    - ?mine=true filter returns only events of the authenticated user.
+    ViewSet für Event-Modell.
+    - Anonyme Benutzer können öffentliche Events lesen.
+    - Authentifizierte Benutzer können Events erstellen (Eigentümer wird automatisch gesetzt).
+    - Nur der Eigentümer kann seine Events aktualisieren/löschen.
+    - ?mine=true Filter gibt nur Events des authentifizierten Benutzers zurück.
     """
     queryset = Event.objects.all()
     serializer_class = EventSerializer
@@ -124,9 +122,9 @@ class EventViewSet(viewsets.ModelViewSet):
 @permission_classes([IsAuthenticated])
 def generate_ai_description(request):
     """
-    Generate AI description using Groq API.
-    Expects: { "type": "pitch"|"event", "keywords": "...", "tone": "professional"|"creative"|"technical" }
-    Returns: { "description": "..." }
+    Generiert KI-Beschreibung mit Groq API.
+    Erwartet: { "type": "pitch"|"event", "keywords": "...", "tone": "professional"|"creative"|"technical" }
+    Gibt zurück: { "description": "..." }
     """
     try:
         from groq import Groq
@@ -136,7 +134,7 @@ def generate_ai_description(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
     
-    # Get request data
+    # Anfragedaten abrufen
     content_type = request.data.get('type', 'pitch')
     keywords = request.data.get('keywords', '')
     tone = request.data.get('tone', 'professional')
@@ -147,7 +145,7 @@ def generate_ai_description(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     
-    # Check if API key is configured
+    # Prüfen ob API-Schlüssel konfiguriert ist
     api_key = getattr(settings, 'GROQ_API_KEY', None)
     if not api_key:
         return Response(
@@ -155,7 +153,7 @@ def generate_ai_description(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
     
-    # Build prompt based on type and tone
+    # Prompt basierend auf Typ und Tonalität erstellen
     tone_map = {
         'professional': 'professionell und überzeugend',
         'creative': 'kreativ und einzigartig',
@@ -179,7 +177,7 @@ Schreibe 2-3 Sätze, die das Problem, die Lösung und den Mehrwert klar kommuniz
 Antworte NUR mit der Beschreibung, ohne zusätzliche Kommentare."""
     
     try:
-        # Call Groq API
+        # Groq API aufrufen
         client = Groq(api_key=api_key)
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
@@ -212,24 +210,24 @@ Antworte NUR mit der Beschreibung, ohne zusätzliche Kommentare."""
 
 class SavedPitchViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for SavedPitch model.
-    - Only authenticated users can save/unsave pitches.
-    - Users can only see their own saved pitches.
-    - Custom actions: save_pitch, unsave_pitch, check_saved
+    ViewSet für SavedPitch-Modell.
+    - Nur authentifizierte Benutzer können Pitches speichern/entfernen.
+    - Benutzer sehen nur ihre eigenen gespeicherten Pitches.
+    - Benutzerdefinierte Aktionen: save_pitch, unsave_pitch, check_saved
     """
     serializer_class = SavedPitchSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """Return only saved pitches of the current user."""
+        """Gibt nur gespeicherte Pitches des aktuellen Benutzers zurück."""
         return SavedPitch.objects.filter(user=self.request.user).select_related('pitch', 'pitch__owner')
 
     @action(detail=False, methods=['post'])
     def save_pitch(self, request):
         """
-        Save a pitch for the current user.
-        Expects: { "pitch_id": 123 }
-        Returns: SavedPitchSerializer data or error
+        Speichert einen Pitch für den aktuellen Benutzer.
+        Erwartet: { "pitch_id": 123 }
+        Gibt zurück: SavedPitchSerializer Daten oder Fehler
         """
         pitch_id = request.data.get('pitch_id')
         
@@ -247,7 +245,7 @@ class SavedPitchViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        # Create or get existing saved pitch
+        # Gespeicherten Pitch erstellen oder abrufen
         saved_pitch, created = SavedPitch.objects.get_or_create(
             user=request.user,
             pitch=pitch
@@ -263,9 +261,9 @@ class SavedPitchViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def unsave_pitch(self, request):
         """
-        Remove a saved pitch for the current user.
-        Expects: { "pitch_id": 123 }
-        Returns: success message or error
+        Entfernt einen gespeicherten Pitch für den aktuellen Benutzer.
+        Erwartet: { "pitch_id": 123 }
+        Gibt zurück: Erfolgsmeldung oder Fehler
         """
         pitch_id = request.data.get('pitch_id')
         
@@ -294,9 +292,9 @@ class SavedPitchViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def check_saved(self, request):
         """
-        Check if a pitch is saved by the current user.
-        Query param: ?pitch_id=123
-        Returns: { "saved": true/false }
+        Prüft ob ein Pitch vom aktuellen Benutzer gespeichert ist.
+        Query-Parameter: ?pitch_id=123
+        Gibt zurück: { "saved": true/false }
         """
         pitch_id = request.query_params.get('pitch_id')
         
@@ -316,10 +314,10 @@ class SavedPitchViewSet(viewsets.ModelViewSet):
 
 class InvestmentViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for Investment model.
-    - Only authenticated investors can create/view investments
-    - Users can only see their own investments
-    - Custom action for creating investment from marketplace
+    ViewSet für Investment-Modell.
+    - Nur authentifizierte Investoren können Investitionen erstellen/ansehen
+    - Benutzer sehen nur ihre eigenen Investitionen
+    - Benutzerdefinierte Aktion für Investitionen vom Marketplace
     """
     serializer_class = InvestmentSerializer
     permission_classes = [IsAuthenticated]
@@ -335,8 +333,8 @@ class InvestmentViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def invest(self, request):
         """
-        Create a new investment from marketplace.
-        Expects: { "pitch_id": 123, "amount": 50000, "equity_percentage": 5 }
+        Erstellt eine neue Investition vom Marketplace.
+        Erwartet: { "pitch_id": 123, "amount": 50000, "equity_percentage": 5 }
         """
         pitch_id = request.data.get('pitch_id')
         amount = request.data.get('amount')
@@ -356,14 +354,14 @@ class InvestmentViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        # Check if already invested
+        # Prüfen ob bereits investiert
         if Investment.objects.filter(investor=request.user, pitch=pitch).exists():
             return Response(
                 {"error": "You have already invested in this pitch"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Create investment
+        # Investition erstellen
         investment = Investment.objects.create(
             investor=request.user,
             pitch=pitch,
@@ -380,17 +378,17 @@ class InvestmentViewSet(viewsets.ModelViewSet):
 @permission_classes([IsAuthenticated])
 def investor_kpis(request):
     """
-    Calculate and return KPIs for investor dashboard.
-    Includes: total invested, portfolio count, watchlist, avg investment,
-    portfolio growth, ROI forecast, success rate, Value at Risk, and more.
+    Berechnet und gibt KPIs für das Investor-Dashboard zurück.
+    Enthält: Gesamtinvestition, Portfolio-Anzahl, Watchlist, Durchschnittsinvestition,
+    Portfolio-Wachstum, ROI-Prognose, Erfolgsquote, Value at Risk und mehr.
     """
     user = request.user
     
-    # Get all investments
+    # Alle Investitionen abrufen
     investments = Investment.objects.filter(investor=user)
     saved_pitches = SavedPitch.objects.filter(user=user)
     
-    # Basic KPIs
+    # Basis-KPIs
     total_invested = investments.aggregate(Sum('amount'))['amount__sum'] or Decimal('0')
     investment_count = investments.count()
     active_investments = investments.filter(status='active').count()
@@ -463,12 +461,12 @@ def investor_kpis(request):
             'amount': f'{inv.amount:,.0f}€'
         })
     
-    # Matching suggestions (top 3 pitches based on sector preference)
-    # Get user's most invested sectors
+    # Passende Vorschläge (Top 3 Pitches basierend auf Sektorpräferenz)
+    # Ermittle die am meisten investierten Sektoren des Benutzers
     top_sectors = sorted(sector_distribution.items(), key=lambda x: x[1], reverse=True)[:2]
     sector_names = [s[0] for s in top_sectors] if top_sectors else []
     
-    # Get pitches from preferred sectors that user hasn't invested in
+    # Hole Pitches aus bevorzugten Sektoren, in die der Benutzer noch nicht investiert hat
     invested_pitch_ids = investments.values_list('pitch_id', flat=True)
     matching_pitches = Pitch.objects.filter(
         is_public=True,
@@ -477,7 +475,7 @@ def investor_kpis(request):
     
     matching_suggestions = []
     for pitch in matching_pitches:
-        match_score = 85 + (len(sector_names) * 5)  # Simple scoring
+        match_score = 85 + (len(sector_names) * 5)  # Einfache Bewertung
         matching_suggestions.append({
             'id': pitch.id,
             'title': pitch.title,
@@ -515,8 +513,8 @@ def investor_kpis(request):
 
 def calculate_value_at_risk(investments):
     """
-    Calculate Value at Risk (VaR) for portfolio.
-    Uses simplified Historical Simulation method with 95% confidence level.
+    Berechnet Value at Risk (VaR) für das Portfolio.
+    Verwendet vereinfachte Historische Simulationsmethode mit 95% Konfidenzniveau.
     """
     if not investments.exists():
         return {
@@ -526,10 +524,10 @@ def calculate_value_at_risk(investments):
             'riskLevel': 'Niedrig'
         }
     
-    # Calculate portfolio value
+    # Berechne Portfolio-Wert
     total_value = sum(float(inv.current_value) for inv in investments)
     
-    # Risk factors based on stage
+    # Risikofaktoren basierend auf Phase
     risk_factors = {
         'Pre-Seed': 0.45,  # 45% risk
         'Seed': 0.35,      # 35% risk
@@ -538,7 +536,7 @@ def calculate_value_at_risk(investments):
         'Reife': 0.08      # 8% risk
     }
     
-    # Calculate weighted average risk
+    # Berechne gewichtetes durchschnittliches Risiko
     total_invested = sum(float(inv.amount) for inv in investments)
     weighted_risk = 0
     
@@ -548,7 +546,7 @@ def calculate_value_at_risk(investments):
         weight = float(inv.amount) / total_invested if total_invested > 0 else 0
         weighted_risk += risk * weight
     
-    # VaR at 95% confidence level (1.65 standard deviations)
+    # VaR bei 95% Konfidenzniveau (1.65 Standardabweichungen)
     var_95 = total_value * weighted_risk * 1.65
     
     # VaR at 99% confidence level (2.33 standard deviations)
@@ -575,7 +573,7 @@ def calculate_value_at_risk(investments):
 
 
 def format_time_ago(dt):
-    """Format datetime as 'vor X Tagen/Stunden' """
+    """Formatiert datetime als 'vor X Tagen/Stunden'."""
     now = datetime.now()
     if dt.tzinfo is not None:
         from django.utils import timezone
@@ -599,27 +597,27 @@ def format_time_ago(dt):
 @permission_classes([IsAuthenticated])
 def generate_certificate_pdf(request, investment_id):
     """
-    Generate and download shareholder certificate PDF for an investment.
+    Generiert und lädt Aktionärszertifikat-PDF für eine Investition herunter.
     GET /api/investments/<id>/certificate/
     """
     from django.http import FileResponse
     from .pdf_generator import generate_investment_certificate
     
     try:
-        # Get investment and verify ownership
+        # Investition abrufen und Eigentümerschaft prüfen
         investment = Investment.objects.select_related('investor', 'pitch').get(id=investment_id)
         
-        # Check if user owns this investment
+        # Prüfen ob Benutzer diese Investition besitzt
         if investment.investor != request.user:
             return Response(
                 {"error": "Sie sind nicht berechtigt, dieses Zertifikat herunterzuladen."},
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Generate PDF
+        # PDF generieren
         pdf_buffer = generate_investment_certificate(investment)
         
-        # Return as file response
+        # Als Datei-Antwort zurückgeben
         filename = f"Investify_Zertifikat_{investment.pitch.title}_{investment_id}.pdf"
         response = FileResponse(pdf_buffer, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="{filename}"'

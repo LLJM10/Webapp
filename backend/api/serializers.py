@@ -110,7 +110,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """Cross-field validation"""
-        # Set host to username if not provided and event is public
+        # Setze Host auf Benutzernamen, falls nicht angegeben und Event öffentlich ist
         if data.get('is_public', True) and not data.get('host'):
             data['host'] = self.context['request'].user.username
         return data

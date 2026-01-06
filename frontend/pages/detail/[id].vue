@@ -257,23 +257,23 @@ const investmentForm = ref({
   equity_percentage: 5.0
 });
 
-// Computed property to check if user is an investor
+// Berechne, ob Benutzer ein Investor ist
 const isInvestor = computed(() => user.value.role === 'investor');
 
-// Open investment modal and initialize values from pitch
+// Investitionsmodal öffnen und Werte vom Pitch initialisieren
 function openInvestmentModal() {
   if (!pitch.value) return;
   
-  // Initialize investment form with pitch values
+  // Investitionsformular mit Pitch-Werten initialisieren
   investmentForm.value.amount = parseFloat(pitch.value.goal) || 50000;
   investmentForm.value.equity_percentage = parseFloat(pitch.value.equity) || 5.0;
   
-  // Reset error and open modal
+  // Fehler zurücksetzen und Modal öffnen
   investmentError.value = '';
   showInvestmentModal.value = true;
 }
 
-// Format currency helper
+// Hilfsfunktion zur Währungsformatierung
 function formatCurrency(value) {
   return new Intl.NumberFormat('de-DE', { 
     style: 'currency', 
@@ -287,31 +287,31 @@ function openMail() {
   window.location.href = 'mailto:startup@test.de'
 }
 
-// Helper function to get the correct image URL
+// Hilfsfunktion zum Abrufen der korrekten Bild-URL
 function getImageUrl(imgPath, fallbackText = 'Pitch') {
   if (!imgPath) {
     return 'https://placehold.co/1200x400/3b82f6/ffffff?text=' + encodeURIComponent(fallbackText);
   }
   
-  // If it's already a full URL (http/https), return as is
+  // Wenn es bereits eine vollständige URL ist (http/https), direkt zurückgeben
   if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) {
     return imgPath;
   }
   
-  // If it's a relative path from backend (e.g., /media/pitch_images/...)
+  // Wenn es ein relativer Pfad vom Backend ist (z.B. /media/pitch_images/...)
   if (imgPath.startsWith('/media/')) {
     const config = useRuntimeConfig();
     const apiBase = config.public?.apiBase || 'http://127.0.0.1:8000';
     return apiBase + imgPath;
   }
   
-  // If it's just a filename or relative path without /media/
+  // Wenn es nur ein Dateiname oder relativer Pfad ohne /media/ ist
   const config = useRuntimeConfig();
   const apiBase = config.public?.apiBase || 'http://127.0.0.1:8000';
   return `${apiBase}/media/${imgPath}`;
 }
 
-// Toggle save/unsave pitch
+// Pitch speichern/entfernen umschalten
 async function toggleSavePitch() {
   if (!pitch.value || !user.value || user.value.role !== 'investor') return;
   
@@ -353,7 +353,7 @@ async function toggleSavePitch() {
   }
 }
 
-// Check if pitch is already saved
+// Prüfe ob Pitch bereits gespeichert ist
 async function checkIfSaved() {
   if (!pitch.value || !user.value || user.value.role !== 'investor') return;
   
@@ -377,7 +377,7 @@ async function checkIfSaved() {
   }
 }
 
-// Submit investment
+// Investition absenden
 async function submitInvestment() {
   if (!pitch.value) return;
   
@@ -408,7 +408,7 @@ async function submitInvestment() {
   }
   
   try {
-    // Step 1: Create investment in database immediately
+    // Schritt 1: Investition sofort in Datenbank erstellen
     const res = await fetch(`${apiBase}/investments/invest/`, {
       method: 'POST',
       headers: {
@@ -425,11 +425,11 @@ async function submitInvestment() {
     if (res.ok) {
       const data = await res.json();
       
-      // Close modal and show success
+      // Modal schließen und Erfolg anzeigen
       showInvestmentModal.value = false;
       alert(`Investment erfolgreich gespeichert! (ID: ${data.id})`);
       
-      // Step 2: Open PayPal in new tab (non-blocking)
+      // Schritt 2: PayPal in neuem Tab öffnen (nicht blockierend)
       try {
         const { createOrder } = usePayPal();
         const returnUrl = `${window.location.origin}/dashboard?investment_success=${data.id}`;
@@ -444,17 +444,17 @@ async function submitInvestment() {
         
         const approval = paypalResp.approval_url || paypalResp.approvalUrl || paypalResp.data?.approval_url;
         if (approval) {
-          // Open PayPal in new tab
+          // PayPal in neuem Tab öffnen
           window.open(approval, '_blank');
         } else {
           console.error('No approval URL from PayPal', paypalResp);
         }
       } catch (paypalError) {
         console.error('PayPal error:', paypalError);
-        // Investment is already saved, so this is non-critical
+        // Investition ist bereits gespeichert, daher nicht kritisch
       }
       
-      // Redirect to dashboard after short delay
+      // Nach kurzer Verzögerung zum Dashboard weiterleiten
       setTimeout(() => {
         router.push('/dashboard');
       }, 2000);
@@ -476,7 +476,7 @@ onMounted(async () => {
   const pitchId = route.params.id;
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
-  // Load user data from backend
+  // Benutzerdaten vom Backend laden
   if (token) {
     try {
       const userRes = await fetch('http://127.0.0.1:8000/api/users/me/', {
@@ -497,7 +497,7 @@ onMounted(async () => {
     }
   }
 
-  // Load pitch data
+  // Pitch-Daten laden
   if (apiBase && pitchId) {
     try {
       const res = await fetch(`${apiBase}/pitches/${pitchId}/`, {
@@ -515,7 +515,7 @@ onMounted(async () => {
     }
   }
   
-  // Check if pitch is saved after loading
+  // Prüfe ob Pitch gespeichert ist nach dem Laden
   if (pitch.value && user.value.role === 'investor') {
     await checkIfSaved();
   }

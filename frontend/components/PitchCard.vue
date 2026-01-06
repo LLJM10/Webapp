@@ -104,18 +104,18 @@ const router = useRouter();
 const auth = useAuthStore();
 const config = useRuntimeConfig();
 
-// Helper function to get the correct image URL
+// Hilfsfunktion zum Abrufen der korrekten Bild-URL
 function getImageUrl(imgPath) {
   if (!imgPath) {
     return 'https://placehold.co/600x400/22c55e/ffffff?text=' + encodeURIComponent(props.pitch.title || 'Pitch');
   }
   
-  // If it's already a full URL (http/https), return as is
+  // Wenn es bereits eine vollständige URL ist (http/https), direkt zurückgeben
   if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) {
     return imgPath;
   }
   
-  // If it's a relative path from backend (e.g., /media/pitch_images/...)
+  // Wenn es ein relativer Pfad vom Backend ist (z.B. /media/pitch_images/...)
   if (imgPath.startsWith('/media/')) {
     const apiBase = config.public?.apiBase || 'http://127.0.0.1:8000';
     return apiBase + imgPath;

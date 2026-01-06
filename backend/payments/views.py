@@ -18,7 +18,7 @@ class CreateOrderView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        """Create a PayPal order for the given amount and currency.
+        """Erstellt eine PayPal-Bestellung für den angegebenen Betrag und die Währung.
 
         Request JSON: {"amount": "10.00", "currency": "EUR", "return_url": "...", "cancel_url": "..."}
         """
@@ -34,12 +34,12 @@ class CreateOrderView(APIView):
             client = PayPalClient()
             data = client.create_order(amount, currency, return_url, cancel_url)
         except Exception as e:
-            # Log and return a 502 Bad Gateway with the underlying error message
+            # Fehler loggen und 502 Bad Gateway mit zugrunde liegender Fehlermeldung zurückgeben
             logger.exception('Error creating PayPal order')
             return Response({'detail': 'Failed to create PayPal order', 'error': str(e)}, status=status.HTTP_502_BAD_GATEWAY)
 
         order_id = data.get('id')
-        # store a Payment record
+        # Zahlungsdatensatz speichern
         payment = Payment.objects.create(
             user=request.user,
             order_id=order_id,
@@ -123,14 +123,14 @@ class WebhookView(APIView):
         event_type = request.data.get('event_type')
         resource = request.data.get('resource', {})
 
-        # Handle common events
+        # Häufige Events verarbeiten
         if event_type == 'CHECKOUT.ORDER.APPROVED':
             order_id = resource.get('id')
-            # mark as approved
+            # Als genehmigt markieren
             Payment.objects.filter(order_id=order_id).update(status='APPROVED', raw_response=resource)
 
         if event_type == 'PAYMENT.CAPTURE.COMPLETED':
-            # resource contains capture details
+            # Resource enthält Capture-Details
             order_id = resource.get('supplementary_data', {}).get('related_ids', {}).get('order_id')
             capture_id = resource.get('id')
             Payment.objects.filter(order_id=order_id).update(status='COMPLETED', capture_id=capture_id, raw_response=resource)

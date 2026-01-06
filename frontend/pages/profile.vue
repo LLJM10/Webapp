@@ -228,7 +228,7 @@ const isCapturing = ref(false);
 const videoElement = ref<HTMLVideoElement | null>(null);
 const canvasElement = ref<HTMLCanvasElement | null>(null);
 
-// Avatar URL basierend auf Username
+// Avatar-URL basierend auf Benutzername
 const avatarUrl = computed(() => {
   const seed = user.value.username || 'user';
   return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
@@ -307,7 +307,7 @@ const saveEmail = async () => {
   }
 };
 
-// Logout
+// Abmelden
 const auth = useAuthStore();
 const handleLogout = () => {
   if (confirm('Möchten Sie sich wirklich abmelden?')) {
@@ -316,7 +316,7 @@ const handleLogout = () => {
   }
 };
 
-// Verification Camera Functions
+// Verifizierungs-Kamera Funktionen
 const startVerification = async () => {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({

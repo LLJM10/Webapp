@@ -19,9 +19,9 @@ from decimal import Decimal
 
 
 class CertificateGenerator:
-    """Generates professional investment certificates with bank-standard design."""
+    """Generiert professionelle Investitionszertifikate mit banküblichem Design."""
     
-    # Design constants - aligned with Investify brand colors
+    # Design-Konstanten - abgestimmt mit Investify-Markenfarben
     PRIMARY_COLOR = colors.HexColor('#061022')  # Dark navy (matching webapp bg)
     ACCENT_COLOR = colors.HexColor('#5eead4')   # Teal/Turquoise (matching webapp accent)
     ACCENT_2_COLOR = colors.HexColor('#60a5fa')  # Light blue (matching webapp accent-2)
@@ -34,9 +34,9 @@ class CertificateGenerator:
         self._setup_custom_styles()
     
     def _setup_custom_styles(self):
-        """Setup custom paragraph styles for the certificate."""
+        """Richtet benutzerdefinierte Absatzstile für das Zertifikat ein."""
         
-        # Title style (Sans-Serif for modern look, matching webapp)
+        # Titelstil (Sans-Serif für modernen Look, passend zur Webapp)
         self.title_style = ParagraphStyle(
             'CustomTitle',
             parent=self.styles['Heading1'],
@@ -48,7 +48,7 @@ class CertificateGenerator:
             spaceBefore=20
         )
         
-        # Subtitle style
+        # Untertitelstil
         self.subtitle_style = ParagraphStyle(
             'CustomSubtitle',
             parent=self.styles['Normal'],
@@ -59,7 +59,7 @@ class CertificateGenerator:
             spaceAfter=24
         )
         
-        # Body style
+        # Textstil
         self.body_style = ParagraphStyle(
             'CustomBody',
             parent=self.styles['Normal'],
@@ -70,7 +70,7 @@ class CertificateGenerator:
             spaceAfter=6
         )
         
-        # Footer style
+        # Fußzeilenstil
         self.footer_style = ParagraphStyle(
             'CustomFooter',
             parent=self.styles['Normal'],
@@ -82,7 +82,7 @@ class CertificateGenerator:
         )
     
     def _generate_qr_code(self, transaction_id):
-        """Generate QR code for transaction verification."""
+        """Generiert QR-Code für Transaktionsverifizierung."""
         qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -94,7 +94,7 @@ class CertificateGenerator:
         
         img = qr.make_image(fill_color="black", back_color="white")
         
-        # Convert to BytesIO
+        # In BytesIO konvertieren
         buffer = BytesIO()
         img.save(buffer, format='PNG')
         buffer.seek(0)
@@ -153,7 +153,7 @@ class CertificateGenerator:
             BytesIO or path to generated PDF
         """
         
-        # Create buffer
+        # Puffer erstellen
         if output_path is None:
             buffer = BytesIO()
             doc = SimpleDocTemplate(buffer, pagesize=A4,
@@ -164,14 +164,14 @@ class CertificateGenerator:
                                    leftMargin=40*mm, rightMargin=40*mm,
                                    topMargin=50*mm, bottomMargin=30*mm)
         
-        # Content elements
+        # Inhaltselemente
         story = []
         
-        # Title
+        # Titel
         title = Paragraph('Zeichnungsschein & Investmentbestätigung', self.title_style)
         story.append(title)
         
-        # Subtitle with dynamic data
+        # Untertitel mit dynamischen Daten
         investor_name = investment_data.get('investor_name', 'N/A')
         startup_name = investment_data.get('startup_name', 'N/A')
         subtitle_text = f'Hiermit bestätigen wir, dass {investor_name} Anteile an {startup_name} erworben hat.'
@@ -180,7 +180,7 @@ class CertificateGenerator:
         
         story.append(Spacer(1, 12))
         
-        # Transaction ID line
+        # Transaktions-ID Zeile
         transaction_id = investment_data.get('transaction_id', 'N/A')
         trans_text = f'<b>Transaktions-ID:</b> {transaction_id}'
         trans_para = Paragraph(trans_text, self.body_style)
@@ -188,14 +188,14 @@ class CertificateGenerator:
         
         story.append(Spacer(1, 20))
         
-        # Main data block (table with light gray background)
+        # Hauptdatenblock (Tabelle mit hellgrauem Hintergrund)
         investment_amount = investment_data.get('investment_amount', Decimal('0'))
         share_count = investment_data.get('share_count', 0)
         equity_percentage = investment_data.get('equity_percentage', Decimal('0'))
         investor_address = investment_data.get('investor_address', 'Keine Adresse hinterlegt')
         transaction_date = investment_data.get('transaction_date', datetime.now())
         
-        # Format date
+        # Datum formatieren
         if isinstance(transaction_date, str):
             try:
                 transaction_date = datetime.fromisoformat(transaction_date.replace('Z', '+00:00'))
@@ -288,10 +288,10 @@ def generate_investment_certificate(investment):
         BytesIO buffer containing the PDF
     """
     
-    # Calculate share count (simplified: 1 share per 100 EUR)
+    # Berechne Anzahl der Anteile (vereinfacht: 1 Anteil pro 100 EUR)
     share_count = int(investment.amount / 100)
     
-    # Prepare investment data
+    # Investitionsdaten vorbereiten
     investment_data = {
         'investor_name': f"{investment.investor.first_name} {investment.investor.last_name}" if investment.investor.first_name else investment.investor.username,
         'investor_address': getattr(investment.investor, 'address', 'Landgrabenweg 149, 53227 Bonn'),

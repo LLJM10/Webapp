@@ -82,7 +82,7 @@ onMounted(async () => {
   const apiBase = config.public?.apiBase;
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
-  // Fetch all public pitches from backend
+  // Alle öffentlichen Pitches vom Backend abrufen
   if (apiBase) {
     try {
       const res = await fetch(`${apiBase}/pitches/`, {
@@ -95,7 +95,7 @@ onMounted(async () => {
         console.debug('Loaded preview pitches from backend:', previewStartups.value.length);
       } else {
         console.warn('Backend pitches request failed with status', res.status);
-        // Fallback to demo data
+        // Fallback auf Demo-Daten
         loadDemoPitches();
       }
     } catch (e) {
@@ -108,7 +108,7 @@ onMounted(async () => {
 });
 
 function loadDemoPitches() {
-  // Fallback: show demo pitches if backend unavailable
+  // Fallback: Zeige Demo-Pitches wenn Backend nicht erreichbar
   const startups = [
     { id:'s1', title:'SmartHome Energy', sector:'Energy', stage:'Seed', desc:'Dezentrale Energieoptimierung für Privathaushalte mittels Edge-AI und Lastverschiebung.', img:'https://picsum.photos/seed/s1/900/480', goal:'400k€', equity:8 },
     { id:'s2', title:'GreenCharge', sector:'AI', stage:'Series A', desc:'Batterie-Management für EV-Flotten mit optimierter Ladeplanung und Flotten-Analytics.', img:'https://picsum.photos/seed/s2/900/480', goal:'2.5M€', equity:12 },

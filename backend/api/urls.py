@@ -10,7 +10,7 @@ from rest_framework_simplejwt.views import (
     TokenBlacklistView,
 )
 
-# Create router and register viewsets
+# Router erstellen und ViewSets registrieren
 router = DefaultRouter()
 router.register(r'pitches', PitchViewSet, basename='pitch')
 router.register(r'events', EventViewSet, basename='event')
