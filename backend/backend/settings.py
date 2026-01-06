@@ -231,5 +231,9 @@ EMAIL_TIMEOUT = 30  # Timeout in Sekunden
 # Groq AI API Key
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
 
+# Encryption Key für Bildverschlüsselung
+# WICHTIG: In Produktion über Umgebungsvariable laden!
+ENCRYPTION_KEY = os.environ.get('ENCRYPTION_KEY')
+
 
 

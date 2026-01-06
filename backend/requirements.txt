@@ -1,4 +1,5 @@
 requests>=2.28
 reportlab>=4.0.0
 qrcode[pil]>=7.4.2
+cryptography>=41.0.0
 # The project likely already has Django and DRF installed. This file only lists the new library used by payments service.

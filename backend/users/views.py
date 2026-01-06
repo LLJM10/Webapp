@@ -5,6 +5,7 @@ from rest_framework import viewsets, status
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.conf import settings
+from django.http import HttpResponse
 import secrets
 import os
 from .models import UserProfile
@@ -166,6 +167,46 @@ def verify_identity(request):
             {'error': f'Fehler beim Hochladen: {str(e)}'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def view_verification_image(request, user_id):
+    """
+    Zeigt verschlüsseltes Verifizierungsbild.
+    Nur der Bildbesitzer oder Admins dürfen zugreifen.
+    """
+    try:
+        profile = UserProfile.objects.get(user_id=user_id)
+        
+        # Sicherheit: Nur eigenes Bild oder Admin darf zugreifen
+        if request.user.id != user_id and not request.user.is_staff:
+            return HttpResponse('Keine Berechtigung', status=403)
+        
+        if not profile.verification_image:
+            return HttpResponse('Kein Bild vorhanden', status=404)
+        
+        file_path = profile.verification_image.path
+        
+        # Versuche Bild zu entschlüsseln
+        from .encryption import decrypt_image_file
+        decrypted_data = decrypt_image_file(file_path)
+        
+        if decrypted_data:
+            # Erkenne Content-Type basierend auf Dateiendung
+            if file_path.lower().endswith('.png'):
+                content_type = 'image/png'
+            else:
+                content_type = 'image/jpeg'
+            return HttpResponse(decrypted_data, content_type=content_type)
+        
+        return HttpResponse('Entschlüsselung fehlgeschlagen', status=500)
+    
+    except UserProfile.DoesNotExist:
+        return HttpResponse('User nicht gefunden', status=404)
+    except Exception as e:
+        return HttpResponse(f'Fehler: {str(e)}', status=500)
+
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
