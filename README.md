@@ -20,7 +20,7 @@ source venv/Scripts/activate
     (pip install python) #pip install django djangorestframework django-cors-headers djangorestframework-simplejwt
     python manage.py runserver
     
-    ✅ Now backend runs at: http://127.0.0.1:8000
+    Now backend runs at: http://127.0.0.1:8000
 
 4. Start frontend
     Open new terminal
@@ -29,4 +29,4 @@ source venv/Scripts/activate
     npm run dev
 
     
-    ✅ Now frontend runs at: http://localhost:3000
+    Now frontend runs at: http://localhost:3000
