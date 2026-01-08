@@ -68,7 +68,7 @@ const clearTimeoutIfNeeded = () => {
 };
 
 const executeTypingAnimation = () => {
-  // Ensure we always have a string (guard against undefined when index out-of-range)
+  // Sicherstellen, dass wir immer einen String haben (Schutz gegen undefined bei Index außerhalb des Bereichs)
   const currentText = textArray.value[currentTextIndex.value] ?? '';
   const processedText = props.reverseMode ? currentText.split('').reverse().join('') : currentText;
 
@@ -77,7 +77,7 @@ const executeTypingAnimation = () => {
       isDeleting.value = false;
       if (currentTextIndex.value === textArray.value.length - 1 && !props.loop) return;
 
-      // onSentenceComplete expects a string; coalesce undefined to empty string
+      // onSentenceComplete erwartet einen String; undefined wird zu einem leeren String zusammengeführt
       props.onSentenceComplete?.(textArray.value[currentTextIndex.value] ?? '', currentTextIndex.value);
 
       currentTextIndex.value = (currentTextIndex.value + 1) % textArray.value.length;

@@ -121,7 +121,7 @@ function getImageUrl(imgPath) {
     return apiBase + imgPath;
   }
   
-  // If it's just a filename or relative path without /media/
+  // Wenn es nur ein Dateiname oder relativer Pfad ohne /media/ ist
   const apiBase = config.public?.apiBase || 'http://127.0.0.1:8000';
   return `${apiBase}/media/${imgPath}`;
 }
@@ -148,7 +148,7 @@ function navigateToDetail() {
 
 function formatValuation(val) {
   if (!val) return '';
-  // Remove € and spaces, keep the number
+  // Entferne € und Leerzeichen, behalte die Zahl
   return val.replace(/\s+/g, ' ');
 }
 </script>

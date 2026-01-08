@@ -37,12 +37,12 @@ def encrypt_verification_image(sender, instance, created, **kwargs):
         from .encryption import encrypt_image_file
         file_path = instance.verification_image.path
         if os.path.exists(file_path):
-            # Prüfe ob Datei bereits verschlüsselt ist (verschlüsselte Dateien starten mit gAA...)
+            # Prüfe ob Datei bereits verschlüsselt ist
             with open(file_path, 'rb') as f:
                 first_bytes = f.read(10)
                 # Wenn Datei nicht mit JPEG/PNG Header startet, ist sie wahrscheinlich verschlüsselt
                 if not (first_bytes.startswith(b'\xff\xd8\xff') or first_bytes.startswith(b'\x89PNG')):
-                    return  # Bereits verschlüsselt
+                    return 
             
             if encrypt_image_file(file_path):
                 print(f"Verifizierungsbild für User {instance.user.id} verschlüsselt")

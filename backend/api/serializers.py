@@ -10,8 +10,8 @@ class TodoSerializer(serializers.ModelSerializer):
 
 class PitchSerializer(serializers.ModelSerializer):
     """
-    Serializer for Pitch model.
-    owner is read-only and set automatically in the viewset.
+    Serializer für Pitch-Modell.
+    owner ist read-only und wird automatisch im ViewSet gesetzt.
     """
     owner = serializers.CharField(source='owner.username', read_only=True)
     
@@ -32,14 +32,14 @@ class PitchSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'owner', 'created_at', 'updated_at']
     
     def validate_img(self, value):
-        """Validate pitch image file"""
+        """Validiert Pitch-Bild-Datei"""
         if value and hasattr(value, 'size'):
             if value.size > 5242880:  # 5MB
                 raise serializers.ValidationError("Bild zu groß. Maximum: 5MB")
         return value
     
     def validate_pitch_deck(self, value):
-        """Validate pitch deck PDF file"""
+        """Validiert Pitch-Deck-PDF-Datei"""
         if value and not value.name.endswith('.pdf'):
             raise serializers.ValidationError("Nur PDF-Dateien erlaubt.")
         if value and value.size > 10485760:  # 10MB
@@ -47,7 +47,7 @@ class PitchSerializer(serializers.ModelSerializer):
         return value
     
     def validate_business_plan(self, value):
-        """Validate business plan PDF file"""
+        """Validiert Businessplan-PDF-Datei"""
         if value and not value.name.endswith('.pdf'):
             raise serializers.ValidationError("Nur PDF-Dateien erlaubt.")
         if value and value.size > 10485760:
@@ -55,7 +55,7 @@ class PitchSerializer(serializers.ModelSerializer):
         return value
     
     def validate_financial_report(self, value):
-        """Validate financial report PDF file"""
+        """Validiert Finanzbericht-PDF-Datei"""
         if value and not value.name.endswith('.pdf'):
             raise serializers.ValidationError("Nur PDF-Dateien erlaubt.")
         if value and value.size > 10485760:
@@ -65,9 +65,9 @@ class PitchSerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
     """
-    Serializer for Event model.
-    owner is read-only and set automatically in the viewset.
-    Includes validation for required fields.
+    Serializer für Event-Modell.
+    owner ist read-only und wird automatisch im ViewSet gesetzt.
+    Beinhaltet Validierung für Pflichtfelder.
     """
     owner = serializers.CharField(source='owner.username', read_only=True)
     img = serializers.ImageField(required=False, allow_null=True)
@@ -82,13 +82,13 @@ class EventSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'owner', 'created_at', 'updated_at']
 
     def validate_name(self, value):
-        """Event name must be at least 3 characters"""
+        """Event-Name muss mindestens 3 Zeichen haben"""
         if len(value.strip()) < 3:
             raise serializers.ValidationError("Event-Name muss mindestens 3 Zeichen haben.")
         return value
 
     def validate_duration(self, value):
-        """Duration must be positive and max 8 hours (480 min)"""
+        """Dauer muss positiv und maximal 8 Stunden (480 Min) sein"""
         if value <= 0:
             raise serializers.ValidationError("Dauer muss größer als 0 sein.")
         if value > 480:
@@ -96,20 +96,20 @@ class EventSerializer(serializers.ModelSerializer):
         return value
 
     def validate_date(self, value):
-        """Event date must be in the future"""
+        """Event-Datum muss in der Zukunft liegen"""
         if value < timezone.now():
             raise serializers.ValidationError("Event-Datum muss in der Zukunft liegen.")
         return value
 
     def validate_img(self, value):
-        """Validate event image file"""
+        """Validiert Event-Bild-Datei"""
         if value and hasattr(value, 'size'):
             if value.size > 5242880:  # 5MB
                 raise serializers.ValidationError("Bild zu groß. Maximum: 5MB")
         return value
 
     def validate(self, data):
-        """Cross-field validation"""
+        """Feldübergreifende Validierung"""
         # Setze Host auf Benutzernamen, falls nicht angegeben und Event öffentlich ist
         if data.get('is_public', True) and not data.get('host'):
             data['host'] = self.context['request'].user.username
@@ -118,8 +118,8 @@ class EventSerializer(serializers.ModelSerializer):
 
 class SavedPitchSerializer(serializers.ModelSerializer):
     """
-    Serializer for SavedPitch model.
-    Returns the full pitch data along with save timestamp.
+    Serializer für SavedPitch-Modell.
+    Gibt die vollständigen Pitch-Daten zusammen mit dem Speicherzeitpunkt zurück.
     """
     pitch = PitchSerializer(read_only=True)
     user = serializers.CharField(source='user.username', read_only=True)
@@ -132,8 +132,8 @@ class SavedPitchSerializer(serializers.ModelSerializer):
 
 class InvestmentSerializer(serializers.ModelSerializer):
     """
-    Serializer for Investment model.
-    Includes pitch details and calculated fields.
+    Serializer für Investment-Modell.
+    Beinhaltet Pitch-Details und berechnete Felder.
     """
     investor = serializers.CharField(source='investor.username', read_only=True)
     pitch = PitchSerializer(read_only=True)
@@ -152,13 +152,13 @@ class InvestmentSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'investor', 'investment_date', 'created_at', 'updated_at']
 
     def validate_amount(self, value):
-        """Investment amount must be positive"""
+        """Investment-Betrag muss positiv sein"""
         if value <= 0:
             raise serializers.ValidationError("Investment-Betrag muss größer als 0 sein.")
         return value
 
     def validate_equity_percentage(self, value):
-        """Equity percentage must be between 0 and 100"""
+        """Equity-Prozentsatz muss zwischen 0 und 100 liegen"""
         if value is not None and (value < 0 or value > 100):
             raise serializers.ValidationError("Equity-Anteil muss zwischen 0 und 100% liegen.")
         return value

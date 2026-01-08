@@ -20,7 +20,7 @@ class CreateOrderView(APIView):
     def post(self, request):
         """Erstellt eine PayPal-Bestellung für den angegebenen Betrag und die Währung.
 
-        Request JSON: {"amount": "10.00", "currency": "EUR", "return_url": "...", "cancel_url": "..."}
+        Anfrage-JSON: {"amount": "10.00", "currency": "EUR", "return_url": "...", "cancel_url": "..."}
         """
         amount = request.data.get('amount')
         currency = request.data.get('currency', 'EUR')
@@ -49,7 +49,7 @@ class CreateOrderView(APIView):
             raw_response=data,
         )
 
-        # find approval url
+        # Finde Genehmigungs-URL
         approval_url = None
         for link in data.get('links', []):
             if link.get('rel') == 'approve' or link.get('rel') == 'approval_url':
@@ -73,14 +73,14 @@ class CaptureOrderView(APIView):
             logger.exception('Error capturing PayPal order %s', order_id)
             return Response({'detail': 'Failed to capture PayPal order', 'error': str(e)}, status=status.HTTP_502_BAD_GATEWAY)
 
-        # Update Payment
+        # Aktualisiere Zahlung
         try:
             payment = Payment.objects.get(order_id=order_id)
         except Payment.DoesNotExist:
             payment = None
 
         if payment:
-            # capture details may contain capture id in purchase_units -> payments -> captures
+            # Capture-Details können Capture-ID in purchase_units -> payments -> captures enthalten
             captures = []
             for pu in data.get('purchase_units', []):
                 payments = pu.get('payments', {})
@@ -99,7 +99,7 @@ class WebhookView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        # Basic webhook handling: verify signature and process events
+        # Grundlegende Webhook-Verarbeitung: Signatur verifizieren und Events verarbeiten
         client = PayPalClient()
 
         transmission_id = request.META.get('HTTP_PAYPAL_TRANSMISSION_ID')
@@ -114,7 +114,7 @@ class WebhookView(APIView):
                 cert_url, auth_algo, transmission_sig
             )
         except Exception as e:
-            # If verification failed, still return 200 to avoid retries when not desired
+            # Wenn Verifizierung fehlschlägt, gebe trotzdem 200 zurück um ungewollte Wiederholungen zu vermeiden
             return Response({'detail': 'verification failed', 'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         if verification.get('verification_status') != 'SUCCESS':

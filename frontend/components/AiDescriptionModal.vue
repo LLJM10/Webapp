@@ -99,7 +99,7 @@ const tones = [
   { value: 'technical', label: 'Technisch', icon: '🔧' }
 ];
 
-// Reset when modal opens/closes
+// Zurücksetzen wenn Modal geöffnet/geschlossen wird
 watch(() => props.isOpen, (newVal) => {
   if (newVal) {
     error.value = '';
@@ -142,7 +142,6 @@ async function generateDescription() {
       })
     });
     
-    // Token expired? Try refresh
     if (response.status === 401) {
       const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
       if (refreshToken) {
@@ -159,7 +158,7 @@ async function generateDescription() {
             localStorage.setItem('access_token', token);
           }
           
-          // Retry original request with new token
+          // Ursprüngliche Anfrage mit neuem Token wiederholen
           response = await fetch(`${apiBase}/ai/generate-description/`, {
             method: 'POST',
             headers: {

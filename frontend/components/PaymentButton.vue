@@ -25,13 +25,11 @@ async function onPay() {
   loading.value = true
   error.value = null
   try {
-    // Use current page as return/cancel URL by default
     const returnUrl = typeof window !== 'undefined' ? window.location.href : ''
     const cancelUrl = returnUrl
 
     const resp = await createOrder({ amount: props.amount, currency: props.currency, returnUrl, cancelUrl })
 
-    // backend returns approval_url
     const approval = resp.approval_url || resp.approvalUrl || resp.data?.approval_url
     if (approval) {
       window.location.href = approval

@@ -49,5 +49,5 @@
 </template>
 
 <script setup>
-// Für diese statische Seite wird keine Script-Logik benötigt.
+
 </script>

@@ -1,6 +1,6 @@
 """
-PDF Certificate Generator for Investify
-Generates professional shareholder certificates for investments.
+PDF-Zertifikatsgenerator für Investify
+Generiert professionelle Aktionärszertifikate für Investitionen.
 """
 
 from reportlab.lib.pagesizes import A4
@@ -21,13 +21,13 @@ from decimal import Decimal
 class CertificateGenerator:
     """Generiert professionelle Investitionszertifikate mit banküblichem Design."""
     
-    # Design-Konstanten - abgestimmt mit Investify-Markenfarben
-    PRIMARY_COLOR = colors.HexColor('#061022')  # Dark navy (matching webapp bg)
-    ACCENT_COLOR = colors.HexColor('#5eead4')   # Teal/Turquoise (matching webapp accent)
-    ACCENT_2_COLOR = colors.HexColor('#60a5fa')  # Light blue (matching webapp accent-2)
-    TEXT_COLOR = colors.HexColor('#333333')     # Dark gray
+    # Design-Konstanten
+    PRIMARY_COLOR = colors.HexColor('#061022')  
+    ACCENT_COLOR = colors.HexColor('#5eead4')   
+    ACCENT_2_COLOR = colors.HexColor('#60a5fa')  
+    TEXT_COLOR = colors.HexColor('#333333')     
     LIGHT_GRAY = colors.HexColor('#f3f4f6')
-    HEADER_COLOR = colors.HexColor('#0b1320')   # Card background color
+    HEADER_COLOR = colors.HexColor('#0b1320')   
     
     def __init__(self):
         self.styles = getSampleStyleSheet()
@@ -36,7 +36,7 @@ class CertificateGenerator:
     def _setup_custom_styles(self):
         """Richtet benutzerdefinierte Absatzstile für das Zertifikat ein."""
         
-        # Titelstil (Sans-Serif für modernen Look, passend zur Webapp)
+        # Titelstil
         self.title_style = ParagraphStyle(
             'CustomTitle',
             parent=self.styles['Heading1'],
@@ -76,7 +76,7 @@ class CertificateGenerator:
             parent=self.styles['Normal'],
             fontName='Helvetica',
             fontSize=8,
-            textColor=colors.HexColor('#9fb0c8'),  # Matching webapp muted color
+            textColor=colors.HexColor('#9fb0c8'),  
             alignment=TA_LEFT,
             leading=10
         )
@@ -101,24 +101,24 @@ class CertificateGenerator:
         return buffer
     
     def _draw_header(self, canvas_obj, doc):
-        """Draw header with logo and transaction info."""
+        """Zeichnet Kopfzeile mit Logo und Transaktionsinformationen."""
         canvas_obj.saveState()
         
-        # Logo box with gradient effect (matching webapp logo style)
+        
         canvas_obj.setFillColor(self.ACCENT_COLOR)
         canvas_obj.roundRect(40*mm, 268*mm, 10*mm, 10*mm, 2*mm, fill=1, stroke=0)
         
-        # Logo text "iv" inside box
+        # Logo-Text "iv" in Box
         canvas_obj.setFont('Helvetica-Bold', 16)
         canvas_obj.setFillColor(self.PRIMARY_COLOR)
         canvas_obj.drawCentredString(45*mm, 271*mm, 'iv')
         
-        # Company name next to logo
+        # Firmenname neben Logo
         canvas_obj.setFont('Helvetica-Bold', 18)
         canvas_obj.setFillColor(self.PRIMARY_COLOR)
         canvas_obj.drawString(52*mm, 271*mm, 'investify')
         
-        # Transaction info (right side)
+        # Transaktionsinfo (rechte Seite)
         canvas_obj.setFont('Helvetica', 9)
         canvas_obj.setFillColor(self.TEXT_COLOR)
         canvas_obj.drawRightString(170*mm, 275*mm, f"Datum: {datetime.now().strftime('%d.%m.%Y')}")
@@ -126,7 +126,7 @@ class CertificateGenerator:
         canvas_obj.restoreState()
     
     def _draw_divider(self, canvas_obj, y_position):
-        """Draw horizontal divider line."""
+        """Zeichnet horizontale Trennlinie."""
         canvas_obj.saveState()
         canvas_obj.setStrokeColor(self.ACCENT_COLOR)
         canvas_obj.setLineWidth(2)
@@ -135,22 +135,22 @@ class CertificateGenerator:
     
     def generate_certificate(self, investment_data, output_path=None):
         """
-        Generate a shareholder certificate PDF.
+        Generiert ein Aktionärszertifikat als PDF.
         
         Args:
-            investment_data (dict): Dictionary containing:
-                - investor_name: Name of investor
-                - investor_address: Address (optional)
-                - startup_name: Name of startup
-                - investment_amount: Amount in EUR
-                - share_count: Number of shares
-                - transaction_date: Date of transaction
-                - transaction_id: Unique transaction ID
-                - equity_percentage: Equity percentage
-            output_path (str): Path to save PDF. If None, returns BytesIO.
+            investment_data (dict): Dictionary enthält:
+                - investor_name: Name des Investors
+                - investor_address: Adresse (optional)
+                - startup_name: Name des Startups
+                - investment_amount: Betrag in EUR
+                - share_count: Anzahl der Anteile
+                - transaction_date: Transaktionsdatum
+                - transaction_id: Eindeutige Transaktions-ID
+                - equity_percentage: Eigenkapitalanteil in Prozent
+            output_path (str): Pfad zum Speichern des PDFs. Falls None, gibt BytesIO zurück.
         
         Returns:
-            BytesIO or path to generated PDF
+            BytesIO oder Pfad zum generierten PDF
         """
         
         # Puffer erstellen
@@ -227,11 +227,11 @@ class CertificateGenerator:
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('LEFTPADDING', (0, 0), (0, -1), 16),
             ('RIGHTPADDING', (1, 0), (1, -1), 16),
-            # Highlight key data rows
+            # Wichtige Datenzeilen hervorheben
             ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
             ('FONTSIZE', (0, 0), (1, 0), 12),
             ('TEXTCOLOR', (1, 0), (1, 0), self.ACCENT_COLOR),
-            # Highlight investment sum
+            # Investitionssumme hervorheben
             ('FONTNAME', (0, 5), (1, 5), 'Helvetica-Bold'),
             ('FONTSIZE', (0, 5), (1, 5), 14),
             ('TEXTCOLOR', (1, 5), (1, 5), self.ACCENT_COLOR),
@@ -241,7 +241,7 @@ class CertificateGenerator:
         story.append(table)
         story.append(Spacer(1, 50))
         
-        # Signature section (without QR code)
+        # Signaturbereich (ohne QR-Code)
         signature_style = ParagraphStyle(
             'Signature',
             parent=self.body_style,
@@ -255,7 +255,7 @@ class CertificateGenerator:
         story.append(signature)
         story.append(Spacer(1, 30))
         
-        # Footer disclaimer
+        # Fußzeilen-Haftungsausschluss
         disclaimer_text = """
         <b>Hinweis:</b> Dieses Dokument wurde maschinell erstellt und dient als Bestätigung für die 
         Simulation auf der Plattform. Es begründet keine realen rechtlichen Ansprüche.
@@ -263,7 +263,7 @@ class CertificateGenerator:
         disclaimer = Paragraph(disclaimer_text, self.footer_style)
         story.append(disclaimer)
         
-        # Build PDF with custom page template
+        # PDF mit benutzerdefinierter Seitenvorlage erstellen
         def add_page_decorations(canvas_obj, doc):
             self._draw_header(canvas_obj, doc)
             self._draw_divider(canvas_obj, 265*mm)
@@ -279,16 +279,16 @@ class CertificateGenerator:
 
 def generate_investment_certificate(investment):
     """
-    Helper function to generate certificate for an Investment model instance.
+    Hilfsfunktion zum Generieren eines Zertifikats für eine Investment-Modellinstanz.
     
     Args:
-        investment: Investment model instance
+        investment: Investment-Modellinstanz
     
     Returns:
-        BytesIO buffer containing the PDF
+        BytesIO-Puffer mit dem PDF
     """
     
-    # Berechne Anzahl der Anteile (vereinfacht: 1 Anteil pro 100 EUR)
+    # Berechne Anzahl der Anteile 1 Anteil pro 100 EUR
     share_count = int(investment.amount / 100)
     
     # Investitionsdaten vorbereiten

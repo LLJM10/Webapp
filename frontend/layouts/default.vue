@@ -16,10 +16,9 @@
 </template>
 
 <script setup>
-// Nuxt 3 Composition API Setup Script
-// Kein Javascript nötig, da Header und Seiten die Logik übernehmen
+
 </script>
 
 <style>
-/* Die globalen styles/main.css werden via nuxt.config.ts eingebunden */
+
 </style>

@@ -828,7 +828,7 @@ const existingEventImage = ref(null);
 const editEventImageFile = ref(null);
 const editEventImagePreview = ref(null);
 
-// Investor KPI data - loaded dynamically from API
+// Investor-KPI-Daten - dynamisch von der API geladen
 const investorKPIs = ref({
   totalInvested: 0,
   startupCount: 0,
@@ -1161,7 +1161,7 @@ async function loadInvestments() {
   }
 }
 
-// Remove investment (for testing)
+// Investition entfernen (zum Testen)
 async function removeInvestment(investmentId) {
   const config = useRuntimeConfig();
   const apiBase = config.public?.apiBase;
@@ -1193,7 +1193,7 @@ async function removeInvestment(investmentId) {
   }
 }
 
-// Download certificate PDF for investment
+// Zertifikats-PDF für Investition herunterladen
 async function downloadCertificate(investmentId) {
   const config = useRuntimeConfig();
   const apiBase = config.public?.apiBase;
@@ -1947,7 +1947,7 @@ function handleAiGenerated(description) {
   box-shadow: 0 4px 12px rgba(94, 234, 212, 0.4);
 }
 
-/* Modal Overlay Override for Dashboard */
+/* Modal Overlay Override für Dashboard */
 .modal-overlay {
   overflow-y: auto;
 }
@@ -2497,7 +2497,7 @@ function handleAiGenerated(description) {
   color: var(--accent);
 }
 
-/* Saved Pitches Section */
+/* Gespeicherte Pitches Sektion */
 .saved-pitches-section {
   animation: fadeInUp 0.75s ease-out;
 }

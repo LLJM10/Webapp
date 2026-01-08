@@ -15,7 +15,7 @@ import os
 from dotenv import load_dotenv
 from datetime import timedelta
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Baue Pfade innerhalb des Projekts so: BASE_DIR / 'subdir'
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Umgebungsvariablen aus .env-Datei laden
@@ -32,19 +32,19 @@ print(f"EMAIL_HOST_PASSWORD from env: {'SET' if os.environ.get('EMAIL_HOST_PASSW
 print("="*50)
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+# Schnellstart-Entwicklungseinstellungen - nicht geeignet für Produktion
+# Siehe https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SICHERHEITSWARNUNG: Halte den Secret Key in Produktion geheim!
 SECRET_KEY = 'django-insecure-axba)-tj+rcs(e&6(*p=50np8-*0_!6oxv(pbcq(nba_7lexwh'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# SICHERHEITSWARNUNG: In Produktion nicht mit Debug laufen lassen!
 DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 
-# Application definition
+# Anwendungsdefinition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -106,7 +106,7 @@ DATABASES = {
 }
 
 
-# Password validation
+# Passwort-Validierung
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -125,7 +125,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
+# Internationalisierung
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
@@ -137,20 +137,20 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+# Statische Dateien (CSS, JavaScript, Bilder)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
 
-# Media files (user uploads)
+# Medien-Dateien (Benutzer-Uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# File upload settings
+# Datei-Upload-Einstellungen
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 
-# Default primary key field type
+# Standard-Primärschlüssel-Feldtyp
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -171,31 +171,31 @@ REST_FRAMEWORK = {
 }
 
 
-# JWT Token Settings (Django Simple JWT)
+# JWT Token-Einstellungen (Django Simple JWT)
 SIMPLE_JWT = {
-    # Token Lifetimes
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),        # Access Token gültig für 1 Stunde (statt 5 Min Standard)
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),        # Refresh Token gültig für 7 Tage (statt 1 Tag Standard)
+    # Token-Laufzeiten
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),        # Access Token gültig für 1 Stunde
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),        # Refresh Token gültig für 7 Tage
     
-    # Token Rotation & Blacklisting
+    # Token-Rotation & Blacklisting
     'ROTATE_REFRESH_TOKENS': False,                     # Bei Token-Refresh wird KEIN neuer Refresh Token erstellt
     'BLACKLIST_AFTER_ROTATION': True,                   # Alte Tokens werden nach Rotation auf Blacklist gesetzt
     'UPDATE_LAST_LOGIN': True,                          # Aktualisiert last_login bei jedem Token-Refresh
     
-    # Algorithm & Security
+    # Algorithmus & Sicherheit
     'ALGORITHM': 'HS256',                               # Hash-Algorithmus für Token-Signatur
     'SIGNING_KEY': SECRET_KEY,                          # Verwendet Django SECRET_KEY zum Signieren
     'VERIFYING_KEY': None,                              # Für asymmetrische Algorithmen (RS256, etc.)
     
-    # Token Headers
+    # Token-Header
     'AUTH_HEADER_TYPES': ('Bearer',),                   # Authorization Header Format: "Bearer <token>"
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',           # Header-Name für Authorization
     
-    # User Identification
+    # Benutzer-Identifikation
     'USER_ID_FIELD': 'id',                              # User Model Field für user_id Claim
     'USER_ID_CLAIM': 'user_id',                         # JWT Claim Name für User ID
     
-    # Token Types
+    # Token-Typen
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'TOKEN_TYPE_CLAIM': 'token_type',                   # JWT Claim für Token Type
     
@@ -206,24 +206,24 @@ SIMPLE_JWT = {
 }
 
 
-# PayPal settings (set real credentials as environment variables in production)
+# PayPal-Einstellungen (echte Anmeldedaten in Produktion als Umgebungsvariablen setzen)
 PAYPAL_MODE = os.environ.get("PAYPAL_MODE", "sandbox")  # "live" for production
 PAYPAL_CLIENT_ID = os.environ.get("PAYPAL_CLIENT_ID", "")
 PAYPAL_CLIENT_SECRET = os.environ.get("PAYPAL_CLIENT_SECRET", "")
-# If you use PayPal Webhook verification you'll need your webhook id
+# Falls PayPal Webhook-Verifizierung verwendet wird, wird die Webhook-ID benötigt
 PAYPAL_WEBHOOK_ID = os.environ.get("PAYPAL_WEBHOOK_ID", "")
 
-# Email settings
-# Development: Console Backend (E-Mails im Terminal)
+# E-Mail-Einstellungen
+# Entwicklung: Console Backend (E-Mails im Terminal)
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Production: SMTP Backend (echte E-Mails versenden)
+# Produktion: SMTP Backend (echte E-Mails versenden)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 465
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True  # WICHTIG: Bei Port 465 muss SSL auf True sein
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')  # Ihre Gmail-Adresse
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')  # Mail-Adresse
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')  # App-Passwort
 DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER', 'noreply@investify.com')  # Muss gleiche Adresse sein wie EMAIL_HOST_USER
 EMAIL_TIMEOUT = 30  # Timeout in Sekunden
@@ -231,8 +231,7 @@ EMAIL_TIMEOUT = 30  # Timeout in Sekunden
 # Groq AI API Key
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
 
-# Encryption Key für Bildverschlüsselung
-# WICHTIG: In Produktion über Umgebungsvariable laden!
+# Verschlüsselungsschlüssel für Bildverschlüsselung
 ENCRYPTION_KEY = os.environ.get('ENCRYPTION_KEY')
 
 

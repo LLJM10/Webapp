@@ -3,11 +3,12 @@ from django.conf import settings
 
 
 class PayPalClient:
-    """Minimal PayPal HTTP client without external SDK.
+    """Minimaler PayPal HTTP Client ohne externes SDK.
 
-    Uses client credentials to obtain an OAuth2 token and provides helpers to
-    create and capture orders. This is intentionally small and dependency-free
-    (uses requests). In production prefer official SDK and robust error handling.
+    Verwendet Client-Anmeldedaten um ein OAuth2-Token zu erhalten und bietet
+    Hilfsfunktionen zum Erstellen und Abschließen von Bestellungen. Dies ist
+    absichtlich klein und ohne Abhängigkeiten (nutzt requests). In der Produktion
+    sollte das offizielle SDK mit robuster Fehlerbehandlung verwendet werden.
     """
 
     def __init__(self):
@@ -16,11 +17,11 @@ class PayPalClient:
             self.base = 'https://api-m.paypal.com'
         else:
             self.base = 'https://api-m.sandbox.paypal.com'
-        # Read credentials from settings (set via env vars in production)
+        # Lese Anmeldedaten aus den Settings (in Produktion über Umgebungsvariablen setzen)
         self.client_id = getattr(settings, 'PAYPAL_CLIENT_ID', '')
         self.client_secret = getattr(settings, 'PAYPAL_CLIENT_SECRET', '')
         if not self.client_id or not self.client_secret:
-            # Fail fast with a clear message when credentials are missing
+            # Schnell fehlschlagen mit klarer Meldung wenn Anmeldedaten fehlen
             raise ValueError('PayPal client credentials are not configured (PAYPAL_CLIENT_ID / PAYPAL_CLIENT_SECRET)')
 
     def _get_access_token(self):
@@ -69,7 +70,7 @@ class PayPalClient:
         return resp.json()
 
     def verify_webhook_signature(self, transmission_id, timestamp, webhook_id, event_body, cert_url, auth_algo, transmission_sig):
-        # Uses PayPal verify-webhook-signature endpoint. Requires webhook_id configured in settings.
+        # Verwendet PayPal verify-webhook-signature Endpunkt. Benötigt webhook_id in den Settings.
         token = self._get_access_token()
         url = f"{self.base}/v1/notifications/verify-webhook-signature"
         headers = {

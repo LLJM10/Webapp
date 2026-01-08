@@ -1,5 +1,8 @@
 
 
+/* =====================================
+   CSS-VARIABLEN & GLOBALE EINSTELLUNGEN
+   ===================================== */
 :root{
   --bg:#061022; --card:#0b1320; --muted:#9fb0c8; --accent:#5eead4; --accent-2:#60a5fa;
   --glass: rgba(255,255,255,0.03); --radius:12px; --shadow: 0 10px 30px rgba(2,6,23,0.6);
@@ -38,6 +41,8 @@ h1.large{
 }
 
 /* HEADER & NAVIGATION */
+/* Sticky Header mit Glasmorphismus-Effekt  und Responsive Navigation
+   Ab 768px wird die Navigation sichtbar, auf Mobile-Geräten wird sie ausgeblendet */
 
 header{
   display:flex;
@@ -90,7 +95,7 @@ nav a.nuxt-link-exact-active{color:#fff;background:rgba(255,255,255,0.03)}
   margin: 24px auto 0;  
 }
 
-/* GRIDS & LAYOUT */
+
 
 .hero{
   display:flex;
@@ -124,6 +129,7 @@ nav a.nuxt-link-exact-active{color:#fff;background:rgba(255,255,255,0.03)}
 .events-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
 
 /* CARDS & BUTTONS */
+/* Basis-Komponenten mit Gradient-Buttons (primary) und Ghost-Buttons (transparent)*/
 
 .hero-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:1.4rem;border-radius:14px}
 .card{background:var(--card);padding:1rem;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
@@ -343,6 +349,7 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
 }
 
 /* UTILITY CLASSES */
+/* Tailwind-ähnliche Hilfsklassen für Margins, Padding, Flexbox und Text-Ausrichtung. */
 
 .mt-4 { margin-top: 4px; }
 .mt-8 { margin-top: 8px; }
@@ -465,6 +472,8 @@ th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)
 }
 
 /* MODAL STYLES */
+/* Overlay-Modal mit Blur-Effekt und Slide-In-Animation.
+   Modal-Card hat feste Struktur mit Header, Body und Footer für konsistente Dialoge */
 
 .modal-overlay {
   position: fixed;

@@ -89,30 +89,30 @@ class EventViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
-        """Set owner to the current user when creating an event."""
+        """Setzt den Eigentümer auf den aktuellen Benutzer beim Erstellen eines Events."""
         serializer.save(owner=self.request.user)
 
     def get_queryset(self):
         """
-        Optionally filter queryset:
-        - ?mine=true returns only user's own events (requires auth)
-        - Otherwise returns public events (is_public=True) or all if staff
+        Optionale Filterung des Querysets:
+        - ?mine=true gibt nur eigene Events zurück (erfordert Authentifizierung)
+        - Sonst öffentliche Events (is_public=True) oder alle für Staff
         """
         qs = super().get_queryset()
         
-        # If user requests their own events
+        # Wenn Benutzer seine eigenen Events anfordert
         if self.request.query_params.get('mine') in ['1', 'true', 'True']:
             if self.request.user.is_authenticated:
                 return qs.filter(owner=self.request.user)
             else:
                 return qs.none()  # Anonymous users have no events
         
-        # For public listing (marketplace)
+        # Für öffentliche Auflistung (Marketplace)
         if self.request.user.is_authenticated and self.request.user.is_staff:
-            # Staff can see all events
+            # Staff kann alle Events sehen
             return qs
         else:
-            # Public users see only public events
+            # Öffentliche Benutzer sehen nur öffentliche Events
             return qs.filter(is_public=True)
         
         return qs
@@ -141,7 +141,7 @@ def generate_ai_description(request):
     
     if not keywords:
         return Response(
-            {"error": "Keywords are required"},
+            {"error": "Stichwörter sind erforderlich"},
             status=status.HTTP_400_BAD_REQUEST
         )
     
@@ -280,12 +280,12 @@ class SavedPitchViewSet(viewsets.ModelViewSet):
             )
             saved_pitch.delete()
             return Response(
-                {"message": "Pitch removed from saved list"},
+                {"message": "Pitch aus gespeicherter Liste entfernt"},
                 status=status.HTTP_200_OK
             )
         except SavedPitch.DoesNotExist:
             return Response(
-                {"error": "Saved pitch not found"},
+                {"error": "Gespeicherter Pitch nicht gefunden"},
                 status=status.HTTP_404_NOT_FOUND
             )
 
@@ -300,7 +300,7 @@ class SavedPitchViewSet(viewsets.ModelViewSet):
         
         if not pitch_id:
             return Response(
-                {"error": "pitch_id query parameter is required"},
+                {"error": "pitch_id Query-Parameter ist erforderlich"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -323,11 +323,11 @@ class InvestmentViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """Return only investments of the current user."""
+        """Gibt nur Investitionen des aktuellen Benutzers zurück."""
         return Investment.objects.filter(investor=self.request.user).select_related('pitch', 'pitch__owner')
 
     def perform_create(self, serializer):
-        """Set investor to the current user when creating an investment."""
+        """Setzt den Investor auf den aktuellen Benutzer beim Erstellen einer Investition."""
         serializer.save(investor=self.request.user)
 
     @action(detail=False, methods=['post'])
@@ -342,7 +342,7 @@ class InvestmentViewSet(viewsets.ModelViewSet):
         
         if not pitch_id or not amount:
             return Response(
-                {"error": "pitch_id and amount are required"},
+                {"error": "pitch_id und amount sind erforderlich"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -357,7 +357,7 @@ class InvestmentViewSet(viewsets.ModelViewSet):
         # Prüfen ob bereits investiert
         if Investment.objects.filter(investor=request.user, pitch=pitch).exists():
             return Response(
-                {"error": "You have already invested in this pitch"},
+                {"error": "Sie haben bereits in diesen Pitch investiert"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -549,13 +549,13 @@ def calculate_value_at_risk(investments):
     # VaR bei 95% Konfidenzniveau (1.65 Standardabweichungen)
     var_95 = total_value * weighted_risk * 1.65
     
-    # VaR at 99% confidence level (2.33 standard deviations)
+    # VaR bei 99% Konfidenzniveau (2.33 Standardabweichungen)
     var_99 = total_value * weighted_risk * 2.33
     
-    # Expected loss (average loss in worst 5% scenarios)
+    # Erwarteter Verlust (durchschnittlicher Verlust in den schlechtesten 5% Szenarien)
     expected_loss = var_95 * 1.3
     
-    # Risk level classification
+    # Risikoebenen-Klassifizierung
     if weighted_risk < 0.20:
         risk_level = 'Niedrig'
     elif weighted_risk < 0.35:

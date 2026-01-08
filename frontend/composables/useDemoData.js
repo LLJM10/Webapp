@@ -19,7 +19,7 @@ export const useRole = () => useState('currentRole', () => 'startup');
 export const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /**
- * Dummy-Funktion zur Simulation von API-Aufrufen und Behebung des Modul-Fehlers.
+ * Dummy-Funktion zur Simulation von API-Aufrufen.
  */
 export function dummyApi(endpoint){
   alert('Dummy API Call: ' + endpoint);
@@ -27,9 +27,7 @@ export function dummyApi(endpoint){
 }
 
 
-// ------------------------------------
-// --- DEMO DATA (EXPORTS) ---
-// ------------------------------------
+// DEMO DATEN FÜR STARTUPS, PROFILE, EVENTS
 
 export const startups = [
   { 

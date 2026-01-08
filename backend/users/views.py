@@ -67,12 +67,12 @@ class UserViewSet(viewsets.ModelViewSet):
         # Verifizierungs-E-Mail senden
         verification_url = f"http://localhost:3000/verify-email?token={verification_token}"
         
-        # Debug: E-Mail-Einstellungen ausgeben (in Produktion entfernen!)
-        print(f"=== EMAIL DEBUG ===")
-        print(f"EMAIL_HOST_USER: {settings.EMAIL_HOST_USER}")
-        print(f"EMAIL_HOST_PASSWORD: {'*' * len(settings.EMAIL_HOST_PASSWORD) if settings.EMAIL_HOST_PASSWORD else 'NOT SET'}")
-        print(f"Sending email to: {user.email}")
-        print(f"==================")
+        # Debug: E-Mail-Einstellungen ausgeben 
+        #print(f"=== EMAIL DEBUG ===")
+        # print(f"EMAIL_HOST_USER: {settings.EMAIL_HOST_USER}")
+        # print(f"EMAIL_HOST_PASSWORD: {'*' * len(settings.EMAIL_HOST_PASSWORD) if settings.EMAIL_HOST_PASSWORD else 'NOT SET'}")
+        # print(f"Sending email to: {user.email}")
+        # print(f"==================")
         
         try:
             send_mail(

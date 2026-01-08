@@ -22,45 +22,45 @@ class Todo(models.Model):
 
 class Pitch(models.Model):
     """
-    Model to store startup pitches created by users.
-    Each pitch is owned by a user (ForeignKey to AUTH_USER_MODEL).
+    Modell zum Speichern von Startup-Pitches, die von Benutzern erstellt wurden.
+    Jeder Pitch gehört einem Benutzer (ForeignKey zu AUTH_USER_MODEL).
     """
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='pitches',
-        help_text='User who created this pitch'
+        help_text='Benutzer, der diesen Pitch erstellt hat'
     )
-    title = models.CharField(max_length=200, help_text='Startup name or pitch title')
-    sector = models.CharField(max_length=100, blank=True, help_text='Industry sector')
-    stage = models.CharField(max_length=50, blank=True, help_text='Funding stage (e.g., Seed, Series A)')
-    goal = models.CharField(max_length=64, blank=True, help_text='Funding goal (e.g., 500.000€)')
-    equity = models.IntegerField(null=True, blank=True, help_text='Equity percentage offered')
-    desc = models.TextField(blank=True, help_text='Pitch description')
-    img = models.ImageField(upload_to='pitch_images/', blank=True, null=True, help_text='Pitch card image')
-    valuation = models.CharField(max_length=64, blank=True, help_text='Calculated valuation')
+    title = models.CharField(max_length=200, help_text='Startup-Name oder Pitch-Titel')
+    sector = models.CharField(max_length=100, blank=True, help_text='Branche')
+    stage = models.CharField(max_length=50, blank=True, help_text='Finanzierungsphase (z.B. Seed, Series A)')
+    goal = models.CharField(max_length=64, blank=True, help_text='Finanzierungsziel (z.B. 500.000€)')
+    equity = models.IntegerField(null=True, blank=True, help_text='Angebotener Eigenkapitalanteil in Prozent')
+    desc = models.TextField(blank=True, help_text='Pitch-Beschreibung')
+    img = models.ImageField(upload_to='pitch_images/', blank=True, null=True, help_text='Pitch-Kartenbild')
+    valuation = models.CharField(max_length=64, blank=True, help_text='Berechnete Bewertung')
     
     # PDF file uploads
     pitch_deck = models.FileField(
         upload_to='pitch_decks/',
         blank=True,
         null=True,
-        help_text='Pitch Deck PDF file'
+        help_text='Pitch-Deck-PDF-Datei'
     )
     business_plan = models.FileField(
         upload_to='business_plans/',
         blank=True,
         null=True,
-        help_text='Business Plan PDF file'
+        help_text='Businessplan-PDF-Datei'
     )
     financial_report = models.FileField(
         upload_to='financial_reports/',
         blank=True,
         null=True,
-        help_text='Financial Report PDF file'
+        help_text='Finanzbericht-PDF-Datei'
     )
     
-    is_public = models.BooleanField(default=True, help_text='Whether pitch is visible on marketplace')
+    is_public = models.BooleanField(default=True, help_text='Ob Pitch auf Marktplatz sichtbar ist')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -75,30 +75,30 @@ class Pitch(models.Model):
 
 class Event(models.Model):
     """
-    Model to store events created by users.
-    Each event is owned by a user (ForeignKey to AUTH_USER_MODEL).
+    Modell zum Speichern von Events, die von Benutzern erstellt wurden.
+    Jedes Event gehört einem Benutzer (ForeignKey zu AUTH_USER_MODEL).
     """
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='events',
-        help_text='User who created this event'
+        help_text='Benutzer, der dieses Event erstellt hat'
     )
-    name = models.CharField(max_length=200, help_text='Event name')
-    topic = models.CharField(max_length=200, help_text='Event topic or panel description')
-    location = models.CharField(max_length=200, help_text='Location or platform (e.g., MS Teams, Zoom)')
-    duration = models.IntegerField(help_text='Duration in minutes')
-    date = models.DateTimeField(help_text='Event date and time')
-    link = models.URLField(blank=True, help_text='Meeting link or registration URL')
-    description = models.TextField(help_text='Detailed event description')
-    img = models.ImageField(upload_to='event_images/', blank=True, null=True, help_text='Event cover image')
-    host = models.CharField(max_length=200, blank=True, help_text='Host name or organization')
-    is_public = models.BooleanField(default=True, help_text='Whether event is visible on marketplace')
+    name = models.CharField(max_length=200, help_text='Event-Name')
+    topic = models.CharField(max_length=200, help_text='Event-Thema oder Panel-Beschreibung')
+    location = models.CharField(max_length=200, help_text='Ort oder Plattform (z.B. MS Teams, Zoom)')
+    duration = models.IntegerField(help_text='Dauer in Minuten')
+    date = models.DateTimeField(help_text='Event-Datum und -Zeit')
+    link = models.URLField(blank=True, help_text='Meeting-Link oder Registrierungs-URL')
+    description = models.TextField(help_text='Detaillierte Event-Beschreibung')
+    img = models.ImageField(upload_to='event_images/', blank=True, null=True, help_text='Event-Titelbild')
+    host = models.CharField(max_length=200, blank=True, help_text='Host-Name oder Organisation')
+    is_public = models.BooleanField(default=True, help_text='Ob Event auf Marktplatz sichtbar ist')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['date']  # Order by event date (upcoming first)
+        ordering = ['date']  # Nach Event-Datum sortieren (anstehende zuerst)
         verbose_name = 'Event'
         verbose_name_plural = 'Events'
 
@@ -108,25 +108,24 @@ class Event(models.Model):
 
 class SavedPitch(models.Model):
     """
-    Model to store saved/bookmarked pitches by investors.
-    Many-to-Many relationship between users and pitches.
+    Modell zum Speichern von gespeicherten/gemerkten Pitches durch Investoren.
     """
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='saved_pitches',
-        help_text='User who saved this pitch'
+        help_text='Benutzer, der diesen Pitch gespeichert hat'
     )
     pitch = models.ForeignKey(
         Pitch,
         on_delete=models.CASCADE,
         related_name='saved_by',
-        help_text='The saved pitch'
+        help_text='Der gespeicherte Pitch'
     )
-    saved_at = models.DateTimeField(auto_now_add=True, help_text='When the pitch was saved')
+    saved_at = models.DateTimeField(auto_now_add=True, help_text='Wann der Pitch gespeichert wurde')
 
     class Meta:
-        unique_together = ('user', 'pitch')  # Prevent duplicate saves
+        unique_together = ('user', 'pitch')  # Verhindere doppelte Speicherungen
         ordering = ['-saved_at']
         verbose_name = 'Saved Pitch'
         verbose_name_plural = 'Saved Pitches'
@@ -137,8 +136,8 @@ class SavedPitch(models.Model):
 
 class Investment(models.Model):
     """
-    Model to track investments made by investors into pitches.
-    Used for portfolio management, KPI calculations, and Value at Risk analysis.
+    Modell zum Verfolgen von Investitionen durch Investoren in Pitches.
+    Wird für Portfolio-Management, KPI-Berechnungen und Value-at-Risk-Analysen verwendet.
     """
     STATUS_CHOICES = [
         ('active', 'Active'),
@@ -150,49 +149,49 @@ class Investment(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='investments',
-        help_text='User who made the investment'
+        help_text='Benutzer, der die Investition getätigt hat'
     )
     pitch = models.ForeignKey(
         Pitch,
         on_delete=models.CASCADE,
         related_name='investments',
-        help_text='The pitch being invested in'
+        help_text='Der Pitch, in den investiert wird'
     )
     amount = models.DecimalField(
         max_digits=12, 
         decimal_places=2, 
-        help_text='Investment amount in EUR'
+        help_text='Investitionsbetrag in EUR'
     )
     equity_percentage = models.DecimalField(
         max_digits=5, 
         decimal_places=2, 
         blank=True, 
         null=True,
-        help_text='Equity percentage acquired'
+        help_text='Erworbener Eigenkapitalanteil'
     )
     investment_date = models.DateTimeField(
         auto_now_add=True, 
-        help_text='Date of investment'
+        help_text='Datum der Investition'
     )
     status = models.CharField(
         max_length=20, 
         choices=STATUS_CHOICES, 
         default='active',
-        help_text='Current status of investment'
+        help_text='Aktueller Status der Investition'
     )
     exit_date = models.DateTimeField(
         blank=True, 
         null=True,
-        help_text='Date of exit (if applicable)'
+        help_text='Datum des Ausstiegs (falls zutreffend)'
     )
     exit_amount = models.DecimalField(
         max_digits=12, 
         decimal_places=2, 
         blank=True, 
         null=True,
-        help_text='Exit amount in EUR'
+        help_text='Ausstiegsbetrag in EUR'
     )
-    notes = models.TextField(blank=True, help_text='Investment notes')
+    notes = models.TextField(blank=True, help_text='Investitionsnotizen')
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -210,15 +209,15 @@ class Investment(models.Model):
     
     @property
     def roi(self):
-        """Calculate Return on Investment percentage"""
+        """Berechnet den Return on Investment in Prozent"""
         if self.exit_amount and self.amount:
             return ((self.exit_amount - self.amount) / self.amount) * 100
         return None
     
     @property
     def current_value(self):
-        """Return current value of investment"""
+        """Gibt aktuellen Wert der Investition zurück"""
         if self.status == 'exited' and self.exit_amount:
             return self.exit_amount
-        return self.amount  # For active investments, assume current value = investment amount
+        return self.amount  # Für aktive Investitionen, nehme aktuellen Wert = Investitionsbetrag
 

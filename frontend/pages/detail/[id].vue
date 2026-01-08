@@ -245,10 +245,10 @@ const route = useRoute();
 const router = useRouter();
 const pitch = ref(null);
 const user = ref({ username: '', email: '', role: 'startup' }); // Default user object
-const isSaved = ref(false); // Track if pitch is saved
-const isLoading = ref(false); // Track button loading state
+const isSaved = ref(false); // Verfolge ob Pitch gespeichert ist
+const isLoading = ref(false); // Verfolge Button-Ladezustand
 
-// Investment modal state
+// Investitionsmodal-Status
 const showInvestmentModal = ref(false);
 const investmentLoading = ref(false);
 const investmentError = ref('');

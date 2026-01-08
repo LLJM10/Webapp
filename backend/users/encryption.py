@@ -6,9 +6,7 @@ import os
 def get_encryption_key():
     """
     Hole den Verschlüsselungs-Key aus den Settings.
-    
     """
-    
     return settings.ENCRYPTION_KEY.encode() if isinstance(settings.ENCRYPTION_KEY, str) else settings.ENCRYPTION_KEY
 
 
