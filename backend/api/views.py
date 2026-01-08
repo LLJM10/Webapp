@@ -105,7 +105,7 @@ class EventViewSet(viewsets.ModelViewSet):
             if self.request.user.is_authenticated:
                 return qs.filter(owner=self.request.user)
             else:
-                return qs.none()  # Anonymous users have no events
+                return qs.none()  # Anonyme Benutzer haben keine Events
         
         # Für öffentliche Auflistung (Marketplace)
         if self.request.user.is_authenticated and self.request.user.is_staff:
@@ -394,11 +394,11 @@ def investor_kpis(request):
     active_investments = investments.filter(status='active').count()
     watchlist_count = saved_pitches.count()
     
-    # New pitches on watchlist this week
+    # Neue Pitches auf der Watchlist diese Woche
     one_week_ago = datetime.now() - timedelta(days=7)
     new_this_week = saved_pitches.filter(saved_at__gte=one_week_ago).count()
     
-    # Average investment
+    # Durchschnittliche Investition
     avg_investment = investments.aggregate(Avg('amount'))['amount__avg'] or Decimal('0')
     
     # Portfolio growth (simulated based on stage distribution)
@@ -422,13 +422,13 @@ def investor_kpis(request):
     projected_return = total_invested * Decimal('1.35')  # 35% ROI assumption
     roi_forecast = Decimal('35')
     
-    # Success Rate
+    # Erfolgsrate
     exited_count = investments.filter(status='exited').count()
     successful_exits = investments.filter(status='exited', exit_amount__gt=0).count()
     success_rate = (successful_exits / exited_count * 100) if exited_count > 0 else Decimal('0')
     
-    # Value at Risk (VaR) Calculation
-    # Using Historical Simulation method with 95% confidence level
+    # Value at Risk (VaR) Berechnung
+    # Verwendet Historical Simulation-Methode mit 95% Konfidenzniveau
     var_data = calculate_value_at_risk(investments)
     
     # Sector Diversification

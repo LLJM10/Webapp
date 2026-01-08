@@ -779,18 +779,18 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const phases = ref(['Pre-Seed', 'Seed', 'Series A', 'Wachstum', 'Reife']);
 
-const user = ref({ username: 'Startup-User', email: 'demo@startup.com', role: 'startup' }); // Default-Werte für Demo
+const user = ref({ username: 'Startup-User', email: 'demo@startup.com', role: 'startup' }); // Standardwerte für Demo
 const myPitches = ref([]); // Startet mit einer leeren Liste
 const myEvents = ref([]); // NEU: Liste für Events
 const savedPitches = ref([]); // NEU: Gespeicherte Pitches für Investoren
-const myInvestments = ref([]); // Liste der Investments (für Testing)
-const downloadingCertificates = ref({}); // Tracking für Download-Status
+const myInvestments = ref([]); // Liste der Investments (zum Testen)
+const downloadingCertificates = ref({}); // Verfolgung des Download-Status
 const showCreateModal = ref(false);
 const showCreateEventModal = ref(false); // NEU: State für Event-Modal
 const showAiModal = ref(false);
 const showEditEventModal = ref(false); // State für Edit-Modal
 const eventToDelete = ref(null); // Event das gelöscht werden soll
-const editingEvent = ref(null); // Event das bearbeitet wird
+const editingEvent = ref(null); // Event, das bearbeitet wird
 const validationErrors = ref({}); // Validierungsfehler
 
 const pitchToDelete = ref(null);
@@ -807,7 +807,7 @@ const newPitch = ref({
   img: 'https://placehold.co/600x400/22c55e/ffffff?text=Neu'
 });
 
-// Event form model
+// Event-Formular-Modell
 const newEvent = ref({
   id: null,
   name: '',
@@ -845,7 +845,7 @@ const investorKPIs = ref({
   recentActivity: []
 });
 
-// LocalStorage helpers: load/save lists so created items survive page reloads (Option A)
+// LocalStorage-Hilfsfunktionen: Listen laden/speichern, damit erstellte Elemente Seitenneuladen überstehen
 function savePitchesToLocalStorage() {
   if (typeof window !== 'undefined') {
     try {
@@ -1178,9 +1178,9 @@ async function removeInvestment(investmentId) {
     });
     
     if (res.ok) {
-      // Remove from local list
+      // Aus lokaler Liste entfernen
       myInvestments.value = myInvestments.value.filter(inv => inv.id !== investmentId);
-      // Reload KPIs to update dashboard
+      // KPIs neu laden um Dashboard zu aktualisieren
       await loadInvestorKPIs();
       alert('Investment erfolgreich gelöscht!');
     } else {
@@ -1371,7 +1371,7 @@ function isoToDatetimeLocal(iso) {
   return `${yyyy}-${MM}-${dd}T${hh}:${mm}`;
 }
 
-// Validation für Event-Formular
+// Validierung für Event-Formular
 function validateEventForm() {
   validationErrors.value = {};
   let isValid = true;
@@ -1460,7 +1460,7 @@ async function handleCreateEvent() {
         myEvents.value.unshift(createdEvent);
         console.log('Event erfolgreich erstellt:', createdEvent);
         showCreateEventModal.value = false;
-        // Reset form
+        // Formular zurücksetzen
         newEvent.value = {
           id: null, name: '', duration: null, location: '', topic: '', date: '', host: '', link: '', description: '', img: null
         };
@@ -1501,7 +1501,7 @@ async function handleCreateEvent() {
 
 // Event bearbeiten
 function openEditEventModal(event) {
-  // copy event and normalize date for datetime-local input
+  // Event kopieren und Datum für datetime-local-Eingabe normalisieren
   editingEvent.value = { ...event, date: isoToDatetimeLocal(event.date) };
   editEventImageFile.value = null;
   editEventImagePreview.value = null;
@@ -1805,7 +1805,7 @@ function handleAiGenerated(description) {
   gap: 8px;
 }
 
-/* Events List */
+/* Events-Liste */
 .events-list {
   display: flex;
   flex-direction: column;
@@ -1913,7 +1913,7 @@ function handleAiGenerated(description) {
   gap: 16px;
 }
 
-/* Delete Confirmation Styling */
+/* Löschbestätigungs-Styling */
 .delete-confirmation {
   margin-top: 12px;
   padding: 16px;
@@ -2238,7 +2238,7 @@ function handleAiGenerated(description) {
   text-align: center;
 }
 
-/* Success Ring */
+/* Erfolgsring */
 .success-ring {
   position: relative;
   width: 120px;
@@ -2947,7 +2947,7 @@ function handleAiGenerated(description) {
   margin-bottom: 20px;
 }
 
-/* Utility Helper Classes */
+/* Hilfsklassen */
 .block { display: block; }
 .text-danger { color: #ef4444; }
 .text-muted { color: #cbd5e1; font-size: 0.9rem; }

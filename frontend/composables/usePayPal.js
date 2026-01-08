@@ -11,7 +11,7 @@ export function usePayPal() {
 
     const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
 
-    // uses Nuxt's global $fetch
+    // Verwendet Nuxts globales $fetch
     const res = await $fetch(`${apiBase}/payments/create-order/`, {
       method: 'POST',
       body: { amount: String(amount), currency, return_url: returnUrl, cancel_url: cancelUrl },

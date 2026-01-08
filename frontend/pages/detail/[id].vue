@@ -244,7 +244,7 @@ import { usePayPal } from '~/composables/usePayPal';
 const route = useRoute();
 const router = useRouter();
 const pitch = ref(null);
-const user = ref({ username: '', email: '', role: 'startup' }); // Default user object
+const user = ref({ username: '', email: '', role: 'startup' }); // Standard-Benutzerobjekt
 const isSaved = ref(false); // Verfolge ob Pitch gespeichert ist
 const isLoading = ref(false); // Verfolge Button-Ladezustand
 
@@ -394,7 +394,7 @@ async function submitInvestment() {
     return;
   }
   
-  // Validation
+  // Validierung
   if (!investmentForm.value.amount || investmentForm.value.amount <= 0) {
     investmentError.value = 'Bitte gib einen gültigen Betrag ein.';
     investmentLoading.value = false;

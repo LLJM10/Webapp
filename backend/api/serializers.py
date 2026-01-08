@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
-from .models import Todo, Pitch, Event, SavedPitch, Investment   # dein Model
+from .models import Todo, Pitch, Event, SavedPitch, Investment  
 
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:

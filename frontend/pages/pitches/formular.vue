@@ -344,7 +344,7 @@ async function handleCreatePitch() {
         body: formData
       });
       
-      // Token expired? Try refresh
+      // Token abgelaufen? Versuche Aktualisierung
       if (res.status === 401) {
         const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
         if (refreshToken) {
@@ -361,7 +361,7 @@ async function handleCreatePitch() {
               localStorage.setItem('access_token', newToken);
             }
             
-            // Erneuter Versuch mit neuem Token
+            // Ursprüngliche Anfrage mit neuem Token erneut versuchen
             res = await fetch(`${apiBase}/pitches/${newPitch.value.id}/`, {
               method: 'PATCH',
               headers: {
@@ -398,7 +398,7 @@ async function handleCreatePitch() {
         body: formData
       });
       
-      // Token expired? Try refresh
+      // Token abgelaufen? Versuche Aktualisierung
       if (res.status === 401) {
         const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
         if (refreshToken) {
@@ -415,7 +415,7 @@ async function handleCreatePitch() {
               localStorage.setItem('access_token', newToken);
             }
             
-            // Retry original request with new token
+            // Ursprüngliche Anfrage mit neuem Token erneut versuchen
             res = await fetch(`${apiBase}/pitches/`, {
               method: 'POST',
               headers: {

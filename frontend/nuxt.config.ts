@@ -32,7 +32,7 @@ export default defineNuxtConfig({
   // Module
   modules: ["@pinia/nuxt"],
 
-  // Runtime Config (für API-Basis-URL)
+  // Laufzeitkonfiguration (für API-Basis-URL)
   runtimeConfig: {
     public: {
       apiBase: "http://127.0.0.1:8000/api"

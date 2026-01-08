@@ -18,6 +18,6 @@ export default defineNuxtPlugin(() => {
       auth.$patch({ user: { username, email, role } })
     }
   } catch (e) {
-    // ignore storage errors
+    // Speicherfehler ignorieren
   }
 })

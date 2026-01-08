@@ -1,4 +1,4 @@
-# Generated migration for email verification fields
+# Generierte Migration für E-Mail-Verifizierungsfelder
 
 from django.db import migrations, models
 

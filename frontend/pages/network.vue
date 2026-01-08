@@ -212,7 +212,7 @@ function simulatePost() {
 </script>
 
 <style scoped>
-/* Create Post Card */
+/* Beitrag-erstellen-Karte */
 .create-post {
   margin-bottom: 24px;
   background: linear-gradient(135deg, rgba(94, 234, 212, 0.05), rgba(168, 85, 247, 0.05));

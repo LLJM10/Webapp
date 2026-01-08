@@ -40,7 +40,7 @@ class Pitch(models.Model):
     img = models.ImageField(upload_to='pitch_images/', blank=True, null=True, help_text='Pitch-Kartenbild')
     valuation = models.CharField(max_length=64, blank=True, help_text='Berechnete Bewertung')
     
-    # PDF file uploads
+    # PDF-Datei-Uploads
     pitch_deck = models.FileField(
         upload_to='pitch_decks/',
         blank=True,

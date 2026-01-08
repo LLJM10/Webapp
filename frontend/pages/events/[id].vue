@@ -397,7 +397,7 @@ function shareEvent() {
   font-weight: 600;
 }
 
-/* Info List */
+/* Info-Liste */
 .info-list {
   display: flex;
   flex-direction: column;

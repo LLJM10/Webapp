@@ -74,7 +74,7 @@ const handleLogin = async () => {
       refresh: data.refresh
     });
     
-    await navigateTo('/dashboard'); // Redirect to a protected page
+    await navigateTo('/dashboard'); // Weiterleitung zu geschützter Seite
   } catch (error: any) {
     errorMessage.value = error.message || 'Ein unbekannter Fehler ist aufgetreten.';
   }

@@ -291,7 +291,7 @@ const saveEmail = async () => {
       isEditingEmail.value = false;
       successMessage.value = 'E-Mail Adresse erfolgreich aktualisiert!';
       
-      // Clear success message after 5 seconds
+      // Erfolgsmeldung nach 5 Sekunden löschen
       setTimeout(() => {
         successMessage.value = '';
       }, 5000);
@@ -372,7 +372,7 @@ const captureFrame = async () => {
     if (context) {
       context.drawImage(videoElement.value, 0, 0);
       
-      // Convert canvas to blob and upload
+      // Canvas in Blob konvertieren und hochladen
       canvasElement.value.toBlob(async (blob: Blob | null) => {
         if (blob) {
           await uploadVerificationImage(blob);
@@ -475,7 +475,7 @@ const loadStats = async () => {
         stats.value.savedPitches = saved.length;
       }
 
-      // Events Attended (Placeholder - würde eine Backend-Erweiterung benötigen)
+      // Besuchte Events (Platzhalter - würde eine Backend-Erweiterung benötigen)
       stats.value.eventsAttended = 0;
     }
   } catch (err) {

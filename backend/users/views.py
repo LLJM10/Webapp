@@ -70,8 +70,8 @@ class UserViewSet(viewsets.ModelViewSet):
         # Debug: E-Mail-Einstellungen ausgeben 
         #print(f"=== EMAIL DEBUG ===")
         # print(f"EMAIL_HOST_USER: {settings.EMAIL_HOST_USER}")
-        # print(f"EMAIL_HOST_PASSWORD: {'*' * len(settings.EMAIL_HOST_PASSWORD) if settings.EMAIL_HOST_PASSWORD else 'NOT SET'}")
-        # print(f"Sending email to: {user.email}")
+        # print(f"EMAIL_HOST_PASSWORD: {'*' * len(settings.EMAIL_HOST_PASSWORD) if settings.EMAIL_HOST_PASSWORD else 'NICHT GESETZT'}")
+        # print(f"E-Mail wird gesendet an: {user.email}")
         # print(f"==================")
         
         try:

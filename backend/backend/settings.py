@@ -192,7 +192,7 @@ SIMPLE_JWT = {
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',           # Header-Name für Authorization
     
     # Benutzer-Identifikation
-    'USER_ID_FIELD': 'id',                              # User Model Field für user_id Claim
+    'USER_ID_FIELD': 'id',                              # User-Model-Feld für user_id Claim
     'USER_ID_CLAIM': 'user_id',                         # JWT Claim Name für User ID
     
     # Token-Typen
@@ -207,7 +207,7 @@ SIMPLE_JWT = {
 
 
 # PayPal-Einstellungen (echte Anmeldedaten in Produktion als Umgebungsvariablen setzen)
-PAYPAL_MODE = os.environ.get("PAYPAL_MODE", "sandbox")  # "live" for production
+PAYPAL_MODE = os.environ.get("PAYPAL_MODE", "sandbox")  # "live" für Produktion
 PAYPAL_CLIENT_ID = os.environ.get("PAYPAL_CLIENT_ID", "")
 PAYPAL_CLIENT_SECRET = os.environ.get("PAYPAL_CLIENT_SECRET", "")
 # Falls PayPal Webhook-Verifizierung verwendet wird, wird die Webhook-ID benötigt

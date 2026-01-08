@@ -1,4 +1,4 @@
-# Generated manually for custom upload_to function
+# Manuell generiert für benutzerdefinierte upload_to-Funktion
 
 from django.db import migrations, models
 import users.models

@@ -1,1 +1,1 @@
-# migrations package for payments app
+# Migrations-Paket für Payments-App
