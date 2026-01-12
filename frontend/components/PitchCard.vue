@@ -88,7 +88,6 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '~/stores/auth';
 import { useRuntimeConfig } from '#app';
-// Wir importieren nur die dummyApi, da die Pitch-Daten über Props kommen
 import { dummyApi } from '~/composables/useDemoData'; 
 
 // Props definieren, um Pitch-Daten zu erhalten
@@ -110,7 +109,6 @@ function getImageUrl(imgPath) {
     return 'https://placehold.co/600x400/22c55e/ffffff?text=' + encodeURIComponent(props.pitch.title || 'Pitch');
   }
   
-  // Wenn es bereits eine vollständige URL ist (http/https), direkt zurückgeben
   if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) {
     return imgPath;
   }
@@ -131,8 +129,7 @@ const isOwner = computed(() => {
   return auth.user?.id === props.pitch.owner;
 });
 
-// Navigation zur Edit-Seite nur wenn der User der Owner ist und auf die Card klickt
-// Sonst zur Detail-Seite für Nicht-Owner
+// Navigation zur Edit-Seite wenn der User der Owner ist 
 function handleCardClick() {
   if (isOwner.value) {
     router.push({ path: '/pitches/formular', query: { id: props.pitch.id } });
@@ -141,7 +138,7 @@ function handleCardClick() {
   }
 }
 
-// Vorschau-Button führt IMMER zur Detail-Ansicht (auch für Owner)
+// Vorschau-Button führt zur Detail-Ansichht
 function navigateToDetail() {
   router.push({ path: '/detail/' + props.pitch.id });
 }
@@ -157,7 +154,6 @@ function formatCurrency(value) {
 
 function formatValuation(val) {
   if (!val) return '';
-  // Entferne € und Leerzeichen, behalte die Zahl
   return val.replace(/\s+/g, ' ');
 }
 </script>

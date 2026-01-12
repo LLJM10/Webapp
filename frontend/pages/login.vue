@@ -62,7 +62,6 @@ const handleLogin = async () => {
     if (!response.ok) throw new Error('Benutzername oder Passwort ist falsch.');
     const data = await response.json();
     
-    // Speichere die Tokens im localStorage
     if (typeof window !== 'undefined') {
       localStorage.setItem('access_token', data.access);
       localStorage.setItem('refresh_token', data.refresh);
@@ -93,7 +92,7 @@ const handleLogin = async () => {
 .header-typetext {
   display: block;
   text-align: center;
-  font-size: 2.25rem; /* etwas größer */
+  font-size: 2.25rem; 
   font-weight: 800;
   margin: 1rem 0 1.25rem;
   color: var(--accent);

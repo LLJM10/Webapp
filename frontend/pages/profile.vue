@@ -328,7 +328,7 @@ const startVerification = async () => {
     showVerificationCamera.value = true;
     errorMessage.value = '';
     
-    // Warte auf nächsten Vue-Render-Zyklus damit das Video-Element im DOM ist
+    // Warte auf nächsten Vue-Render-Zyklus damit Video-Element im DOM ist
     await nextTick();
     
     if (videoElement.value) {
@@ -345,7 +345,7 @@ const startVerification = async () => {
       // Stream setzen
       videoElement.value.srcObject = stream;
       
-      // Fallback: Versuche direkt play() nach kurzer Verzögerung
+
       setTimeout(() => {
         if (videoElement.value && videoElement.value.readyState >= 2) {
           videoElement.value.play().catch((err: Error) => {
@@ -475,7 +475,7 @@ const loadStats = async () => {
         stats.value.savedPitches = saved.length;
       }
 
-      // Besuchte Events (Platzhalter - würde eine Backend-Erweiterung benötigen)
+      // Besuchte Events (Platzhalter ,mit 0)
       stats.value.eventsAttended = 0;
     }
   } catch (err) {

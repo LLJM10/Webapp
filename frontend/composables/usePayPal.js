@@ -1,5 +1,8 @@
-// composables/usePayPal.js
-// Minimaler PayPal-Helper für das Frontend (Nuxt)
+/**
+ * PayPal-Zahlungen über Backend
+ * createOrder: Erstellt PayPal-Order und gibt approval_url zurück
+ *captureOrder: Schließt Zahlung nach User-Bestätigung ab
+ */
 import { useRuntimeConfig } from '#app'
 
 export function usePayPal() {
@@ -11,7 +14,6 @@ export function usePayPal() {
 
     const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
 
-    // Verwendet Nuxts globales $fetch
     const res = await $fetch(`${apiBase}/payments/create-order/`, {
       method: 'POST',
       body: { amount: String(amount), currency, return_url: returnUrl, cancel_url: cancelUrl },

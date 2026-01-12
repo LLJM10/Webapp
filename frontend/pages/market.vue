@@ -38,8 +38,7 @@ onMounted(async () => {
         loadDemoPitches();
       }
     } catch (e) {
-      console.warn('Failed to fetch pitches from backend, falling back to demo data', e);
-      loadDemoPitches();
+        loadDemoPitches();
     }
   } else {
     loadDemoPitches();
@@ -58,7 +57,6 @@ function loadDemoPitches() {
 </script>
 
 <style scoped>
-/* Etwas Styling, damit die Seite gut aussieht */
 .test-container {
   display: flex;
   flex-direction: column;
@@ -69,7 +67,7 @@ function loadDemoPitches() {
 }
 
 h1 {
-  color: var(--accent-2); /* Nutzt die Farben aus deiner main.css */
+  color: var(--accent-2); 
   margin-bottom: 24px;
 }
 </style>
