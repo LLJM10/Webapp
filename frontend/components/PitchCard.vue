@@ -98,12 +98,10 @@ const props = defineProps({
   }
 });
 
-// Router-Instanz für die Navigation
 const router = useRouter();
-const auth = useAuthStore();
+const authStore = useAuthStore();
 const config = useRuntimeConfig();
 
-// Hilfsfunktion zum Abrufen der korrekten Bild-URL
 function getImageUrl(imgPath) {
   if (!imgPath) {
     return 'https://placehold.co/600x400/22c55e/ffffff?text=' + encodeURIComponent(props.pitch.title || 'Pitch');

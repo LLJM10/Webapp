@@ -378,7 +378,7 @@ async function handleCreatePitch() {
         method: 'PATCH',
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {})
-          // WICHTIG: KEIN Content-Type Header - Browser setzt automatisch mit boundary
+          // Browser setzt automatisch mit boundary
         },
         body: formData
       });

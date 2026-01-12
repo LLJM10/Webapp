@@ -1,26 +1,6 @@
-// composables/useDemoData.js
-
-// Importiert Nuxt's State Management (wichtig für useRole)
 import { useState } from '#app'; 
-
-// ------------------------------------
-// --- GLOBAL STATE & UTILITIES (EXPORTS) ---
-// ------------------------------------
-
-/**
- * Globaler State für die aktuelle Benutzerrolle ('startup' oder 'investor').
- * Verwendung: const currentRole = useRole();
- */
 export const useRole = () => useState('currentRole', () => 'startup'); 
-
-/**
- * Kapitalisiert den ersten Buchstaben eines Strings.
- */
 export const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-
-/**
- * Dummy-Funktion zur Simulation von API-Aufrufen.
- */
 export function dummyApi(endpoint){
   alert('Dummy API Call: ' + endpoint);
 }

@@ -170,7 +170,6 @@ const getProfileByAuthor = (authorName) => {
 };
 
 function filterProfiles() {
-  // Profilsuche ausgeführt
 }
 
 // User-Daten beim Laden der Seite holen
