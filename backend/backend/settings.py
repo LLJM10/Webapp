@@ -22,14 +22,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env_path = BASE_DIR / '.env'
 load_dotenv(dotenv_path=env_path)
 
-# Debug: Prüfen ob .env-Datei gefunden wurde
-if env_path.exists():
-    print(f"✅ .env file found at: {env_path}")
-else:
-    print(f"❌ .env file NOT found at: {env_path}")
-print(f"EMAIL_HOST_USER from env: {os.environ.get('EMAIL_HOST_USER', 'NOT SET')}")
-print(f"EMAIL_HOST_PASSWORD from env: {'SET' if os.environ.get('EMAIL_HOST_PASSWORD') else 'NOT SET'}")
-print("="*50)
+# Prüfen ob .env-Datei gefunden wurde
+# if env_path.exists():
+#     print(f" .env file found at: {env_path}")
+# else:
+#     print(f" .env file NOT found at: {env_path}")
+# print(f"EMAIL_HOST_USER from env: {os.environ.get('EMAIL_HOST_USER', 'NOT SET')}")
+# print(f"EMAIL_HOST_PASSWORD from env: {'SET' if os.environ.get('EMAIL_HOST_PASSWORD') else 'NOT SET'}")
+# print("="*50)
 
 
 # Schnellstart-Entwicklungseinstellungen - nicht geeignet für Produktion
@@ -171,7 +171,7 @@ REST_FRAMEWORK = {
 }
 
 
-# JWT Token-Einstellungen (Django Simple JWT)
+# JWT Token-Einstellungen 
 SIMPLE_JWT = {
     # Token-Laufzeiten
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),        # Access Token gültig für 1 Stunde
@@ -206,26 +206,22 @@ SIMPLE_JWT = {
 }
 
 
-# PayPal-Einstellungen (echte Anmeldedaten in Produktion als Umgebungsvariablen setzen)
+# PayPal-Einstellungen 
 PAYPAL_MODE = os.environ.get("PAYPAL_MODE", "sandbox")  # "live" für Produktion
 PAYPAL_CLIENT_ID = os.environ.get("PAYPAL_CLIENT_ID", "")
 PAYPAL_CLIENT_SECRET = os.environ.get("PAYPAL_CLIENT_SECRET", "")
-# Falls PayPal Webhook-Verifizierung verwendet wird, wird die Webhook-ID benötigt
+
 PAYPAL_WEBHOOK_ID = os.environ.get("PAYPAL_WEBHOOK_ID", "")
 
 # E-Mail-Einstellungen
-# Entwicklung: Console Backend (E-Mails im Terminal)
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-# Produktion: SMTP Backend (echte E-Mails versenden)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 465
 EMAIL_USE_TLS = False
-EMAIL_USE_SSL = True  # WICHTIG: Bei Port 465 muss SSL auf True sein
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')  # Mail-Adresse
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')  # App-Passwort
-DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER', 'noreply@investify.com')  # Muss gleiche Adresse sein wie EMAIL_HOST_USER
+EMAIL_USE_SSL = True  
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')  
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '') 
+DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER', 'noreply@investify.com')  
 EMAIL_TIMEOUT = 30  # Timeout in Sekunden
 
 # Groq AI API Key

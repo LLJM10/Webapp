@@ -6,8 +6,7 @@ import os
 
 def user_verification_image_path(instance, filename):
     """
-    Generiert eindeutigen Dateipfad für das Verifizierungsbild jedes Benutzers.
-    Format: verification_images/user_{user_id}_verification.jpg
+   eindeutigen Dateipfad für das Verifizierungsbild
     """
     # Dateiendung ermitteln
     ext = filename.split('.')[-1]
@@ -37,10 +36,10 @@ def encrypt_verification_image(sender, instance, created, **kwargs):
         from .encryption import encrypt_image_file
         file_path = instance.verification_image.path
         if os.path.exists(file_path):
-            # Prüfe ob Datei bereits verschlüsselt ist
+            # Prüfe ob Datei verschlüsselt ist
             with open(file_path, 'rb') as f:
                 first_bytes = f.read(10)
-                # Wenn Datei nicht mit JPEG/PNG Header startet, ist sie wahrscheinlich verschlüsselt
+                # Wenn Datei nicht mit JPEG/PNG Header startet, wahrscheinlich verschlüsselt
                 if not (first_bytes.startswith(b'\xff\xd8\xff') or first_bytes.startswith(b'\x89PNG')):
                     return 
             

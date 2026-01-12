@@ -1,8 +1,3 @@
-"""
-PDF-Zertifikatsgenerator für Investify
-Generiert professionelle Aktionärszertifikate für Investitionen.
-"""
-
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.units import mm
@@ -19,7 +14,7 @@ from decimal import Decimal
 
 
 class CertificateGenerator:
-    """Generiert professionelle Investitionszertifikate mit banküblichem Design."""
+    """Generiert  Investitionszertifikate"""
     
     # Design-Konstanten
     PRIMARY_COLOR = colors.HexColor('#061022')  
@@ -33,9 +28,7 @@ class CertificateGenerator:
         self.styles = getSampleStyleSheet()
         self._setup_custom_styles()
     
-    def _setup_custom_styles(self):
-        """Richtet benutzerdefinierte Absatzstile für das Zertifikat ein."""
-        
+    def _setup_custom_styles(self):        
         # Titelstil
         self.title_style = ParagraphStyle(
             'CustomTitle',
@@ -70,7 +63,7 @@ class CertificateGenerator:
             spaceAfter=6
         )
         
-        # Fußzeilenstil
+        #Fußzeilenstil
         self.footer_style = ParagraphStyle(
             'CustomFooter',
             parent=self.styles['Normal'],
@@ -82,7 +75,7 @@ class CertificateGenerator:
         )
     
     def _generate_qr_code(self, transaction_id):
-        """Generiert QR-Code für Transaktionsverifizierung."""
+        """QR-Code für Transaktionsverifizierung"""
         qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -101,7 +94,7 @@ class CertificateGenerator:
         return buffer
     
     def _draw_header(self, canvas_obj, doc):
-        """Zeichnet Kopfzeile mit Logo und Transaktionsinformationen."""
+        """Kopfzeile mit Logo und Transaktionsinformationen"""
         canvas_obj.saveState()
         
         
@@ -118,7 +111,6 @@ class CertificateGenerator:
         canvas_obj.setFillColor(self.PRIMARY_COLOR)
         canvas_obj.drawString(52*mm, 271*mm, 'investify')
         
-        # Transaktionsinfo (rechte Seite)
         canvas_obj.setFont('Helvetica', 9)
         canvas_obj.setFillColor(self.TEXT_COLOR)
         canvas_obj.drawRightString(170*mm, 275*mm, f"Datum: {datetime.now().strftime('%d.%m.%Y')}")
@@ -126,7 +118,6 @@ class CertificateGenerator:
         canvas_obj.restoreState()
     
     def _draw_divider(self, canvas_obj, y_position):
-        """Zeichnet horizontale Trennlinie."""
         canvas_obj.saveState()
         canvas_obj.setStrokeColor(self.ACCENT_COLOR)
         canvas_obj.setLineWidth(2)
@@ -135,8 +126,6 @@ class CertificateGenerator:
     
     def generate_certificate(self, investment_data, output_path=None):
         """
-        Generiert ein Aktionärszertifikat als PDF.
-        
         Args:
             investment_data (dict): Dictionary enthält:
                 - investor_name: Name des Investors
@@ -241,7 +230,7 @@ class CertificateGenerator:
         story.append(table)
         story.append(Spacer(1, 50))
         
-        # Signaturbereich (ohne QR-Code)
+        # Signaturbereich
         signature_style = ParagraphStyle(
             'Signature',
             parent=self.body_style,
@@ -255,7 +244,7 @@ class CertificateGenerator:
         story.append(signature)
         story.append(Spacer(1, 30))
         
-        # Fußzeilen-Haftungsausschluss
+        # Fußzeilen
         disclaimer_text = """
         <b>Hinweis:</b> Dieses Dokument wurde maschinell erstellt und dient als Bestätigung für die 
         Simulation auf der Plattform. Es begründet keine realen rechtlichen Ansprüche.
@@ -279,11 +268,9 @@ class CertificateGenerator:
 
 def generate_investment_certificate(investment):
     """
-    Hilfsfunktion zum Generieren eines Zertifikats für eine Investment-Modellinstanz.
-    
+    Hilfsfunktion
     Args:
         investment: Investment-Modellinstanz
-    
     Returns:
         BytesIO-Puffer mit dem PDF
     """

@@ -10,7 +10,7 @@ class TodoSerializer(serializers.ModelSerializer):
 
 class PitchSerializer(serializers.ModelSerializer):
     """
-    Serializer für Pitch-Modell.
+   Pitch-Modell
     owner ist read-only und wird automatisch im ViewSet gesetzt.
     """
     owner = serializers.CharField(source='owner.username', read_only=True)
@@ -32,14 +32,14 @@ class PitchSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'owner', 'created_at', 'updated_at']
     
     def validate_img(self, value):
-        """Validiert Pitch-Bild-Datei"""
+        """Pitch-Bild-Datei"""
         if value and hasattr(value, 'size'):
             if value.size > 5242880:  # 5MB
                 raise serializers.ValidationError("Bild zu groß. Maximum: 5MB")
         return value
     
     def validate_pitch_deck(self, value):
-        """Validiert Pitch-Deck-PDF-Datei"""
+        """Pitch-Deck-PDF-Datei"""
         if value and not value.name.endswith('.pdf'):
             raise serializers.ValidationError("Nur PDF-Dateien erlaubt.")
         if value and value.size > 10485760:  # 10MB
@@ -47,7 +47,7 @@ class PitchSerializer(serializers.ModelSerializer):
         return value
     
     def validate_business_plan(self, value):
-        """Validiert Businessplan-PDF-Datei"""
+        """Businessplan-PDF-Datei"""
         if value and not value.name.endswith('.pdf'):
             raise serializers.ValidationError("Nur PDF-Dateien erlaubt.")
         if value and value.size > 10485760:
@@ -55,7 +55,7 @@ class PitchSerializer(serializers.ModelSerializer):
         return value
     
     def validate_financial_report(self, value):
-        """Validiert Finanzbericht-PDF-Datei"""
+        """Finanzbericht-PDF-Datei"""
         if value and not value.name.endswith('.pdf'):
             raise serializers.ValidationError("Nur PDF-Dateien erlaubt.")
         if value and value.size > 10485760:
@@ -65,9 +65,8 @@ class PitchSerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
     """
-    Serializer für Event-Modell.
-    owner ist read-only und wird automatisch im ViewSet gesetzt.
-    Beinhaltet Validierung für Pflichtfelder.
+    Event-Modell
+    Beinhaltet Validierung für Pflichtfelder
     """
     owner = serializers.CharField(source='owner.username', read_only=True)
     img = serializers.ImageField(required=False, allow_null=True)
@@ -82,13 +81,11 @@ class EventSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'owner', 'created_at', 'updated_at']
 
     def validate_name(self, value):
-        """Event-Name muss mindestens 3 Zeichen haben"""
         if len(value.strip()) < 3:
             raise serializers.ValidationError("Event-Name muss mindestens 3 Zeichen haben.")
         return value
 
     def validate_duration(self, value):
-        """Dauer muss positiv und maximal 8 Stunden (480 Min) sein"""
         if value <= 0:
             raise serializers.ValidationError("Dauer muss größer als 0 sein.")
         if value > 480:
@@ -96,21 +93,18 @@ class EventSerializer(serializers.ModelSerializer):
         return value
 
     def validate_date(self, value):
-        """Event-Datum muss in der Zukunft liegen"""
         if value < timezone.now():
             raise serializers.ValidationError("Event-Datum muss in der Zukunft liegen.")
         return value
 
     def validate_img(self, value):
-        """Validiert Event-Bild-Datei"""
         if value and hasattr(value, 'size'):
             if value.size > 5242880:  # 5MB
                 raise serializers.ValidationError("Bild zu groß. Maximum: 5MB")
         return value
 
     def validate(self, data):
-        """Feldübergreifende Validierung"""
-        # Setze Host auf Benutzernamen, falls nicht angegeben und Event öffentlich ist
+        # Setze Host auf Benutzernamen falls nicht angegeben 
         if data.get('is_public', True) and not data.get('host'):
             data['host'] = self.context['request'].user.username
         return data
@@ -118,8 +112,8 @@ class EventSerializer(serializers.ModelSerializer):
 
 class SavedPitchSerializer(serializers.ModelSerializer):
     """
-    Serializer für SavedPitch-Modell.
-    Gibt die vollständigen Pitch-Daten zusammen mit dem Speicherzeitpunkt zurück.
+    SavedPitch-Modell
+    Gibt vollständigen Pitch-Daten zusammen mit dem Speicherzeitpunkt zurück
     """
     pitch = PitchSerializer(read_only=True)
     user = serializers.CharField(source='user.username', read_only=True)
@@ -132,8 +126,8 @@ class SavedPitchSerializer(serializers.ModelSerializer):
 
 class InvestmentSerializer(serializers.ModelSerializer):
     """
-    Serializer für Investment-Modell.
-    Beinhaltet Pitch-Details und berechnete Felder.
+    Investment-Modell
+    Beinhaltet Pitch-Details und berechnete Felder
     """
     investor = serializers.CharField(source='investor.username', read_only=True)
     pitch = PitchSerializer(read_only=True)
@@ -152,13 +146,11 @@ class InvestmentSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'investor', 'investment_date', 'created_at', 'updated_at']
 
     def validate_amount(self, value):
-        """Investment-Betrag muss positiv sein"""
         if value <= 0:
             raise serializers.ValidationError("Investment-Betrag muss größer als 0 sein.")
         return value
 
     def validate_equity_percentage(self, value):
-        """Equity-Prozentsatz muss zwischen 0 und 100 liegen"""
         if value is not None and (value < 0 or value > 100):
             raise serializers.ValidationError("Equity-Anteil muss zwischen 0 und 100% liegen.")
         return value

@@ -18,7 +18,7 @@ class CreateOrderView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        """Erstellt eine PayPal-Bestellung für den angegebenen Betrag und die Währung.
+        """PayPal-Bestellung für angegebenen Betrag und Währung.
 
         Anfrage-JSON: {"amount": "10.00", "currency": "EUR", "return_url": "...", "cancel_url": "..."}
         """
@@ -34,7 +34,6 @@ class CreateOrderView(APIView):
             client = PayPalClient()
             data = client.create_order(amount, currency, return_url, cancel_url)
         except Exception as e:
-            # Fehler loggen und 502 Bad Gateway mit zugrunde liegender Fehlermeldung zurückgeben
             logger.exception('Error creating PayPal order')
             return Response({'detail': 'Failed to create PayPal order', 'error': str(e)}, status=status.HTTP_502_BAD_GATEWAY)
 
@@ -80,7 +79,6 @@ class CaptureOrderView(APIView):
             payment = None
 
         if payment:
-            # Capture-Details können Capture-ID in purchase_units -> payments -> captures enthalten
             captures = []
             for pu in data.get('purchase_units', []):
                 payments = pu.get('payments', {})
@@ -99,7 +97,7 @@ class WebhookView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        # Grundlegende Webhook-Verarbeitung: Signatur verifizieren und Events verarbeiten
+        #Signatur verifizieren und Events verarbeiten
         client = PayPalClient()
 
         transmission_id = request.META.get('HTTP_PAYPAL_TRANSMISSION_ID')
@@ -114,7 +112,7 @@ class WebhookView(APIView):
                 cert_url, auth_algo, transmission_sig
             )
         except Exception as e:
-            # Wenn Verifizierung fehlschlägt, gebe trotzdem 200 zurück um ungewollte Wiederholungen zu vermeiden
+            # Wenn Verifizierung fehlschlägt
             return Response({'detail': 'verification failed', 'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         if verification.get('verification_status') != 'SUCCESS':
@@ -126,7 +124,6 @@ class WebhookView(APIView):
         # Häufige Events verarbeiten
         if event_type == 'CHECKOUT.ORDER.APPROVED':
             order_id = resource.get('id')
-            # Als genehmigt markieren
             Payment.objects.filter(order_id=order_id).update(status='APPROVED', raw_response=resource)
 
         if event_type == 'PAYMENT.CAPTURE.COMPLETED':

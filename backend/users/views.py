@@ -67,12 +67,11 @@ class UserViewSet(viewsets.ModelViewSet):
         # Verifizierungs-E-Mail senden
         verification_url = f"http://localhost:3000/verify-email?token={verification_token}"
         
-        # Debug: E-Mail-Einstellungen ausgeben 
-        #print(f"=== EMAIL DEBUG ===")
+        # Debug E-Mail-Einstellungen  
+        #print(f" EMAIL DEBUG ")
         # print(f"EMAIL_HOST_USER: {settings.EMAIL_HOST_USER}")
         # print(f"EMAIL_HOST_PASSWORD: {'*' * len(settings.EMAIL_HOST_PASSWORD) if settings.EMAIL_HOST_PASSWORD else 'NICHT GESETZT'}")
         # print(f"E-Mail wird gesendet an: {user.email}")
-        # print(f"==================")
         
         try:
             send_mail(
@@ -112,7 +111,7 @@ def verify_email(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def verify_identity(request):
-    """Verarbeitet Identitätsverifizierung mit hochgeladenem Bild."""
+    """Identitätsverifizierung mit hochgeladenem Bild"""
     try:
         user = request.user
         profile = UserProfile.objects.get(user=user)
@@ -125,7 +124,7 @@ def verify_identity(request):
         
         verification_image = request.FILES['verification_image']
         
-        # Validierung: Dateityp prüfen
+
         allowed_types = ['image/jpeg', 'image/jpg', 'image/png']
         if verification_image.content_type not in allowed_types:
             return Response(
@@ -133,7 +132,7 @@ def verify_identity(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Validierung: Dateigröße prüfen (max 5MB)
+        
         max_size = 5 * 1024 * 1024  # 5MB
         if verification_image.size > max_size:
             return Response(
@@ -143,12 +142,10 @@ def verify_identity(request):
         
         # Lösche altes Verifizierungsbild falls vorhanden
         if profile.verification_image:
-            # Lösche physische Datei
             if os.path.isfile(profile.verification_image.path):
                 os.remove(profile.verification_image.path)
         
         # Speichere neues Verifizierungsbild
-        # Der Dateiname wird automatisch durch user_verification_image_path generiert
         profile.verification_image = verification_image
         profile.save()
         
@@ -178,7 +175,7 @@ def view_verification_image(request, user_id):
     try:
         profile = UserProfile.objects.get(user_id=user_id)
         
-        # Nur eigenes Bild oder Admin darf zugreifen
+        # Nur eigenes Bild oder Admin
         if request.user.id != user_id and not request.user.is_staff:
             return HttpResponse('Keine Berechtigung', status=403)
         
