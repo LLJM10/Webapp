@@ -1,5 +1,10 @@
+Django>=4.2,<5.0
+djangorestframework>=3.14
+djangorestframework-simplejwt>=5.3
+django-cors-headers>=4.3
+python-dotenv>=1.0
 requests>=2.28
 reportlab>=4.0.0
 qrcode[pil]>=7.4.2
 cryptography>=41.0.0
-# The project likely already has Django and DRF installed. This file only lists the new library used by payments service.
+groq>=0.4

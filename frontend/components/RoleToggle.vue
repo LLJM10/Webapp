@@ -26,6 +26,5 @@ const currentRole = useRole(); // Holen des globalen States über das Composable
  */
 function setRole(role) {
   currentRole.value = role
-  console.log('Rolle gewechselt zu:', role);
 }
 </script>

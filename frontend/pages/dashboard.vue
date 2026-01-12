@@ -1337,7 +1337,6 @@ function handleCreatePitch() {
   myPitches.value.unshift(pitchToAdd);
   // Speichere sofort, damit der Pitch nach Reload erhalten bleibt
   savePitchesToLocalStorage();
-  console.log('Neuer Pitch erstellt:', pitchToAdd);
   showCreateModal.value = false;
 
   newPitch.value = {
@@ -1458,7 +1457,6 @@ async function handleCreateEvent() {
       if (res.ok) {
         const createdEvent = await res.json();
         myEvents.value.unshift(createdEvent);
-        console.log('Event erfolgreich erstellt:', createdEvent);
         showCreateEventModal.value = false;
         // Formular zurücksetzen
         newEvent.value = {
@@ -1545,7 +1543,6 @@ async function handleUpdateEvent() {
         const updated = await res.json();
         const idx = myEvents.value.findIndex(e => e.id === updated.id);
         if (idx !== -1) myEvents.value[idx] = updated;
-        console.log('Event erfolgreich aktualisiert');
         showEditEventModal.value = false;
         editEventImageFile.value = null;
         editEventImagePreview.value = null;
@@ -1588,7 +1585,6 @@ async function deleteEvent() {
       
       if (res.ok || res.status === 204) {
         myEvents.value = myEvents.value.filter(e => e.id !== eventToDelete.value.id);
-        console.log('Event erfolgreich gelöscht');
         eventToDelete.value = null;
       } else {
         console.error('Fehler beim Löschen:', res.status);
@@ -1635,7 +1631,6 @@ async function deletePitch() {
       
       if (res.ok || res.status === 204) {
         myPitches.value = myPitches.value.filter(p => p.id !== pitchToDelete.value.id);
-        console.log('Pitch erfolgreich gelöscht');
         pitchToDelete.value = null;
       } else {
         console.error('Fehler beim Löschen:', res.status);

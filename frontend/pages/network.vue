@@ -170,7 +170,7 @@ const getProfileByAuthor = (authorName) => {
 };
 
 function filterProfiles() {
-  console.log('Profilsuche ausgeführt für:', searchQuery.value);
+  // Profilsuche ausgeführt
 }
 
 // User-Daten beim Laden der Seite holen

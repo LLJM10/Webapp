@@ -47,9 +47,6 @@ const errorMessage = ref('');
 onMounted(async () => {
   const token = route.query.token;
   
-  console.log('=== E-Mail Verifizierung ===');
-  console.log('Token aus URL:', token);
-  
   if (!token) {
     loading.value = false;
     error.value = true;
@@ -58,8 +55,6 @@ onMounted(async () => {
   }
 
   const apiBase = config.public?.apiBase;
-  console.log('API Base:', apiBase);
-  console.log('Request URL:', `${apiBase}/users/verify-email/`);
   
   try {
     const res = await fetch(`${apiBase}/users/verify-email/`, {
@@ -69,12 +64,8 @@ onMounted(async () => {
       },
       body: JSON.stringify({ token })
     });
-
-    console.log('Response Status:', res.status);
-    console.log('Response OK:', res.ok);
     
     const data = await res.json();
-    console.log('Response Data:', data);
 
     if (res.ok) {
       loading.value = false;

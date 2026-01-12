@@ -343,7 +343,6 @@ async function toggleSavePitch() {
     
     if (res.ok) {
       isSaved.value = !isSaved.value;
-      console.log(isSaved.value ? 'Pitch saved' : 'Pitch unsaved');
     } else {
       const errorData = await res.json();
       console.error('Error toggling saved pitch:', errorData);
@@ -492,7 +491,6 @@ onMounted(async () => {
         user.value.username = userData.username || '';
         user.value.email = userData.email || '';
         user.value.role = userData.profile?.role || userData.role || 'startup';
-        console.log('User loaded:', user.value);
       } else {
         console.warn('Failed to load user data:', userRes.status);
       }
@@ -510,7 +508,6 @@ onMounted(async () => {
       
       if (res.ok) {
         pitch.value = await res.json();
-        console.log('Pitch loaded:', pitch.value);
       } else {
         console.error('Failed to load pitch:', res.status);
       }
