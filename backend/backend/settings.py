@@ -32,13 +32,12 @@ load_dotenv(dotenv_path=env_path)
 # print("="*50)
 
 
-# Schnellstart-Entwicklungseinstellungen - nicht geeignet für Produktion
 # Siehe https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SICHERHEITSWARNUNG: Halte den Secret Key in Produktion geheim!
+
 SECRET_KEY = 'django-insecure-axba)-tj+rcs(e&6(*p=50np8-*0_!6oxv(pbcq(nba_7lexwh'
 
-# SICHERHEITSWARNUNG: In Produktion nicht mit Debug laufen lassen!
+
 DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
@@ -179,27 +178,27 @@ SIMPLE_JWT = {
     
     # Token-Rotation & Blacklisting
     'ROTATE_REFRESH_TOKENS': False,                     # Bei Token-Refresh wird KEIN neuer Refresh Token erstellt
-    'BLACKLIST_AFTER_ROTATION': True,                   # Alte Tokens werden nach Rotation auf Blacklist gesetzt
-    'UPDATE_LAST_LOGIN': True,                          # Aktualisiert last_login bei jedem Token-Refresh
+    'BLACKLIST_AFTER_ROTATION': True,                   
+    'UPDATE_LAST_LOGIN': True,                          
     
     # Algorithmus & Sicherheit
-    'ALGORITHM': 'HS256',                               # Hash-Algorithmus für Token-Signatur
-    'SIGNING_KEY': SECRET_KEY,                          # Verwendet Django SECRET_KEY zum Signieren
-    'VERIFYING_KEY': None,                              # Für asymmetrische Algorithmen (RS256, etc.)
+    'ALGORITHM': 'HS256',                               
+    'SIGNING_KEY': SECRET_KEY,                          
+    'VERIFYING_KEY': None,                              
     
     # Token-Header
-    'AUTH_HEADER_TYPES': ('Bearer',),                   # Authorization Header Format: "Bearer <token>"
-    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',           # Header-Name für Authorization
+    'AUTH_HEADER_TYPES': ('Bearer',),                   
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',           
     
     # Benutzer-Identifikation
-    'USER_ID_FIELD': 'id',                              # User-Model-Feld für user_id Claim
-    'USER_ID_CLAIM': 'user_id',                         # JWT Claim Name für User ID
+    'USER_ID_FIELD': 'id',                             
+    'USER_ID_CLAIM': 'user_id',                         
     
     # Token-Typen
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'TOKEN_TYPE_CLAIM': 'token_type',                   # JWT Claim für Token Type
     
-    # Sliding Tokens (optional - derzeit nicht verwendet)
+    # Sliding Tokens 
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
@@ -207,7 +206,7 @@ SIMPLE_JWT = {
 
 
 # PayPal-Einstellungen 
-PAYPAL_MODE = os.environ.get("PAYPAL_MODE", "sandbox")  # "live" für Produktion
+PAYPAL_MODE = os.environ.get("PAYPAL_MODE", "sandbox")  
 PAYPAL_CLIENT_ID = os.environ.get("PAYPAL_CLIENT_ID", "")
 PAYPAL_CLIENT_SECRET = os.environ.get("PAYPAL_CLIENT_SECRET", "")
 

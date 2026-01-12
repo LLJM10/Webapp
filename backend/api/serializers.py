@@ -4,10 +4,7 @@ from .models import Pitch, Event, SavedPitch, Investment
 
 
 class PitchSerializer(serializers.ModelSerializer):
-    """
-    Pitch-Modell
-    owner ist read-only und wird automatisch im ViewSet gesetzt.
-    """
+    """Pitch-Modell"""
     owner = serializers.CharField(source='owner.username', read_only=True)
     
     img = serializers.ImageField(required=False, allow_null=True)
