@@ -13,11 +13,11 @@ class PayPalClient:
             self.base = 'https://api-m.paypal.com'
         else:
             self.base = 'https://api-m.sandbox.paypal.com'
-        # Lese Anmeldedaten aus den Settings
+        #Anmeldedaten aus Settings
         self.client_id = getattr(settings, 'PAYPAL_CLIENT_ID', '')
         self.client_secret = getattr(settings, 'PAYPAL_CLIENT_SECRET', '')
         if not self.client_id or not self.client_secret:
-            # Schnell fehlschlagen wenn Anmeldedaten fehlen
+            #fehlschlagen wenn Anmeldedaten fehlen
             raise ValueError('PayPal client credentials are not configured (PAYPAL_CLIENT_ID / PAYPAL_CLIENT_SECRET)')
 
     def _get_access_token(self):

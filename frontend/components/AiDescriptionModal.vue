@@ -81,8 +81,7 @@ const props = defineProps({
   },
   type: {
     type: String,
-    default: 'pitch', // 'pitch' oder 'event'
-    validator: (value) => ['pitch', 'event'].includes(value)
+    default: 'pitch'
   }
 });
 

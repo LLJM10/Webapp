@@ -1,16 +1,6 @@
 from django.db import models
 from django.conf import settings
 
-# Erstelle deine Modelle hier
-from django.db import models
-
-class MyModel(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-
-    def __str__(self):
-        return self.name
-
 
 class Todo(models.Model):
     title = models.CharField(max_length=200)

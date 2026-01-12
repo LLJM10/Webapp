@@ -10,12 +10,11 @@ class TodoSerializer(serializers.ModelSerializer):
 
 class PitchSerializer(serializers.ModelSerializer):
     """
-   Pitch-Modell
+    Pitch-Modell
     owner ist read-only und wird automatisch im ViewSet gesetzt.
     """
     owner = serializers.CharField(source='owner.username', read_only=True)
     
-    # FileFields explizit deklarieren für bessere Kontrolle
     img = serializers.ImageField(required=False, allow_null=True)
     pitch_deck = serializers.FileField(required=False, allow_null=True)
     business_plan = serializers.FileField(required=False, allow_null=True)
@@ -32,14 +31,14 @@ class PitchSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'owner', 'created_at', 'updated_at']
     
     def validate_img(self, value):
-        """Pitch-Bild-Datei"""
+        """Pitch-Bild """
         if value and hasattr(value, 'size'):
             if value.size > 5242880:  # 5MB
                 raise serializers.ValidationError("Bild zu groß. Maximum: 5MB")
         return value
     
     def validate_pitch_deck(self, value):
-        """Pitch-Deck-PDF-Datei"""
+        """Pitch Deck"""
         if value and not value.name.endswith('.pdf'):
             raise serializers.ValidationError("Nur PDF-Dateien erlaubt.")
         if value and value.size > 10485760:  # 10MB
@@ -47,7 +46,7 @@ class PitchSerializer(serializers.ModelSerializer):
         return value
     
     def validate_business_plan(self, value):
-        """Businessplan-PDF-Datei"""
+        """Businessplan"""
         if value and not value.name.endswith('.pdf'):
             raise serializers.ValidationError("Nur PDF-Dateien erlaubt.")
         if value and value.size > 10485760:
@@ -55,7 +54,7 @@ class PitchSerializer(serializers.ModelSerializer):
         return value
     
     def validate_financial_report(self, value):
-        """Finanzbericht-PDF-Datei"""
+        """Finanzbericht PDF"""
         if value and not value.name.endswith('.pdf'):
             raise serializers.ValidationError("Nur PDF-Dateien erlaubt.")
         if value and value.size > 10485760:

@@ -235,7 +235,7 @@ class SavedPitchViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def check_saved(self, request):
-        """Prüft ob Pitch auf Watchlist ist"""
+        """Pitch auf Watchlist?"""
         pitch_id = request.query_params.get('pitch_id')
         
         if not pitch_id:

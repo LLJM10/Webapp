@@ -29,7 +29,6 @@ class CertificateGenerator:
         self._setup_custom_styles()
     
     def _setup_custom_styles(self):        
-        # Titelstil
         self.title_style = ParagraphStyle(
             'CustomTitle',
             parent=self.styles['Heading1'],
@@ -41,7 +40,6 @@ class CertificateGenerator:
             spaceBefore=20
         )
         
-        # Untertitelstil
         self.subtitle_style = ParagraphStyle(
             'CustomSubtitle',
             parent=self.styles['Normal'],
@@ -52,7 +50,7 @@ class CertificateGenerator:
             spaceAfter=24
         )
         
-        # Textstil
+        
         self.body_style = ParagraphStyle(
             'CustomBody',
             parent=self.styles['Normal'],
@@ -63,7 +61,7 @@ class CertificateGenerator:
             spaceAfter=6
         )
         
-        #Fußzeilenstil
+        
         self.footer_style = ParagraphStyle(
             'CustomFooter',
             parent=self.styles['Normal'],
