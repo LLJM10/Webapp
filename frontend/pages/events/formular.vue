@@ -343,12 +343,12 @@ async function handleSubmitEvent() {
   formData.append('host', eventForm.value.host || '');
   formData.append('is_public', 'true');
   
-  // Bild hinzufügen (nur wenn ausgewählt)
+  // Bild hinzufügen 
   if (imageFile.value) {
     formData.append('img', imageFile.value);
   }
 
-  // PATCH (Bearbeiten)
+  
   if (isEditMode.value && apiBase && eventForm.value.id) {
     try {
       let res = await fetch(`${apiBase}/events/${eventForm.value.id}/`, {

@@ -4,7 +4,7 @@ from .models import Pitch, Event, SavedPitch, Investment
 
 
 class PitchSerializer(serializers.ModelSerializer):
-    """Pitch-Modell"""
+    """Startup-Pitch + File-Upload-Validierung"""
     owner = serializers.CharField(source='owner.username', read_only=True)
     
     img = serializers.ImageField(required=False, allow_null=True)
@@ -55,10 +55,7 @@ class PitchSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
-    """
-    Event-Modell
-    Beinhaltet Validierung für Pflichtfelder
-    """
+    """Event-Serializer + Validierung"""
     owner = serializers.CharField(source='owner.username', read_only=True)
     img = serializers.ImageField(required=False, allow_null=True)
 
@@ -102,10 +99,7 @@ class EventSerializer(serializers.ModelSerializer):
 
 
 class SavedPitchSerializer(serializers.ModelSerializer):
-    """
-    SavedPitch-Modell
-    Gibt vollständigen Pitch-Daten zusammen mit dem Speicherzeitpunkt zurück
-    """
+    """Watchlist mit Pitch-Details"""
     pitch = PitchSerializer(read_only=True)
     user = serializers.CharField(source='user.username', read_only=True)
 
@@ -116,10 +110,6 @@ class SavedPitchSerializer(serializers.ModelSerializer):
 
 
 class InvestmentSerializer(serializers.ModelSerializer):
-    """
-    Investment-Modell
-    Beinhaltet Pitch-Details und berechnete Felder
-    """
     investor = serializers.CharField(source='investor.username', read_only=True)
     pitch = PitchSerializer(read_only=True)
     pitch_id = serializers.IntegerField(write_only=True, required=False)

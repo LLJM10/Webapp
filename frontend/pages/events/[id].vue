@@ -1,12 +1,11 @@
 <template>
   <section id="page-event-detail">
-    <!-- Loading State -->
     <div v-if="!event && !error" style="text-align: center; padding: 80px 20px">
       <div style="font-size: 3rem; margin-bottom: 16px">⏳</div>
       <p class="muted">Event wird geladen...</p>
     </div>
 
-    <!-- Error State -->
+    <!-- Bei Error -->
     <div v-else-if="error" class="card" style="text-align: center; padding: 48px; margin-top: 48px">
       <h2>Event nicht gefunden</h2>
       <p class="muted" style="margin-top: 16px">
@@ -17,9 +16,8 @@
       </NuxtLink>
     </div>
 
-    <!-- Event Content -->
+    <!-- Event -->
     <div v-else-if="event">
-      <!-- Back Button -->
       <div style="margin-bottom: 24px">
         <NuxtLink to="/events" class="btn ghost" style="display:inline-flex;align-items:center;gap:8px">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -29,7 +27,7 @@
         </NuxtLink>
       </div>
 
-      <!-- Hero Section -->
+      
       <div class="hero-section">
         <img :src="event.img || 'https://picsum.photos/seed/event/1200/400'" :alt="event.name" class="hero-image" />
         <div class="hero-overlay">
@@ -43,11 +41,9 @@
         </div>
       </div>
 
-      <!-- Main Content Grid -->
+      
       <div class="detail-grid">
-        <!-- Left Column: Main Content -->
         <div class="main-content">
-          <!-- Description Card -->
           <div class="card description-card">
             <h2 style="margin-bottom: 16px">Über das Event</h2>
             <p style="font-size: 1.125rem; line-height: 1.75; color: var(--muted)">
@@ -90,16 +86,14 @@
             </div>
           </div>
 
-          <!-- Topic Section -->
           <div class="card topic-card">
             <h2 style="margin-bottom: 16px">🎯 Thema</h2>
             <p style="font-size: 1.05rem; color: var(--muted)">{{ event.topic }}</p>
           </div>
         </div>
 
-        <!-- Right Column: Sidebar -->
+        
         <aside class="sidebar">
-          <!-- CTA Card -->
           <div class="card cta-card">
             <h3 style="margin-bottom: 16px; font-size: 1.25rem">Jetzt teilnehmen!</h3>
             <p class="muted" style="margin-bottom: 20px; font-size: 0.95rem">
@@ -128,7 +122,6 @@
             </button>
           </div>
 
-          <!-- Info Card -->
           <div class="card info-card">
             <h3 style="margin-bottom: 16px; font-size: 1.1rem">Quick Info</h3>
             <div class="info-list">
@@ -321,7 +314,7 @@ function shareEvent() {
   border: 1px solid rgba(94, 234, 212, 0.3);
 }
 
-/* Grid Layout */
+
 .detail-grid {
   display: grid;
   grid-template-columns: 1fr 400px;
@@ -344,7 +337,7 @@ function shareEvent() {
   height: fit-content;
 }
 
-/* Cards */
+
 .description-card,
 .details-card,
 .topic-card,
@@ -356,7 +349,7 @@ function shareEvent() {
   border-radius: 12px;
 }
 
-/* Details Grid */
+
 .details-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -397,7 +390,7 @@ function shareEvent() {
   font-weight: 600;
 }
 
-/* Info-Liste */
+
 .info-list {
   display: flex;
   flex-direction: column;
@@ -429,13 +422,12 @@ function shareEvent() {
   text-align: right;
 }
 
-/* CTA Card */
 .cta-card {
   background: linear-gradient(135deg, rgba(94, 234, 212, 0.1) 0%, rgba(96, 165, 250, 0.1) 100%);
   border: 1px solid rgba(94, 234, 212, 0.2);
 }
 
-/* Responsive */
+
 @media (max-width: 1024px) {
   .detail-grid {
     grid-template-columns: 1fr;
