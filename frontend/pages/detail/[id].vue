@@ -77,7 +77,7 @@
                 <div class="metric-icon">💰</div>
                 <div>
                   <div class="metric-label">Funding Ziel</div>
-                  <div class="metric-value">{{ pitch.goal }}€</div>
+                  <div class="metric-value">{{ formatCurrency(parseFloat(String(pitch.goal).replace(/\D/g, '')) || 0) }}</div>
                 </div>
               </div>
               <div class="metric-item">
@@ -275,12 +275,16 @@ function openInvestmentModal() {
 
 // Hilfsfunktion zur Währungsformatierung
 function formatCurrency(value) {
+  if (!value) return '0 €';
+  // Konvertiere String zu Number falls nötig
+  const number = typeof value === 'string' ? parseFloat(value.replace(/\D/g, '')) : value;
+  if (isNaN(number)) return '0 €';
   return new Intl.NumberFormat('de-DE', { 
     style: 'currency', 
     currency: 'EUR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
-  }).format(value);
+  }).format(number);
 }
 
 function openMail() {

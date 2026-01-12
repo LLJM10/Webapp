@@ -5,7 +5,7 @@
         <strong>{{ pitch.title }}</strong>
         <div class="muted">{{ pitch.sector }} · {{ pitch.stage }}</div>
       </div>
-      <div class="tags"><div class="tag">{{ pitch.goal }}€ Ziel</div></div>
+      <div class="tags"><div class="tag">{{ formatCurrency(parseFloat(String(pitch.goal).replace(/\D/g, '')) || 0) }} Ziel</div></div>
     </div>
     <img :src="getImageUrl(pitch.img)" :alt="pitch.title">
     
@@ -15,7 +15,7 @@
         <div class="detail-icon">💰</div>
         <div class="detail-content">
           <div class="detail-label">Funding Ziel</div>
-          <div class="detail-value">{{ pitch.goal }}€</div>
+          <div class="detail-value">{{ formatCurrency(parseFloat(String(pitch.goal).replace(/\D/g, '')) || 0) }}</div>
         </div>
       </div>
       <div class="detail-box">
@@ -144,6 +144,15 @@ function handleCardClick() {
 // Vorschau-Button führt IMMER zur Detail-Ansicht (auch für Owner)
 function navigateToDetail() {
   router.push({ path: '/detail/' + props.pitch.id });
+}
+
+function formatCurrency(value) {
+  if (!value) return '0 €';
+  // Entferne alle Nicht-Ziffern und konvertiere zu Number
+  const number = Number(String(value).replace(/\D/g, ''));
+  if (isNaN(number)) return value;
+  // Formatiere mit deutschen Tausender-Trennzeichen
+  return number.toLocaleString('de-DE') + ' €';
 }
 
 function formatValuation(val) {

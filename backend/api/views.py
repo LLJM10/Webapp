@@ -12,7 +12,7 @@ import math
 from .models import Todo, Pitch, Event, SavedPitch, Investment
 from .serializers import TodoSerializer, PitchSerializer, EventSerializer, SavedPitchSerializer, InvestmentSerializer
 
-
+#Test API Call
 @api_view(["GET"])
 def hello(request):
     return Response({"message": "Hallo von Django!"})
@@ -401,13 +401,13 @@ def investor_kpis(request):
     # Durchschnittliche Investition
     avg_investment = investments.aggregate(Avg('amount'))['amount__avg'] or Decimal('0')
     
-    # Portfolio growth (simulated based on stage distribution)
+    # Portfolio wachstum (simuliert basierend auf der Phasenverteilung)
     stage_weights = {
-        'Pre-Seed': 1.15,  # 15% growth assumption
-        'Seed': 1.25,      # 25% growth
-        'Series A': 1.35,  # 35% growth
-        'Wachstum': 1.20,  # 20% growth
-        'Reife': 1.10      # 10% growth
+        'Pre-Seed': 1.15,  # 15% Wachstum
+        'Seed': 1.25,      # 25% Wachstum
+        'Series A': 1.35, 
+        'Wachstum': 1.20,  
+        'Reife': 1.10      
     }
     
     portfolio_growth = Decimal('0')
@@ -418,8 +418,8 @@ def investor_kpis(request):
             portfolio_growth += (inv.amount * growth_factor - inv.amount)
         portfolio_growth = (portfolio_growth / total_invested * 100) if total_invested > 0 else Decimal('0')
     
-    # ROI Forecast (projected return)
-    projected_return = total_invested * Decimal('1.35')  # 35% ROI assumption
+    # ROI Prognose (projizierte Rendite)
+    projected_return = total_invested * Decimal('1.35')  # 35% ROI 
     roi_forecast = Decimal('35')
     
     # Erfolgsrate
@@ -448,7 +448,7 @@ def investor_kpis(request):
         stage = inv.pitch.stage or 'Unknown'
         stage_distribution[stage] = stage_distribution.get(stage, 0) + 1
     
-    # Recent activity
+    # Letzte Aktivitäten 
     recent_investments = investments.order_by('-investment_date')[:5]
     recent_activity = []
     for inv in recent_investments:
@@ -524,16 +524,16 @@ def calculate_value_at_risk(investments):
             'riskLevel': 'Niedrig'
         }
     
-    # Berechne Portfolio-Wert
+    #Portfolio-Wert
     total_value = sum(float(inv.current_value) for inv in investments)
     
     # Risikofaktoren basierend auf Phase
     risk_factors = {
-        'Pre-Seed': 0.45,  # 45% risk
-        'Seed': 0.35,      # 35% risk
-        'Series A': 0.25,  # 25% risk
-        'Wachstum': 0.15,  # 15% risk
-        'Reife': 0.08      # 8% risk
+        'Pre-Seed': 0.45,  # 45% 
+        'Seed': 0.35,      # 35%
+        'Series A': 0.25,  
+        'Wachstum': 0.15,  
+        'Reife': 0.08      
     }
     
     # Berechne gewichtetes durchschnittliches Risiko

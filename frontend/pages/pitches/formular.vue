@@ -40,7 +40,14 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
           <div class="input-group">
             <label for="goal">Finanzierungsziel</label>
-            <input id="goal" v-model="newPitch.goal" type="text" placeholder="z.B. 500.000€" required>
+            <input 
+              id="goal" 
+              v-model="formattedGoal" 
+              type="text" 
+              placeholder="z.B. 500.000 €" 
+              @input="handleGoalInput"
+              required
+            >
           </div>
           <div class="input-group">
             <label for="equity">Anteil in %</label>
@@ -171,6 +178,25 @@ const newPitch = ref({
   img: null
 });
 
+const formattedGoal = ref('');
+
+function handleGoalInput(event) {
+  let input = event.target.value;
+  
+  // Entferne alle Nicht-Ziffern
+  let numbers = input.replace(/\D/g, '');
+  
+  // Speichere den unformatierten Wert
+  newPitch.value.goal = numbers;
+  
+  // Formatiere mit Tausender-Trennzeichen
+  if (numbers) {
+    formattedGoal.value = Number(numbers).toLocaleString('de-DE') + ' €';
+  } else {
+    formattedGoal.value = '';
+  }
+}
+
 const imageFile = ref(null);
 const imagePreview = ref(null);
 const existingImage = ref(null);
@@ -268,6 +294,12 @@ onMounted(async () => {
           const data = await res.json();
           Object.assign(newPitch.value, data);
           
+          // Formatiere das goal-Feld beim Laden
+          if (data.goal) {
+            const numbers = String(data.goal).replace(/\D/g, '');
+            formattedGoal.value = Number(numbers).toLocaleString('de-DE') + ' €';
+          }
+          
           // Existierende PDFs und Bild laden
           existingFiles.value.pitch_deck = data.pitch_deck || null;
           existingFiles.value.business_plan = data.business_plan || null;
@@ -286,7 +318,14 @@ onMounted(async () => {
       if (saved) {
         const list = JSON.parse(saved);
         const found = list.find(p => String(p.id) === String(id));
-        if (found) Object.assign(newPitch.value, found);
+        if (found) {
+          Object.assign(newPitch.value, found);
+          // Formatiere das goal-Feld beim Laden
+          if (found.goal) {
+            const numbers = String(found.goal).replace(/\D/g, '');
+            formattedGoal.value = Number(numbers).toLocaleString('de-DE') + ' €';
+          }
+        }
       }
     } catch (e) {
       console.warn('Failed to load pitch from localStorage', e);
