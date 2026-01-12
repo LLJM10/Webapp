@@ -273,7 +273,7 @@ def generate_investment_certificate(investment):
         BytesIO-Puffer mit dem PDF
     """
     
-    # Berechne Anzahl der Anteile 1 Anteil pro 100 EUR
+    # Berechne Anzahl der Anteile
     share_count = int(investment.amount / 100)
     
     # Investitionsdaten vorbereiten

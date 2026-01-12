@@ -12,13 +12,7 @@ def get_encryption_key():
 
 def encrypt_image_file(file_path):
     """
-    Verschlüsselt eine Bilddatei in-place.
-    
-    Args:
-        file_path (str): Pfad zur Datei die verschlüsselt werden soll
-    
-    Returns:
-        bool: True wenn erfolgreich, False bei Fehler
+    Verschlüsselt eine Bilddatei in-place
     """
     try:
         key = get_encryption_key()
@@ -47,15 +41,7 @@ def encrypt_image_file(file_path):
 
 def decrypt_image_file(file_path, output_path=None):
     """
-    Entschlüsselt eine verschlüsselte Bilddatei.
-    
-    Args:
-        file_path (str): Pfad zur verschlüsselten Datei
-        output_path (str, optional): Pfad für entschlüsselte Datei. 
-                                     Wenn None, wird in-place entschlüsselt.
-    
-    Returns:
-        bytes: Entschlüsselte Bilddaten oder None bei Fehler
+    Entschlüsselt eine verschlüsselte Bilddatei    
     """
     try:
         key = get_encryption_key()
