@@ -90,7 +90,7 @@
             
             <div v-if="!myPitches.length" class="empty-state">
               <div class="empty-icon">📊</div>
-              <p class="empty-text">Erstellen Sie Ihen ersten Pitch und erreichen Sie Investoren</p>
+              <p class="empty-text">Erstellen Sie Ihren ersten Pitch und erreichen Sie Investoren</p>
               <NuxtLink to="/pitches/formular" class="btn primary empty-cta">
                 Erstes Angebot anlegen
               </NuxtLink>
