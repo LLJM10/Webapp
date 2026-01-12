@@ -9,18 +9,13 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 import math
 
-from .models import Todo, Pitch, Event, SavedPitch, Investment
-from .serializers import TodoSerializer, PitchSerializer, EventSerializer, SavedPitchSerializer, InvestmentSerializer
+from .models import Pitch, Event, SavedPitch, Investment
+from .serializers import PitchSerializer, EventSerializer, SavedPitchSerializer, InvestmentSerializer
 
 #Test API Call
 @api_view(["GET"])
 def hello(request):
     return Response({"message": "Hallo von Django!"})
-
-
-class TodoViewSet(viewsets.ModelViewSet):
-    queryset = Todo.objects.all()
-    serializer_class = TodoSerializer
 
 
 class IsOwnerOrReadOnly(BasePermission):

@@ -1,11 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
-from .models import Todo, Pitch, Event, SavedPitch, Investment  
-
-class TodoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Todo
-        fields = "__all__"
+from .models import Pitch, Event, SavedPitch, Investment  
 
 
 class PitchSerializer(serializers.ModelSerializer):

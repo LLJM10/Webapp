@@ -1,10 +1,9 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import MyModel, Todo, Pitch, Event, SavedPitch, Investment
+from .models import MyModel, Pitch, Event, SavedPitch, Investment
 
 admin.site.register(MyModel)
-admin.site.register(Todo)
 admin.site.register(Pitch)
 admin.site.register(Event)
 admin.site.register(SavedPitch)
