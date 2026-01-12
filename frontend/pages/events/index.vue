@@ -3,7 +3,7 @@
     <div class="events-header">
       <div>
         <h2>Event Marktplatz</h2>
-        <p class="muted">Entdecke interessante Events aus der Community</p>
+        <p class="muted">Entdecken Sie Networking-Events und branchen-relevante Veranstaltungen</p>
       </div>
     </div>
 

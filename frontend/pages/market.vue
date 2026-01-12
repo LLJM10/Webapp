@@ -1,7 +1,7 @@
 <template>
   <div style="margin-top:28px">
   <h2>Marktplatz — Alle Pitches</h2>
-  <p class="muted">Eine Auswahl interessanter Pitches aus der Community.</p>
+  <p class="muted">Finden Sie Ihr nächstes Investment.</p>
   <div class="list">
   <PitchCard v-for="s in allPitches" :key="s.id" :pitch="s" />
   </div>

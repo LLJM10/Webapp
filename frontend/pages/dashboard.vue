@@ -426,7 +426,7 @@
                 <div class="saved-pitch-stats">
                   <div class="stat-small">
                     <span class="stat-small-label">Ziel</span>
-                    <span class="stat-small-value">{{ saved.pitch.goal }}€</span>
+                    <span class="stat-small-value">{{ formatCurrency(parseFloat(String(saved.pitch.goal).replace(/\D/g, '')) || 0) }}</span>
                   </div>
                   <div class="stat-small">
                     <span class="stat-small-label">Equity</span>
