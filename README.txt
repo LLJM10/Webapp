@@ -77,18 +77,5 @@ ENCRYPTION_KEY=generiere-einen-fernet-key
    Frontend läuft jetzt auf: http://localhost:3000
 
 
-Projektstruktur
-
-Webapp/
-├── backend/          
-│   ├── api/          
-│   ├── users/        
-│   ├── payments/     
-│   └── manage.py
-├── frontend/         
-│   ├── pages/        
-│   ├── components/   
-│   └── stores/       
-└── README.txt
 
 
