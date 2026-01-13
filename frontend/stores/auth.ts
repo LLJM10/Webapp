@@ -5,6 +5,7 @@ type TokenResponse = {
   refresh: string
 }
 
+// Pinia Store für Authentifizierung - verwaltung JWT Tokens und User-State
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     access: null as string | null,
@@ -23,7 +24,6 @@ export const useAuthStore = defineStore("auth", {
       this.access = data.access
       this.refresh = data.refresh
 
-      // Beispiel für geschützte API
       const user = await $fetch<{ message: string }>(
         `${config.public.apiBase}/api/secret/`,
         { headers: { Authorization: `Bearer ${this.access}` } }
@@ -32,6 +32,7 @@ export const useAuthStore = defineStore("auth", {
     },
 
     async logout() {
+      // Tokens und User-Daten aus Store und LocalStorage löschen
       this.access = null
       this.refresh = null
       this.user = null
