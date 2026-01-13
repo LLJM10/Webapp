@@ -15,7 +15,8 @@ Setup Anleitung
 
 
 2. Virtuelle Umgebung erstellen und aktivieren
-
+   python -m venv venv
+   
    Windows:
    source venv/Scripts/activate
    
