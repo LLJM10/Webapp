@@ -179,9 +179,11 @@ class Command(BaseCommand):
                 self.stdout.write(f'Created portfolio for {investor_user.username}')
         
         self.stdout.write(self.style.SUCCESS('\n=== Database Population Complete ==='))
-        self.stdout.write(self.style.SUCCESS('\nUser Credentials:'))
+        self.stdout.write(self.style.WARNING('\n⚠️  TEST CREDENTIALS (DO NOT USE IN PRODUCTION):'))
         self.stdout.write('  Admin: admin / admin123')
         self.stdout.write('  Investor: investor1 / investor123')
         self.stdout.write('  Regular User: user1 / user123')
-        self.stdout.write(self.style.SUCCESS(f'\nInvestor-Only Analyses: {len(investor_analyses)}'))
+        self.stdout.write(self.style.WARNING('\nThese are development/testing credentials only.'))
+        self.stdout.write(self.style.WARNING('Change all passwords before deploying to production!\n'))
+        self.stdout.write(self.style.SUCCESS(f'Investor-Only Analyses: {len(investor_analyses)}'))
         self.stdout.write(self.style.SUCCESS(f'Public Analyses: {len(public_analyses)}'))

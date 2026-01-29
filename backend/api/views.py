@@ -1,12 +1,10 @@
 from django.shortcuts import render
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.views.decorators.csrf import csrf_exempt
 from .models import UserProfile, DashboardAnalysis, InvestmentPortfolio
 from .serializers import (
-    UserProfileSerializer, 
     DashboardAnalysisSerializer, 
     InvestmentPortfolioSerializer
 )
@@ -50,7 +48,7 @@ class DashboardAnalysisViewSet(viewsets.ReadOnlyModelViewSet):
 class InvestmentPortfolioViewSet(viewsets.ModelViewSet):
     """
     ViewSet for Investment Portfolios.
-    Only accessible to investors.
+    Users can only access their own portfolios.
     """
     serializer_class = InvestmentPortfolioSerializer
     permission_classes = [IsAuthenticated]
@@ -67,7 +65,7 @@ def dashboard_view(request):
     Main dashboard endpoint that returns:
     - User profile information
     - Available analyses (filtered by role)
-    - List of investor-only analyses (for documentation)
+    - List of investor-only analyses (only for investors/admins)
     """
     user = request.user
     
@@ -75,33 +73,38 @@ def dashboard_view(request):
     try:
         profile = user.profile
         is_investor = profile.is_investor()
+        is_admin = profile.role == 'admin'
     except UserProfile.DoesNotExist:
         is_investor = False
+        is_admin = False
         profile = None
     
     # Get available analyses
-    if is_investor or (profile and profile.role == 'admin'):
+    if is_investor or is_admin:
         analyses = DashboardAnalysis.objects.filter(is_active=True)
     else:
         analyses = DashboardAnalysis.objects.filter(is_active=True, investor_only=False)
     
-    # Get all investor-only analyses for documentation
-    investor_only_analyses = DashboardAnalysis.objects.filter(
-        is_active=True, 
-        investor_only=True
-    ).values('id', 'title', 'analysis_type', 'description')
-    
-    return Response({
+    response_data = {
         'user': {
             'username': user.username,
             'is_investor': is_investor,
             'role': profile.role if profile else 'user'
         },
         'available_analyses': DashboardAnalysisSerializer(analyses, many=True).data,
-        'investor_only_analyses_info': list(investor_only_analyses),
         'total_analyses': analyses.count(),
-        'has_access_to_investor_features': is_investor
-    })
+        'has_access_to_investor_features': is_investor or is_admin
+    }
+    
+    # Only include investor-only analyses info for investors and admins
+    if is_investor or is_admin:
+        investor_only_analyses = DashboardAnalysis.objects.filter(
+            is_active=True, 
+            investor_only=True
+        ).values('id', 'title', 'analysis_type', 'description')
+        response_data['investor_only_analyses_info'] = list(investor_only_analyses)
+    
+    return Response(response_data)
 
 
 @api_view(['GET'])
@@ -109,6 +112,7 @@ def investor_analyses_list(request):
     """
     Public endpoint that lists which analyses are investor-only.
     This helps answer the question: "Which special analyses are only shown to investors?"
+    Note: This is intentionally public to provide transparency about available investor features.
     """
     investor_analyses = DashboardAnalysis.objects.filter(
         is_active=True,
